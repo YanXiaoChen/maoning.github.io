@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: true,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="理解 Linux 启动过程在我们打开 Linux 电脑的电源后第一个启动的进程就是 init。分配给 init 进程的 PID 是 1。它是系统其他所有进程的父进程。当一台 Linux 电脑启动后，处理器会先在系统存储中查找 BIOS，之后 BIOS 会检测系统资源然后找到第一个引导设备，通常为硬盘，然后会查找硬盘的主引导记录（MBR），然后加载到内存中并把控制权交给它，以后的启动过程就由 MBR">
+<meta name="keywords" content="Systemd,systemctl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux 工匠精神（一）：Systemd 命令完全指南">
+<meta property="og:url" content="http://blog.maoning.pro/archives/f22a09ab.html">
+<meta property="og:site_name" content="猫宁i">
+<meta property="og:description" content="理解 Linux 启动过程在我们打开 Linux 电脑的电源后第一个启动的进程就是 init。分配给 init 进程的 PID 是 1。它是系统其他所有进程的父进程。当一台 Linux 电脑启动后，处理器会先在系统存储中查找 BIOS，之后 BIOS 会检测系统资源然后找到第一个引导设备，通常为硬盘，然后会查找硬盘的主引导记录（MBR），然后加载到内存中并把控制权交给它，以后的启动过程就由 MBR">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.maoning.pro/images/57608263_p8.jpg">
+<meta property="og:updated_time" content="2019-11-19T11:25:27.372Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux 工匠精神（一）：Systemd 命令完全指南">
+<meta name="twitter:description" content="理解 Linux 启动过程在我们打开 Linux 电脑的电源后第一个启动的进程就是 init。分配给 init 进程的 PID 是 1。它是系统其他所有进程的父进程。当一台 Linux 电脑启动后，处理器会先在系统存储中查找 BIOS，之后 BIOS 会检测系统资源然后找到第一个引导设备，通常为硬盘，然后会查找硬盘的主引导记录（MBR），然后加载到内存中并把控制权交给它，以后的启动过程就由 MBR">
+<meta name="twitter:image" content="http://blog.maoning.pro/images/57608263_p8.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="猫宁i" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://blog.maoning.pro/archives/f22a09ab.html">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux 工匠精神（一）：Systemd 命令完全指南 | 猫宁i</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">猫宁i</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">趁着年轻，好好生活，用心折腾。</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives menu-item-active">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/books/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/f22a09ab.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux 工匠精神（一）：Systemd 命令完全指南
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-09-19 20:24:12" itemprop="dateCreated datePublished" datetime="2017-09-19T20:24:12+08:00">2017-09-19</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/archives/f22a09ab.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/archives/f22a09ab.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/archives/f22a09ab.html" class="leancloud_visitors" data-flag-title="Linux 工匠精神（一）：Systemd 命令完全指南">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">8.5k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">8 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/57608263_p8.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        <h2 id="理解-Linux-启动过程"><a href="#理解-Linux-启动过程" class="headerlink" title="理解 Linux 启动过程"></a>理解 Linux 启动过程</h2><p>在我们打开 Linux 电脑的电源后第一个启动的进程就是 init。分配给 init 进程的 PID 是 1。它是系统其他所有进程的父进程。当一台 Linux 电脑启动后，处理器会先在系统存储中查找 BIOS，之后 BIOS 会检测系统资源然后找到第一个引导设备，通常为硬盘，然后会查找硬盘的主引导记录（MBR），然后加载到内存中并把控制权交给它，以后的启动过程就由 MBR 控制。</p>
+<p>主引导记录会初始化引导程序（Linux 上有两个著名的引导程序，GRUB 和 LILO，80% 的 Linux 系统在用 GRUB 引导程序），这个时候 GRUB 或 LILO 会加载内核模块。内核会马上查找 / sbin 下的 “init” 程序并执行它。从这里开始 init 成为了 Linux 系统的父进程。init 读取的第一个文件是 / etc/inittab，通过它 init 会确定我们 Linux 操作系统的运行级别。它会从文件 / etc/fstab 里查找分区表信息然后做相应的挂载。然后 init 会启动 / etc/init.d 里指定的默认启动级别的所有服务 / 脚本。所有服务在这里通过 init 一个一个被初始化。在这个过程里，init 每次只启动一个服务，所有服务 / 守护进程都在后台执行并由 init 来管理。</p>
+<p>关机过程差不多是相反的过程，首先 init 停止所有服务，最后阶段会卸载文件系统。</p>
+<p>以上提到的启动过程有一些不足的地方：一是启动时间长。init 进程是串行启动，只有前一个进程启动完，才会启动下一个进程；二是启动脚本复杂。init 进程只是执行启动脚本，不管其他事情。脚本需要自己处理各种情况，这往往使得脚本变得很长。而用一种更好的方式来替代传统 init 的需求已经存在很长时间了。也产生了许多替代方案。其中比较著名的有 Upstart，Epoch，Muda 和 Systemd。而 Systemd 获得最多关注并被认为是目前最佳的方案。</p>
+<a id="more"></a>
+<h2 id="Systemd-概述"><a href="#Systemd-概述" class="headerlink" title="Systemd 概述"></a>Systemd 概述</h2><p>Systemd 就是为了解决这些问题而诞生的。它的设计目标是，为系统的启动和管理提供一套完整的解决方案。根据 Linux 惯例，字母 d 是守护进程（daemon）的缩写。Systemd 这个名字的含义，就是它要守护整个系统。</p>
+<p>使用了 Systemd，就不需要再用 init 了。Systemd 取代了 initd，成为系统的第一个进程（PID 等于 1），其他进程都是它的子进程。</p>
+<p>Systemctl 是一个 systemd 工具，主要负责控制 systemd 系统和服务管理器。systemctl 命令有两大类功能：一是控制 systemd 系统；二是管理系统上运行的服务。</p>
+<p><img src="/media/15435615947106/bg2016030703.png" alt="bg2016030703"></p>
+<h2 id="Systemd-初体验"><a href="#Systemd-初体验" class="headerlink" title="Systemd 初体验"></a>Systemd 初体验</h2><p>Systemd 并不是一个命令，而是一组命令，涉及到系统管理的方方面面。</p>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 检查 systemd 安装的版本</span><br><span class="line"><span class="meta"># systemctl --version</span></span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> 检查 systemd 和 systemctl 的二进制文件和库文件的安装位置</span><br><span class="line"><span class="meta"># whereis systemd </span></span><br><span class="line"><span class="meta"># whereis systemctl</span></span><br><span class="line"></span><br><span class="line"><span class="number">3.</span> 检查 systemd 是否运行[systemd 是作为父进程（PID=<span class="number">1</span>）运行的。在上面带（-e）参数的 ps 命令输出中，选择所有进程，（-a）选择除会话前导外的所有进程，并使用（-f）参数输出完整格式列表（即 -eaf）]</span><br><span class="line"><span class="meta"># ps -eaf | grep [s]ystemd</span></span><br></pre></td></tr></table></figure>
+<h3 id="systemctl"><a href="#systemctl" class="headerlink" title="systemctl"></a>systemctl</h3><p>systemctl 是 Systemd 的主命令，用于管理系统。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 重启系统</span></span><br><span class="line">$ sudo systemctl reboot</span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭系统，切断电源</span></span><br><span class="line">$ sudo systemctl poweroff</span><br><span class="line"></span><br><span class="line"><span class="comment"># CPU 停止工作</span></span><br><span class="line">$ sudo systemctl halt</span><br><span class="line"></span><br><span class="line"><span class="comment"># 暂停系统</span></span><br><span class="line">$ sudo systemctl suspend</span><br><span class="line"></span><br><span class="line"><span class="comment"># 让系统进入冬眠状态</span></span><br><span class="line">$ sudo systemctl hibernate</span><br><span class="line"></span><br><span class="line"><span class="comment"># 让系统进入交互式休眠状态</span></span><br><span class="line">$ sudo systemctl hybrid-sleep</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动进入救援状态（单用户状态）</span></span><br><span class="line">$ sudo systemctl <span class="keyword">rescue</span></span><br></pre></td></tr></table></figure>
+<h3 id="systemd-analyze"><a href="#systemd-analyze" class="headerlink" title="systemd-analyze"></a>systemd-analyze</h3><p>systemd-analyze 命令用于查看启动耗时。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看启动耗时</span></span><br><span class="line">$ systemd-<span class="keyword">analyze</span>                                                                                       </span><br><span class="line"><span class="comment"># 查看每个服务的启动耗时</span></span><br><span class="line">$ systemd-<span class="keyword">analyze</span> blame</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示瀑布状的启动过程流</span></span><br><span class="line">$ systemd-<span class="keyword">analyze</span> <span class="keyword">critical</span>-<span class="keyword">chain</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示指定服务的启动流</span></span><br><span class="line">$ systemd-<span class="keyword">analyze</span> <span class="keyword">critical</span>-<span class="keyword">chain</span> atd.service</span><br></pre></td></tr></table></figure>
+<h3 id="hostnamectl"><a href="#hostnamectl" class="headerlink" title="hostnamectl"></a>hostnamectl</h3><p>hostnamectl 命令用于查看当前主机的信息。</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 显示当前主机的信息</span></span><br><span class="line">$ <span class="string">hostnamectl</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">#</span> 设置主机名</span><br><span class="line">$ <span class="string">sudo </span><span class="string">hostnamectl </span><span class="built_in">set-hostname</span> <span class="string">rhel7</span></span><br></pre></td></tr></table></figure>
+<h3 id="localectl"><a href="#localectl" class="headerlink" title="localectl"></a>localectl</h3><p>localectl 命令用于查看本地化设置。</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看本地化设置</span></span><br><span class="line">$ <span class="string">localectl</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">#</span> 设置本地化参数</span><br><span class="line">$ <span class="string">sudo </span><span class="string">localectl </span><span class="built_in">set-locale</span> <span class="string">LANG=</span><span class="string">en_GB.</span><span class="string">utf8</span></span><br><span class="line"><span class="string">$</span> <span class="string">sudo </span><span class="string">localectl </span><span class="built_in">set-keymap</span> <span class="string">en_GB</span></span><br></pre></td></tr></table></figure>
+<h3 id="timedatectl"><a href="#timedatectl" class="headerlink" title="timedatectl"></a>timedatectl</h3><p>timedatectl 命令用于查看当前时区设置。</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看当前时区设置</span></span><br><span class="line">$ <span class="string">timedatectl</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">#</span> 显示所有可用的时区</span><br><span class="line">$ <span class="string">timedatectl </span><span class="built_in">list-timezones</span>                                                                                   </span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置当前时区</span></span><br><span class="line">$ <span class="string">sudo </span><span class="string">timedatectl </span><span class="built_in">set-timezone</span> <span class="string">America/</span><span class="string">New_York</span></span><br><span class="line"><span class="string">$</span> <span class="string">sudo </span><span class="string">timedatectl </span><span class="built_in">set-time</span> <span class="string">YYYY-MM-</span><span class="string">DD</span></span><br><span class="line"><span class="string">$</span> <span class="string">sudo </span><span class="string">timedatectl </span><span class="built_in">set-time</span> <span class="string">HH:MM:</span><span class="string">SS</span></span><br></pre></td></tr></table></figure>
+<h3 id="loginctl"><a href="#loginctl" class="headerlink" title="loginctl"></a>loginctl</h3><p>loginctl 命令用于查看当前登录的用户。</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列出当前 session</span></span><br><span class="line">$ <span class="string">loginctl </span><span class="built_in">list-sessions</span></span><br><span class="line"><span class="built_in"></span></span><br><span class="line"><span class="built_in">#</span> 列出当前登录用户</span><br><span class="line">$ <span class="string">loginctl </span><span class="built_in">list-users</span></span><br><span class="line"><span class="built_in"></span></span><br><span class="line"><span class="built_in">#</span> 列出显示指定用户的信息</span><br><span class="line">$ <span class="string">loginctl </span><span class="string">show-user </span><span class="string">ruanyf</span></span><br></pre></td></tr></table></figure>
+<h2 id="Unit"><a href="#Unit" class="headerlink" title="Unit"></a>Unit</h2><h3 id="含义"><a href="#含义" class="headerlink" title="含义"></a>含义</h3><p>Systemd 可以管理所有系统资源。不同的资源统称为 Unit（单位）。Unit 一共分成 12 种。</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Service <span class="keyword">unit</span>：系统服务</span><br><span class="line"><span class="keyword">Target</span> <span class="keyword">unit</span>：多个 <span class="keyword">Unit</span> 构成的一个组</span><br><span class="line">Device <span class="keyword">Unit</span>：硬件设备</span><br><span class="line">Mount <span class="keyword">Unit</span>：文件系统的挂载点</span><br><span class="line">Automount <span class="keyword">Unit</span>：自动挂载点</span><br><span class="line">Path <span class="keyword">Unit</span>：文件或路径</span><br><span class="line">Scope <span class="keyword">Unit</span>：不是由 Systemd 启动的外部进程</span><br><span class="line">Slice <span class="keyword">Unit</span>：进程组</span><br><span class="line">Snapshot <span class="keyword">Unit</span>：Systemd 快照，可以切回某个快照</span><br><span class="line">Socket <span class="keyword">Unit</span>：进程间通信的 socket</span><br><span class="line">Swap <span class="keyword">Unit</span>：swap 文件</span><br><span class="line">Timer <span class="keyword">Unit</span>：定时器</span><br></pre></td></tr></table></figure>
+<p>systemctl list-units 命令可以查看当前系统的所有 Unit。</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列出正在运行的 Unit</span></span><br><span class="line">$ <span class="string">systemctl </span><span class="built_in">list-units</span></span><br><span class="line"><span class="built_in"></span></span><br><span class="line"><span class="built_in">#</span> 列出所有 <span class="string">Unit，</span>包括没有找到配置文件的或者启动失败的</span><br><span class="line">$ <span class="string">systemctl </span><span class="built_in">list-units</span> <span class="built_in">--all</span></span><br><span class="line"><span class="built_in"></span></span><br><span class="line"><span class="built_in">#</span> 列出所有没有运行的 <span class="string">Unit</span></span><br><span class="line"><span class="string">$</span> <span class="string">systemctl </span><span class="built_in">list-units</span> <span class="built_in">--all</span> <span class="built_in">--state=inactive</span></span><br><span class="line"><span class="built_in"></span></span><br><span class="line"><span class="built_in">#</span> 列出所有加载失败的 <span class="string">Unit</span></span><br><span class="line"><span class="string">$</span> <span class="string">systemctl </span><span class="built_in">list-units</span> <span class="built_in">--failed</span></span><br><span class="line"><span class="built_in"></span></span><br><span class="line"><span class="built_in">#</span> 列出所有正在运行的、类型为 <span class="string">service </span>的 <span class="string">Unit</span></span><br><span class="line"><span class="string">$</span> <span class="string">systemctl </span><span class="built_in">list-units</span> <span class="built_in">--type=service</span></span><br></pre></td></tr></table></figure>
+<h3 id="Unit-的状态"><a href="#Unit-的状态" class="headerlink" title="Unit 的状态"></a>Unit 的状态</h3><p>systemctl status 命令用于查看系统状态和单个 Unit 的状态。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 显示系统状态</span></span><br><span class="line"><span class="variable">$ </span>systemctl status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示单个 Unit 的状态</span></span><br><span class="line"><span class="variable">$ </span>sysystemctl status bluetooth.service</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示远程主机的某个 Unit 的状态</span></span><br><span class="line"><span class="variable">$ </span>systemctl -H root<span class="variable">@rhel7</span>.example.com status httpd.service</span><br></pre></td></tr></table></figure>
+<p>除了 status 命令，systemctl 还提供了三个查询状态的简单方法，主要供脚本内部的判断语句使用。</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 显示某个 Unit 是否正在运行</span></span><br><span class="line">$ systemctl <span class="keyword">is</span>-active <span class="built_in">application</span>.service</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示某个 Unit 是否处于启动失败状态</span></span><br><span class="line">$ systemctl <span class="keyword">is</span>-failed <span class="built_in">application</span>.service</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示某个 Unit 服务是否建立了启动链接</span></span><br><span class="line">$ systemctl <span class="keyword">is</span>-enabled <span class="built_in">application</span>.service</span><br></pre></td></tr></table></figure>
+<h3 id="Unit-管理"><a href="#Unit-管理" class="headerlink" title="Unit 管理"></a>Unit 管理</h3><p>对于用户来说，最常用的是下面这些命令，用于启动和停止 Unit（主要是 service）。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 立即启动一个服务</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl start apache.service</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 立即停止一个服务</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl stop apache.service</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启一个服务</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl restart apache.service</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 杀死一个服务的所有子进程</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl <span class="built_in">kill</span> apache.service</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 重新加载一个服务的配置文件</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl reload apache.service</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 重载所有修改过的配置文件</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl daemon-reload</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示某个 Unit 的所有底层参数</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> systemctl show httpd.service</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示某个 Unit 的指定属性的值</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> systemctl show -p CPUShares httpd.service</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置某个 Unit 的指定属性</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl <span class="built_in">set</span>-property httpd.service CPUShares=500</span></span><br></pre></td></tr></table></figure>
+<h3 id="依赖关系"><a href="#依赖关系" class="headerlink" title="依赖关系"></a>依赖关系</h3><p>Unit 之间存在依赖关系：A 依赖于 B，就意味着 Systemd 在启动 A 的时候，同时会去启动 B。</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># systemctl list-dependencies 命令列出一个 Unit 的所有依赖。</span></span><br><span class="line">$ <span class="string">systemctl </span><span class="built_in">list-dependencies</span> <span class="string">nginx.</span><span class="string">service</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">#</span> 上面命令的输出结果之中，有些依赖是 <span class="string">Target </span>类型（详见下文），默认不会展开显示。如果要展开 <span class="string">Target，</span>就需要使用 <span class="built_in">--all</span> 参数。</span><br><span class="line">$ <span class="string">systemctl </span><span class="built_in">list-dependencies</span> <span class="built_in">--all</span> <span class="string">nginx.</span><span class="string">service</span></span><br></pre></td></tr></table></figure>
+<h2 id="Unit-的配置文件"><a href="#Unit-的配置文件" class="headerlink" title="Unit 的配置文件"></a>Unit 的配置文件</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>每一个 Unit 都有一个配置文件，告诉 Systemd 怎么启动这个 Unit。</p>
+<p>Systemd 默认从目录 / etc/systemd/system / 读取配置文件。但是，里面存放的大部分文件都是符号链接，指向目录 / usr/lib/systemd/system/，真正的配置文件存放在那个目录。</p>
+<p>systemctl enable 命令用于在上面两个目录之间，建立符号链接关系。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>sudo systemctl enable clamd<span class="variable">@scan</span>.service</span><br><span class="line"><span class="comment"># 等同于</span></span><br><span class="line"><span class="variable">$ </span>sudo ln -s <span class="string">'/usr/lib/systemd/system/clamd@scan.service'</span> <span class="string">'/etc/systemd/system/multi-user.target.wants/clamd@scan.service'</span></span><br></pre></td></tr></table></figure>
+<p>如果配置文件里面设置了开机启动，systemctl enable 命令相当于激活开机启动。</p>
+<p>与之对应的，systemctl disable 命令用于在两个目录之间，撤销符号链接关系，相当于撤销开机启动。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>sudo systemctl disable clamd<span class="variable">@scan</span>.service</span><br></pre></td></tr></table></figure>
+<p>配置文件的后缀名，就是该 Unit 的种类，比如 sshd.socket。如果省略，Systemd 默认后缀名为. service，所以 sshd 会被理解成 sshd.service。</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 在开机时启用一个服务</span><br><span class="line">$ <span class="string">sudo </span><span class="string">systemctl </span><span class="string">enable </span><span class="string">firewalld.</span><span class="string">service</span></span><br><span class="line"><span class="string">/</span>/ 在开机时禁用一个服务</span><br><span class="line">$ <span class="string">sudo </span><span class="string">systemctl </span><span class="string">disable </span><span class="string">firewalld.</span><span class="string">service</span></span><br><span class="line"><span class="string">/</span>/ 查看服务是否开机启动</span><br><span class="line">$ <span class="string">sudo </span><span class="string">systemctl </span><span class="string">is-enabled </span><span class="string">firewalld.</span><span class="string">service</span></span><br><span class="line"><span class="string">/</span>/ 查看开机启动的服务列表</span><br><span class="line">$ <span class="string">sudo </span><span class="string">systemctl </span><span class="built_in">list-unit-files|grep</span> <span class="string">enabled</span></span><br></pre></td></tr></table></figure>
+<h3 id="配置文件的状态"><a href="#配置文件的状态" class="headerlink" title="配置文件的状态"></a>配置文件的状态</h3><p>systemctl list-unit-files 命令用于列出所有配置文件。</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列出所有配置文件</span></span><br><span class="line">$ <span class="string">systemctl </span><span class="built_in">list-unit-files</span></span><br><span class="line"><span class="built_in"></span></span><br><span class="line"><span class="built_in">#</span> 列出指定类型的配置文件</span><br><span class="line">$ <span class="string">systemctl </span><span class="built_in">list-unit-files</span> <span class="built_in">--type=service</span></span><br><span class="line"><span class="built_in"></span></span><br><span class="line"><span class="built_in">#</span> 列出已建立启动链接的配置文件</span><br><span class="line">$ <span class="string">sudo </span><span class="string">systemctl </span><span class="built_in">list-unit-files|grep</span> <span class="string">enabled</span></span><br></pre></td></tr></table></figure>
+<p>这个列表显示每个配置文件的状态，一共有四种。</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">enabled：已建立启动链接</span><br><span class="line">disabled：没建立启动链接</span><br><span class="line">static：该配置文件没有 <span class="selector-attr">[Install]</span> 部分（无法执行），只能作为其他配置文件的依赖</span><br><span class="line">masked：该配置文件被禁止建立启动链接</span><br></pre></td></tr></table></figure>
+<p>一旦修改配置文件，就要让 SystemD 重新加载配置文件，然后重新启动，否则修改不会生效。</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>sudo systemctl daemon-reload</span><br><span class="line"><span class="variable">$ </span>sudo systemctl restart httpd.service</span><br></pre></td></tr></table></figure>
+<h3 id="配置文件的格式"><a href="#配置文件的格式" class="headerlink" title="配置文件的格式"></a>配置文件的格式</h3><p>配置文件就是普通的文本文件，可以用文本编辑器打开。</p>
+<p>systemctl cat 命令可以查看配置文件的内容。</p>
+<p>[Unit]区块通常是配置文件的第一个区块，用来定义 Unit 的元数据，以及配置与其他 Unit 的关系。它的主要字段如下。</p>
+<figure class="highlight irpf90"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Description：简短描述</span><br><span class="line">Documentation：文档地址</span><br><span class="line">Requires：当前 <span class="keyword">Unit</span> 依赖的其他 <span class="keyword">Unit</span>，如果它们没有运行，当前 <span class="keyword">Unit</span> 会启动失败</span><br><span class="line">Wants：与当前 <span class="keyword">Unit</span> 配合的其他 <span class="keyword">Unit</span>，如果它们没有运行，当前 <span class="keyword">Unit</span> 不会启动失败</span><br><span class="line">BindsTo：与 Requires 类似，它指定的 <span class="keyword">Unit</span> 如果退出，会导致当前 <span class="keyword">Unit</span> 停止运行</span><br><span class="line">Before：如果该字段指定的 <span class="keyword">Unit</span> 也要启动，那么必须在当前 <span class="keyword">Unit</span> 之后启动</span><br><span class="line">After：如果该字段指定的 <span class="keyword">Unit</span> 也要启动，那么必须在当前 <span class="keyword">Unit</span> 之前启动</span><br><span class="line">Conflicts：这里指定的 <span class="keyword">Unit</span> 不能与当前 <span class="keyword">Unit</span> 同时运行</span><br><span class="line">Condition...：当前 <span class="keyword">Unit</span> 运行必须满足的条件，否则不会运行</span><br><span class="line"><span class="keyword">Assert</span>...：当前 <span class="keyword">Unit</span> 运行必须满足的条件，否则会报启动失败</span><br></pre></td></tr></table></figure>
+<p>[Install]通常是配置文件的最后一个区块，用来定义如何启动，以及是否开机启动。它的主要字段如下。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">WantedBy：它的值是一个或多个 Target，当前 Unit 激活时（enable）符号链接会放入 / etc/systemd<span class="built_in">/system </span>目录下面以 Target 名 + .wants 后缀构成的子目录中[Target 的含义是服务组，表示一组服务。<span class="attribute">WantedBy</span>=multi-user.target 指的是，sshd 所在的 Target 是 multi-user.target。]</span><br><span class="line">RequiredBy：它的值是一个或多个 Target，当前 Unit 激活时，符号链接会放入 / etc/systemd<span class="built_in">/system </span>目录下面以 Target 名 + .required 后缀构成的子目录中</span><br><span class="line">Alias：当前 Unit 可用于启动的别名</span><br><span class="line">Also：当前 Unit 激活（enable）时，会被同时激活的其他 Unit</span><br></pre></td></tr></table></figure>
+<p>[Service]区块用来 Service 的配置，只有 Service 类型的 Unit 才有这个区块。它的主要字段如下。</p>
+<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Type</span>：定义启动时的进程行为。它有以下几种值。</span><br><span class="line"><span class="keyword">Type</span>=simple：默认值，执行 ExecStart 指定的命令，启动主进程</span><br><span class="line"><span class="keyword">Type</span>=forking：以 fork 方式从父进程创建子进程，创建后父进程会立即退出</span><br><span class="line"><span class="keyword">Type</span>=oneshot：一次性进程，Systemd 会等当前服务退出，再继续往下执行</span><br><span class="line"><span class="keyword">Type</span>=dbus：当前服务通过 D-<span class="keyword">Bus</span> 启动</span><br><span class="line"><span class="keyword">Type</span>=notify：当前服务启动完毕，会通知 Systemd，再继续往下执行</span><br><span class="line"><span class="keyword">Type</span>=idle：若有其他任务执行完毕，当前服务才会运行</span><br><span class="line">ExecStart：启动当前服务的命令</span><br><span class="line">ExecStartPre：启动当前服务之前执行的命令</span><br><span class="line">ExecStartPost：启动当前服务之后执行的命令</span><br><span class="line">ExecReload：重启当前服务时执行的命令</span><br><span class="line">ExecStop：停止当前服务时执行的命令</span><br><span class="line">ExecStopPost：停止当其服务之后执行的命令</span><br><span class="line">RestartSec：自动重启当前服务间隔的秒数</span><br><span class="line">Restart：定义何种情况 Systemd 会自动重启当前服务，可能的值包括 always（总是重启）、<span class="keyword">on</span>-success、<span class="keyword">on</span>-<span class="literal">failure</span>、<span class="keyword">on</span>-abnormal、<span class="keyword">on</span>-abort、<span class="keyword">on</span>-watchdog</span><br><span class="line">TimeoutSec：定义 Systemd 停止当前服务之前等待的秒数</span><br><span class="line">Environment：指定环境变量</span><br></pre></td></tr></table></figure>
+<h2 id="Systemd-实战"><a href="#Systemd-实战" class="headerlink" title="Systemd 实战"></a>Systemd 实战</h2><h3 id="关闭防火墙-firewall"><a href="#关闭防火墙-firewall" class="headerlink" title="关闭防火墙 firewall"></a>关闭防火墙 firewall</h3><p>Centos7.x 中取消了 iptables, 用 firewall 取而代之。要关闭防火墙并禁止开机启动服务使用下面的命令:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> systemctl stop firewalld.service</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> systemctl <span class="built_in">disable</span> firewalld.service</span></span><br></pre></td></tr></table></figure>
+<h3 id="CentOS7-利用-systemctl-添加自定义系统服务"><a href="#CentOS7-利用-systemctl-添加自定义系统服务" class="headerlink" title="CentOS7 利用 systemctl 添加自定义系统服务"></a>CentOS7 利用 systemctl 添加自定义系统服务</h3><ol>
+<li>实例：服务用于开机运行 tomcat 项目:</li>
+</ol>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#vim /usr/lib/systemd/system/tomcat.service</span></span><br><span class="line"> </span><br><span class="line"><span class="section">[Unit]</span></span><br><span class="line"><span class="attr">Description</span>=java tomcat project</span><br><span class="line"><span class="attr">After</span>=tomcat.service</span><br><span class="line">  </span><br><span class="line"><span class="section">[Service]</span></span><br><span class="line"><span class="attr">Type</span>=forking</span><br><span class="line"><span class="attr">User</span>=users</span><br><span class="line"><span class="attr">Group</span>=users</span><br><span class="line"><span class="attr">PIDFile</span>=/usr/local/tomcat/tomcat.pid</span><br><span class="line"><span class="attr">ExecStart</span>=/usr/local/tomcat/bin/startup.sh</span><br><span class="line"><span class="attr">ExecReload</span>=</span><br><span class="line"><span class="attr">ExecStop</span>=/usr/local/tomcat/bin/shutdown.sh</span><br><span class="line"><span class="attr">PrivateTmp</span>=<span class="literal">true</span></span><br><span class="line">  </span><br><span class="line"><span class="section">[Install]</span></span><br><span class="line"><span class="attr">WantedBy</span>=multi-user.target</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>添加可执行权限：</li>
+</ol>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ chmod <span class="number">754</span> /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">systemd</span>/<span class="title">system</span>/<span class="title">tomcat</span>.<span class="title">service</span></span></span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>设置为开机自启动：</li>
+</ol>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl <span class="builtin-name">enable</span> tomcat.service</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html" target="_blank" rel="noopener">Systemd 入门教程：命令篇</a><br>[2]. <a href="http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-part-two.html" target="_blank" rel="noopener">Systemd 入门教程：实战篇</a><br>[3]. <a href="https://linux.cn/article-5926-1.html" target="_blank" rel="noopener">systemctl 命令完全指南</a></p>
+<hr>
+<h2 id="Linux-工匠精神系列"><a href="#Linux-工匠精神系列" class="headerlink" title="Linux 工匠精神系列"></a>Linux 工匠精神系列</h2><ul>
+<li><a href="f22a09ab.html">Linux 工匠精神（一）：Systemd 命令完全指南</a></li>
+<li><a href="275d83e6.html">Linux 工匠精神（二）：理解 Linux 的处理器负载均值</a></li>
+</ul>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>谢谢你长得那么好看，还打赏我！😘</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.jpg" alt="猫宁i 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.jpg" alt="猫宁i 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>猫宁i</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://blog.maoning.pro/archives/f22a09ab.html" title="Linux 工匠精神（一）：Systemd 命令完全指南">http://blog.maoning.pro/archives/f22a09ab.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Systemd/" rel="tag"># Systemd</a>
+          
+            <a href="/tags/systemctl/" rel="tag"># systemctl</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/3b38de0f.html" rel="next" title="论编码重要性（一）：你所不了解的字符编码">
+                <i class="fa fa-chevron-left"></i> 论编码重要性（一）：你所不了解的字符编码
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/archives/b9ada66e.html" rel="prev" title="初识 Nginx（一）：理解原理和功能">
+                初识 Nginx（一）：理解原理和功能 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="猫宁i">
+            
+              <p class="site-author-name" itemprop="name">猫宁i</p>
+              <div class="site-description motion-element" itemprop="description">趁着年轻，好好生活，用心折腾。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">81</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://morning-pro.github.io/" title="https://morning-pro.github.io/" rel="noopener" target="_blank">我的镜像站</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://crossoverjie.top/" title="https://crossoverjie.top/" rel="noopener" target="_blank">crossoverJie's Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://fangjian0423.github.io/" title="http://fangjian0423.github.io/" rel="noopener" target="_blank">Format's Notes</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#理解-Linux-启动过程"><span class="nav-number">1.</span> <span class="nav-text">理解 Linux 启动过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Systemd-概述"><span class="nav-number">2.</span> <span class="nav-text">Systemd 概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Systemd-初体验"><span class="nav-number">3.</span> <span class="nav-text">Systemd 初体验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#systemctl"><span class="nav-number">3.1.</span> <span class="nav-text">systemctl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#systemd-analyze"><span class="nav-number">3.2.</span> <span class="nav-text">systemd-analyze</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hostnamectl"><span class="nav-number">3.3.</span> <span class="nav-text">hostnamectl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#localectl"><span class="nav-number">3.4.</span> <span class="nav-text">localectl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#timedatectl"><span class="nav-number">3.5.</span> <span class="nav-text">timedatectl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#loginctl"><span class="nav-number">3.6.</span> <span class="nav-text">loginctl</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Unit"><span class="nav-number">4.</span> <span class="nav-text">Unit</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#含义"><span class="nav-number">4.1.</span> <span class="nav-text">含义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Unit-的状态"><span class="nav-number">4.2.</span> <span class="nav-text">Unit 的状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Unit-管理"><span class="nav-number">4.3.</span> <span class="nav-text">Unit 管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖关系"><span class="nav-number">4.4.</span> <span class="nav-text">依赖关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Unit-的配置文件"><span class="nav-number">5.</span> <span class="nav-text">Unit 的配置文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">5.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置文件的状态"><span class="nav-number">5.2.</span> <span class="nav-text">配置文件的状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置文件的格式"><span class="nav-number">5.3.</span> <span class="nav-text">配置文件的格式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Systemd-实战"><span class="nav-number">6.</span> <span class="nav-text">Systemd 实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#关闭防火墙-firewall"><span class="nav-number">6.1.</span> <span class="nav-text">关闭防火墙 firewall</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CentOS7-利用-systemctl-添加自定义系统服务"><span class="nav-number">6.2.</span> <span class="nav-text">CentOS7 利用 systemctl 添加自定义系统服务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">7.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-工匠精神系列"><span class="nav-number">8.</span> <span class="nav-text">Linux 工匠精神系列</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-paper-plane"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">猫宁i</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">博客全站字数：</span>
+    
+    <span title="博客全站字数">447k</span>
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+  
+  <script color="0,0,0" opacity="0.3" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+  
+
+<script src="//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: '2saqKR15nDJaNg0KgkpiEIIB-gzGzoHsz',
+    appKey: 'NBf24H2IPzFCX7DjwNXFpDbH',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"react":{"opacity":0.7},"log":false,"tagMode":false});</script></body>
+</html>

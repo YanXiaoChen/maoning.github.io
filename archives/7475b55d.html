@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: true,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言在互联网和大数据的背景下，越来越多的网站、应用系统需要支撑海量数据存储、高并发请求、高可用、高可扩展性等特性要求。传统的关系型数据库 RDBMS 已经难以应对类似的需求，各种各样的 NoSQL（Not Only SQL）数据库凭借易扩展、大数据量和高性能以及灵活的数据模型成功的在数据库领域站稳了脚跟。本文将分析传统数据库的存在的问题，以及几类 NoSQL 如何解决这些问题。在不同的业务场景下，">
+<meta name="keywords" content="NoSQL,RDB,ACID">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一网打尽 NoSQL：当下 NoSQL 类型、适用场景及使用公司">
+<meta property="og:url" content="http://blog.maoning.pro/archives/7475b55d.html">
+<meta property="og:site_name" content="猫宁i">
+<meta property="og:description" content="前言在互联网和大数据的背景下，越来越多的网站、应用系统需要支撑海量数据存储、高并发请求、高可用、高可扩展性等特性要求。传统的关系型数据库 RDBMS 已经难以应对类似的需求，各种各样的 NoSQL（Not Only SQL）数据库凭借易扩展、大数据量和高性能以及灵活的数据模型成功的在数据库领域站稳了脚跟。本文将分析传统数据库的存在的问题，以及几类 NoSQL 如何解决这些问题。在不同的业务场景下，">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.maoning.pro/images/58916425_p0.jpg">
+<meta property="og:updated_time" content="2019-07-26T09:19:57.434Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一网打尽 NoSQL：当下 NoSQL 类型、适用场景及使用公司">
+<meta name="twitter:description" content="前言在互联网和大数据的背景下，越来越多的网站、应用系统需要支撑海量数据存储、高并发请求、高可用、高可扩展性等特性要求。传统的关系型数据库 RDBMS 已经难以应对类似的需求，各种各样的 NoSQL（Not Only SQL）数据库凭借易扩展、大数据量和高性能以及灵活的数据模型成功的在数据库领域站稳了脚跟。本文将分析传统数据库的存在的问题，以及几类 NoSQL 如何解决这些问题。在不同的业务场景下，">
+<meta name="twitter:image" content="http://blog.maoning.pro/images/58916425_p0.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="猫宁i" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://blog.maoning.pro/archives/7475b55d.html">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一网打尽 NoSQL：当下 NoSQL 类型、适用场景及使用公司 | 猫宁i</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">猫宁i</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">趁着年轻，好好生活，用心折腾。</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives menu-item-active">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/books/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/7475b55d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一网打尽 NoSQL：当下 NoSQL 类型、适用场景及使用公司
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-19 18:45:12" itemprop="dateCreated datePublished" datetime="2018-07-19T18:45:12+08:00">2018-07-19</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/NoSQL/" itemprop="url" rel="index"><span itemprop="name">NoSQL</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/archives/7475b55d.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/archives/7475b55d.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/archives/7475b55d.html" class="leancloud_visitors" data-flag-title="一网打尽 NoSQL：当下 NoSQL 类型、适用场景及使用公司">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">6.6k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">6 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/58916425_p0.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在互联网和大数据的背景下，越来越多的网站、应用系统需要支撑海量数据存储、高并发请求、高可用、高可扩展性等特性要求。传统的关系型数据库 RDBMS 已经难以应对类似的需求，各种各样的 NoSQL（Not Only SQL）数据库凭借易扩展、大数据量和高性能以及灵活的数据模型成功的在数据库领域站稳了脚跟。本文将分析传统数据库的存在的问题，以及几类 NoSQL 如何解决这些问题。在不同的业务场景下，作出正确的数据存储技术选型。</p>
+<a id="more"></a>
+<h2 id="传统数据库缺点"><a href="#传统数据库缺点" class="headerlink" title="传统数据库缺点"></a>传统数据库缺点</h2><table>
+<thead>
+<tr>
+<th>缺点</th>
+<th>解释说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>大数据场景下 I/O 较高</td>
+<td>因为数据是按行存储，即使只针对其中某一列进行运算，关系型数据库也会对整行数据进行扫描，从存储设备中读入内存，导致 I/O 较高</td>
+</tr>
+<tr>
+<td>结构化存储不够灵活</td>
+<td>存储的是行记录，无法存储灵活的数据结构</td>
+</tr>
+<tr>
+<td>表结构 schema 扩展不方便</td>
+<td>如要需要修改表结构，需要执行执行 DDL（data definition language）语句修改，修改期间会导致锁表，部分服务不可用。</td>
+</tr>
+<tr>
+<td>全文搜索功能较弱</td>
+<td>关系型数据库只能够进行子字符串的匹配查询，当表的数据逐渐变大的时候，即使在有索引的情况下，like 扫表查询的匹配会非常慢</td>
+</tr>
+<tr>
+<td>难以存储和处理复杂关系型数据</td>
+<td>传统的关系数据库，并不擅长处理数据点之间的关系</td>
+</tr>
+</tbody>
+</table>
+<h2 id="NoSQL-简介"><a href="#NoSQL-简介" class="headerlink" title="NoSQL 简介"></a>NoSQL 简介</h2><p>NoSQL，指的是非关系型的数据库，可以理解为关系型数据库的一个有力补充。NoSQL 有时也称作 Not Only SQL 的缩写，是对不同于传统的关系型数据库的数据库管理系统的统称，它具有非关系型、分布式、不提供 ACID 的数据库设计模式等特征。</p>
+<p>NoSQL 用于超大规模数据的存储（例如谷歌或 Facebook 每天为他们的用户收集万亿比特的数据）。这些类型的数据存储不需要固定的模式，无需多余操作就可以横向扩展。</p>
+<p>NoSQL 在许多方面性能大大优于非关系型数据库的同时，往往也伴随一些特性的缺失。比较常见的是事务功能的缺失。数据库事务正确执行的四个基本要素 ACID 如下：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Atomicity（原子性）</td>
+<td>一个事务中的所有操作，要么全部完成，要么全部不完成，不会在中间某个环节结束。事务在执行过程中发生错误，会被回滚到事务开始前的状态，就像这个事务从来没有执行过一样。</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Consistency（一致性）</td>
+<td>在事务开始之前和事务结束以后，数据库的完整性没有被破坏。</td>
+</tr>
+<tr>
+<td>I</td>
+<td>Isolation（隔离性）</td>
+<td>数据库允许多个并发事务同时对数据进行读写和修改的能力。隔离性可以防止多个事务并发执行时由于交叉执行而导致数据的不一致。</td>
+</tr>
+<tr>
+<td>D</td>
+<td>Durability（持久性）</td>
+<td>事务处理结束后，对数据的修改就是永久的，即便系统故障也不会丢失。</td>
+</tr>
+</tbody>
+</table>
+<p>目前大家基本认同将 NoSQL 数据库分为四大类： 键值（Key-Value）数据库、列存储（Wide Column Store/Column-Family）数据库、 图（Graph-Oriented）数据库以及面向文档（Document-Oriented）数据库，其中每一种类型的数据库都能够解决关系型数据不能解决的问题。在实际应用中，NoSQL 数据库的分类界限其实没有那么明显，往往会是多种类型的组合体。</p>
+<h2 id="键值（Key-Value）数据库"><a href="#键值（Key-Value）数据库" class="headerlink" title="键值（Key-Value）数据库"></a>键值（Key-Value）数据库</h2><p>使用键值（key-value）存储的数据库，其数据按照键值对的形式进行组织、索引和存储。KV 存储非常适合不涉及过多数据关系业务的数据。它能够有效减少读写磁盘的次数，比关系型数据库存储拥有更好的读写性能，能够解决关系型数据库无法存储的数据结构的问题。</p>
+<p><strong> 常见 K-V 数据库 </strong>：Redis、Memcached、LevelDB、Cassandra</p>
+<h3 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h3><p>Redis 是一个使用 ANSI C 编写的开源、支持网络、基于内存、可选持久性的键值对存储数据库。Redis 是目前最流行的键值对存储数据库之一。</p>
+<p>最佳应用场景：适用于数据变化快且数据库大小可遇见（适合内存容量）的应用程序。</p>
+<p>例如：股票价格、数据分析、实时数据搜集、实时通讯。</p>
+<h3 id="Memcached"><a href="#Memcached" class="headerlink" title="Memcached"></a>Memcached</h3><p>Memcached 是一个开放源代码、高性能、分配的内存对象缓存系统。用于加速动态 web 应用程序，减轻关系型数据库负载。它可以应对任意多个连接，使用非阻塞的网络 IO。由于它的工作机制是在内存中开辟一块空间，然后建立一个 Hash 表，Memcached 自管理这些 Hash 表。<br>Memcached 简单而强大。它简单的设计促进迅速部署，易于发现所面临的问题，解决了很多大型数据缓存。</p>
+<h4 id="Cassandra"><a href="#Cassandra" class="headerlink" title="Cassandra"></a>Cassandra</h4><p>Apache Cassandra（社区内一般简称为 C*）是一套开源的分布式 NoSQL 数据库系统。它最初由 Facebook 开发，用于储存收件箱等简单格式数据，集 Google BigTable 的数据模型与 Amazon Dynamo 的完全分布式架构于一身。Cassandra 是一种流行的分布式结构化数据存储方案。</p>
+<p>最佳应用场景：当使用写操作多过读操作（记录日志）</p>
+<p>例如：银行业，金融业（虽然对于金融交易不是必须的，但这些产业对数据库的要求会比它们更大）写比读更快，所以一个自然的特性就是实时数据分析</p>
+<h2 id="LevelDB"><a href="#LevelDB" class="headerlink" title="LevelDB"></a>LevelDB</h2><p>LevelDB 是一个由 Google 所研发的键／值对（Key/Value Pair）嵌入式数据库管理系统编程库，以开源的 BSD 许可证发布。LevelDB 是一个基于本地文件的存储引擎，非分布式存储引擎，原理基于 BigTable（LSM 文件树），无索引机制，存储条目为 Key-value。适用于保存数据缓存、日志存储、高速缓存等应用，主要是避免 RPC 请求带来的延迟问题。</p>
+<h3 id="相关特性"><a href="#相关特性" class="headerlink" title="相关特性"></a>相关特性</h3><p>K-V 数据库的相关特性，以 Redis 为例说明：：</p>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ul>
+<li>性能极高：Redis 单机最高能支持超过 10W 的 TPS。</li>
+<li>丰富的数据类型：Redis 支持包括 String，Hash，List，Set，SortedSet，Bitmap 和 Hyperloglog 等数据结构。</li>
+<li>丰富的特性：Redis 还支持 publish/subscribe，通知，key 过期等特性。</li>
+</ul>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>Redis 事务不能支持原子性和持久性（A 和 D），只支持隔离性和一致性（I 和 C）。</li>
+</ul>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><h4 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h4><p>内容缓存，主要用于处理大量数据的高访问负载，也用于一些日志系统等等。适合存储用户信息（比如会话）、配置文件、参数、购物车等等。这些信息一般都和 ID 挂钩。</p>
+<h4 id="不适用场景"><a href="#不适用场景" class="headerlink" title="不适用场景"></a>不适用场景</h4><ul>
+<li>不适合需要通过值来查询，而不是键来查询。Key-Value 数据库中根本没有通过值查询的途径。</li>
+<li>不适合需要储存数据之间的关系。在 Key-Value 数据库中不能通过两个或以上的键来关联数据。</li>
+<li>不适合需要支持事务的场景。在 Key-Value 数据库中故障产生时不可以进行回滚。</li>
+</ul>
+<h2 id="列存储（Wide-Column-Store-Column-Family）数据库"><a href="#列存储（Wide-Column-Store-Column-Family）数据库" class="headerlink" title="列存储（Wide Column Store/Column-Family）数据库"></a>列存储（Wide Column Store/Column-Family）数据库</h2><p>列式数据库是以列相关存储架构进行数据存储的数据库，主要适合于批量数据处理和即时查询。相对应的是行式数据库，数据以行相关的存储架构进行空间分配，主要适合于小批量的数据处理，常用于联机事务型数据处理。基于列式数据库的列存储特性，可以解决某些特定场景下关系型数据库高 I/O 的问题。</p>
+<p><strong> 常见列式数据库 </strong>：HBase、BigTable</p>
+<h3 id="HBase"><a href="#HBase" class="headerlink" title="HBase"></a>HBase</h3><p>HBase 是一个开源的非关系型分布式数据库（NoSQL），它参考了谷歌的 BigTable 建模，实现的编程语言为 Java。它是 Apache 软件基金会的 Hadoop 项目的一部分，运行于 HDFS 文件系统之上，为 Hadoop 提供类似于 BigTable 规模的服务。因此，它可以容错地存储海量稀疏的数据。</p>
+<p>最佳应用场景：适用于偏好 BigTable；对数据有版本查询需求，并且需要对大数据进行随机、实时访问的场合。</p>
+<p>例如：Facebook 消息数据库</p>
+<h3 id="BigTable"><a href="#BigTable" class="headerlink" title="BigTable"></a>BigTable</h3><p>BigTable 是一种压缩的、高性能的、高可扩展性的，基于 Google 文件系统（Google File System，GFS）的数据存储系统，用于存储大规模结构化数据，适用于云计算。</p>
+<h3 id="相关特性-1"><a href="#相关特性-1" class="headerlink" title="相关特性"></a>相关特性</h3><h4 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h4><ul>
+<li>高效的储存空间利用率：列式数据库针对不同列的数据特征而发明了不同算法，使其比行式数据库高的多的压缩率。普通的行式数据库一般压缩率在 3：1 到 5：1 左右，而列式数据库的压缩率一般在 8：1 到 30：1 左右。</li>
+<li>查询效率高：读取多条数据的同一列效率高，因为这些列都是存储在一起的，一次磁盘操作可以把数据的指定列全部读取到内存中。</li>
+<li>适合做聚合操作</li>
+<li>适合大量的数据而不是小数据</li>
+</ul>
+<h4 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>不适合扫描小量数据</li>
+<li>不适合随机的更新</li>
+<li>不适合做含有删除和更新的实时操作</li>
+<li>单行数据支持 ACID 的事务操作，多行数据的事务操作，不支持事务的正常回滚，支持（Isolation）隔离性、(Durability）持久性，不能保证(Atomicity）原子性、（Consistency）一致性</li>
+</ul>
+<h3 id="应用场景-1"><a href="#应用场景-1" class="headerlink" title="应用场景"></a>应用场景</h3><p>列数据库的适用场景，以 HBase 为例说明：</p>
+<ul>
+<li>适合大数据量(100TB 级数据），有快速随机访问的需求。</li>
+<li>适合写密集型应用，每天写入量巨大，而读数量相对较小的应用，比如 IM 的历史消息，游戏日志等等。</li>
+<li>适合不需要复杂查询条件来查询数据的应用。HBase 只支持基于 rowkey 的查询，对于 HBase 来说，单条记录或者小范围的查询是可以接受的。大范围的查询由于分布式的原因，可能在性能上有点影响。HBase 不适用于有 join，多级索引，表关系复杂的数据模型。</li>
+<li>对性能和可靠性要求非常高的应用。</li>
+<li>由于 HBase 本身没有单点故障，可用性非常高。</li>
+<li>适合数据量较大，而且增长量无法预估的应用，需要进行优雅的数据扩展的应用。HBase 支持在线扩展，即使在一段时间内，数据量呈井喷式增长，也可以通过 HBase 横向扩展来满足功能。</li>
+<li>存储结构化和半结构化的数据。</li>
+</ul>
+<h2 id="图（Graph-Oriented）数据库"><a href="#图（Graph-Oriented）数据库" class="headerlink" title="图（Graph-Oriented）数据库"></a>图（Graph-Oriented）数据库</h2><p>图形数据库应用图形理论存储实体之间的关系信息。最常见例子就是社会网络中人与人之间的关系。关系型数据库用于存储这种关系型数据的效果并不好，其查询复杂、缓慢、超出预期。<br>图形数据库的独特设计弥补了这个缺陷，解决关系型数据库存储和处理复杂关系型数据功能较弱的问题。</p>
+<p><strong> 常见图形数据库 </strong>：Neo4j、ArangoDB</p>
+<h3 id="Neo4j"><a href="#Neo4j" class="headerlink" title="Neo4j"></a>Neo4j</h3><p>Neo4j 是一个高性能的，NOSQL 图形数据库，它将结构化数据存储在 “图形网络上” 而不是“表中”。它是一个嵌入式的、基于磁盘的、具备完全的事务特性的 Java 持久化引擎。Neo4j 也可以被看作是一个高性能的图引擎。</p>
+<p>最佳应用场景：适用于图形一类数据。这是 Neo4j 与其他 nosql 数据库的最显著区别</p>
+<p>例如：社会关系，公共交通网络，地图及网络拓谱</p>
+<h3 id="ArangoDB"><a href="#ArangoDB" class="headerlink" title="ArangoDB"></a>ArangoDB</h3><p>ArangoDB 是一个原生多模型数据库系统。数据库系统支持三个重要的数据模型（键 / 值，文档，图形）。ArangoDB 包含一个数据库核心和统一查询语言 AQL（ArangoDB 查询语言）。查询语言是声明性的，允许在单个查询中组合不同的数据访问模式。ArangoDB 是一个 NoSQL 数据库系统，但 AQL 在很多方面与 SQL 都类似。</p>
+<h3 id="相关特性-2"><a href="#相关特性-2" class="headerlink" title="相关特性"></a>相关特性</h3><h4 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h4><ul>
+<li>高性能表现：图的遍历是图数据结构所具有的独特算法，即从一个节点开始，根据其连接的关系，可以快速和方便地找出它的邻近节点。这种查找数据的方法不受数据量大小的影响，因为邻近查询始终查找的是有限的局部数据，不会对整个数据库进行搜索。利用图结构相关算法。比如最短路径寻址，N 度关系查找等。</li>
+<li>设计的灵活性：数据结构的自然伸展特性，以及其非结构化的数据格式，让图数据库设计可以具有很大的伸缩性和灵活性。因为随着需求的变化而增加的节点、关系及其属性，并不会影响到原来数据的正常使用。</li>
+<li>开发的敏捷性：数据模型直接明了，从需求的讨论开始，到程序开发和实现，基本上不会有大的变化。</li>
+<li>完全支持 ACID：不像别的 NoSQL 数据库，Neo4j 还完全具有事务管理特性，完全支持 ACID 事务管理。</li>
+</ul>
+<h4 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>节点，关系和它们的属性的数量被限制。</li>
+<li>不支持拆分，图数据库结构不太好做分布式的集群方案。</li>
+</ul>
+<h3 id="应用场景-2"><a href="#应用场景-2" class="headerlink" title="应用场景"></a>应用场景</h3><h4 id="适用场景-1"><a href="#适用场景-1" class="headerlink" title="适用场景"></a>适用场景</h4><p>专注于构建关系图谱，善于处理大量复杂、互连接、低结构化的数据，数据往往变化迅速，且查询频繁。（1）在一些关系性强的数据应用，例如社交网络。（2）推荐引擎，将数据以图的形式表现，非常有益于推荐的制定。</p>
+<h4 id="不适用场景-1"><a href="#不适用场景-1" class="headerlink" title="不适用场景"></a>不适用场景</h4><ul>
+<li>记录大量基于事件的数据，如日志记录、传感器数据。</li>
+<li>对大规模分布式数据进行处理，类似于 Hadoop。</li>
+<li>不适用于应该保存在关系型数据库中的结构化数据。</li>
+<li>二进制数据存储。</li>
+</ul>
+<h2 id="面向文档（Document-Oriented）数据库"><a href="#面向文档（Document-Oriented）数据库" class="headerlink" title="面向文档（Document-Oriented）数据库"></a>面向文档（Document-Oriented）数据库</h2><p>文档数据库用于将半结构化数据存储为文档的一种数据库。文档数据库通常以 JSON 或 XML 格式存储数据。（1）由于文档数据库的 no-schema 特性，可以存储和读取任意数据。（2）由于使用的数据格式是 JSON 或者 BSON，因为 JSON 数据是自描述的，无需在使用前定义字段，读取一个 JSON 中不存在的字段也不会导致 SQL 那样的语法错误，可以解决关系型数据库表结构 schema 扩展不方便的问题。</p>
+<p><strong> 常见文档数据库 </strong>：MongoDB、ArangoDB</p>
+<h3 id="MongoDB"><a href="#MongoDB" class="headerlink" title="MongoDB"></a>MongoDB</h3><p>MongoDB 是一个基于分布式文件存储的数据库。由 C++ 语言编写。旨在为 WEB 应用提供可扩展的高性能数据存储解决方案。MongoDB 是一个介于关系数据库和非关系数据库之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的 NoSQL。</p>
+<p>最佳应用场景：适用于需要动态查询支持；需要使用索引而不是 map/reduce 功能；需要对大数据库有性能要求；需要使用 CouchDB 但因为数据改变太频繁而占满内存的应用程序。</p>
+<p>例如：你本打算采用 MySQL 或 PostgreSQL，但因为它们本身自带的预定义栏让你望而却步。</p>
+<h3 id="CouchDB"><a href="#CouchDB" class="headerlink" title="CouchDB"></a>CouchDB</h3><p>CouchDB 是用 Erlang 开发的面向文档的分布式数据库，用于存储半结构化的数据，比较类似 lucene 的 index 结构。CouchDB 支持 RESTful API，它使用 JSON 作为存储格式，JavaScript 作为查询语言，MapReduce 和 HTTP 作为 API 的 NoSQL 数据库。其中一个显著的功能就是多主复制功能。除此之外，CouchDB 构建在强大的 B - 树储存引擎之上。</p>
+<p>最佳应用场景：适用于数据变化较少，执行预定义查询，进行数据统计的应用程序。适用于需要提供数据版本支持的应用程序。</p>
+<p>例如： CRM、CMS 系统。 master-master 复制对于多站点部署是非常有用的。</p>
+<h3 id="相关特性-3"><a href="#相关特性-3" class="headerlink" title="相关特性"></a>相关特性</h3><p>文档型数据库的相关特性，以 MongoDB 为例进行说明：</p>
+<h4 id="优点-3"><a href="#优点-3" class="headerlink" title="优点"></a>优点</h4><ul>
+<li>新增字段简单不需要像关系型数据库一样，先执行 DDL 语句修改表结构，程序代码直接读写即可。</li>
+<li>容易兼容历史数据。对于历史数据，即使没有新增的字段，也不会导致错误，只会返回空值，此时代码兼容处理即可。</li>
+<li>易存储复杂数据。JSON 是一种强大的描述语言，能够描述复杂的数据结构。</li>
+</ul>
+<h4 id="缺点-3"><a href="#缺点-3" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>Atomicity（原子性）：仅支持单行 / 文档级原子性，不支持多行、多文档、多语句原子性。</li>
+<li>Isolation（隔离性）：隔离级别仅支持已提交读（Read committed）级别，可能导致不可重复读，幻读的问题。</li>
+<li>不支持复杂查询。例如 join 查询，如果需要 join 查询，需要多次操作数据库。</li>
+</ul>
+<h3 id="应用场景-3"><a href="#应用场景-3" class="headerlink" title="应用场景"></a>应用场景</h3><h4 id="适用场景-2"><a href="#适用场景-2" class="headerlink" title="适用场景"></a>适用场景</h4><ul>
+<li>数据量很大或者未来会变得很大。</li>
+<li>表结构不明确，且字段在不断增加，例如内容管理系统，信息管理系统。</li>
+</ul>
+<h4 id="不适用场景-2"><a href="#不适用场景-2" class="headerlink" title="不适用场景"></a>不适用场景</h4><ul>
+<li>在不同的文档上需要添加事务。Document-Oriented 数据库并不支持文档间的事务。</li>
+<li>多个文档之间需要复杂的查询，例如 join 操作。</li>
+</ul>
+<hr>
+<h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="https://www.jianshu.com/p/a586a8bf13f7" target="_blank" rel="noopener">浅谈常见的 NoSQL 技术方案和选型</a></p>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>谢谢你长得那么好看，还打赏我！😘</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.jpg" alt="猫宁i 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.jpg" alt="猫宁i 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>猫宁i</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://blog.maoning.pro/archives/7475b55d.html" title="一网打尽 NoSQL：当下 NoSQL 类型、适用场景及使用公司">http://blog.maoning.pro/archives/7475b55d.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/NoSQL/" rel="tag"># NoSQL</a>
+          
+            <a href="/tags/RDB/" rel="tag"># RDB</a>
+          
+            <a href="/tags/ACID/" rel="tag"># ACID</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/d66032e3.html" rel="next" title="Java8 那些事儿（三）：Date/Time API(JSR 310)">
+                <i class="fa fa-chevron-left"></i> Java8 那些事儿（三）：Date/Time API(JSR 310)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/archives/Infinity.html" rel="prev" title="深入理解 Java 虚拟机（三）：内存分配与回收策略">
+                深入理解 Java 虚拟机（三）：内存分配与回收策略 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="猫宁i">
+            
+              <p class="site-author-name" itemprop="name">猫宁i</p>
+              <div class="site-description motion-element" itemprop="description">趁着年轻，好好生活，用心折腾。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">81</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://morning-pro.github.io/" title="https://morning-pro.github.io/" rel="noopener" target="_blank">我的镜像站</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://crossoverjie.top/" title="https://crossoverjie.top/" rel="noopener" target="_blank">crossoverJie's Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://fangjian0423.github.io/" title="http://fangjian0423.github.io/" rel="noopener" target="_blank">Format's Notes</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传统数据库缺点"><span class="nav-number">2.</span> <span class="nav-text">传统数据库缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NoSQL-简介"><span class="nav-number">3.</span> <span class="nav-text">NoSQL 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#键值（Key-Value）数据库"><span class="nav-number">4.</span> <span class="nav-text">键值（Key-Value）数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis"><span class="nav-number">4.1.</span> <span class="nav-text">Redis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Memcached"><span class="nav-number">4.2.</span> <span class="nav-text">Memcached</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Cassandra"><span class="nav-number">4.2.1.</span> <span class="nav-text">Cassandra</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LevelDB"><span class="nav-number">5.</span> <span class="nav-text">LevelDB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#相关特性"><span class="nav-number">5.1.</span> <span class="nav-text">相关特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点"><span class="nav-number">5.1.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点"><span class="nav-number">5.1.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用场景"><span class="nav-number">5.2.</span> <span class="nav-text">应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#适用场景"><span class="nav-number">5.2.1.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#不适用场景"><span class="nav-number">5.2.2.</span> <span class="nav-text">不适用场景</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#列存储（Wide-Column-Store-Column-Family）数据库"><span class="nav-number">6.</span> <span class="nav-text">列存储（Wide Column Store/Column-Family）数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HBase"><span class="nav-number">6.1.</span> <span class="nav-text">HBase</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BigTable"><span class="nav-number">6.2.</span> <span class="nav-text">BigTable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关特性-1"><span class="nav-number">6.3.</span> <span class="nav-text">相关特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点-1"><span class="nav-number">6.3.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点-1"><span class="nav-number">6.3.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用场景-1"><span class="nav-number">6.4.</span> <span class="nav-text">应用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图（Graph-Oriented）数据库"><span class="nav-number">7.</span> <span class="nav-text">图（Graph-Oriented）数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Neo4j"><span class="nav-number">7.1.</span> <span class="nav-text">Neo4j</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ArangoDB"><span class="nav-number">7.2.</span> <span class="nav-text">ArangoDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关特性-2"><span class="nav-number">7.3.</span> <span class="nav-text">相关特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点-2"><span class="nav-number">7.3.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点-2"><span class="nav-number">7.3.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用场景-2"><span class="nav-number">7.4.</span> <span class="nav-text">应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#适用场景-1"><span class="nav-number">7.4.1.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#不适用场景-1"><span class="nav-number">7.4.2.</span> <span class="nav-text">不适用场景</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面向文档（Document-Oriented）数据库"><span class="nav-number">8.</span> <span class="nav-text">面向文档（Document-Oriented）数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MongoDB"><span class="nav-number">8.1.</span> <span class="nav-text">MongoDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CouchDB"><span class="nav-number">8.2.</span> <span class="nav-text">CouchDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关特性-3"><span class="nav-number">8.3.</span> <span class="nav-text">相关特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点-3"><span class="nav-number">8.3.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点-3"><span class="nav-number">8.3.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用场景-3"><span class="nav-number">8.4.</span> <span class="nav-text">应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#适用场景-2"><span class="nav-number">8.4.1.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#不适用场景-2"><span class="nav-number">8.4.2.</span> <span class="nav-text">不适用场景</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">9.</span> <span class="nav-text">参考博文</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-paper-plane"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">猫宁i</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">博客全站字数：</span>
+    
+    <span title="博客全站字数">447k</span>
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+  
+  <script color="0,0,0" opacity="0.3" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+  
+
+<script src="//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: '2saqKR15nDJaNg0KgkpiEIIB-gzGzoHsz',
+    appKey: 'NBf24H2IPzFCX7DjwNXFpDbH',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"react":{"opacity":0.7},"log":false,"tagMode":false});</script></body>
+</html>

@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: true,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言当在团队开发中使用版本控制系统时，商定一个统一的工作流程是至关重要的。Git 的确可以在各个方面做很多事情，然而，如果在你的团队中还没有能形成一个特定有效的工作流程，那么混乱就将是不可避免的。基本上你可以定义一个完全适合你自己项目的工作流程，或者使用一个别人定义好的。就像代码需要代码规范一样，代码管理同样需要一个清晰的流程和规范。 Git flow 工作流是经典模型，体现了工作流的经验和精髓。">
+<meta name="keywords" content="Git flow,工作流">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流">
+<meta property="og:url" content="http://blog.maoning.pro/archives/c0dca125.html">
+<meta property="og:site_name" content="猫宁i">
+<meta property="og:description" content="前言当在团队开发中使用版本控制系统时，商定一个统一的工作流程是至关重要的。Git 的确可以在各个方面做很多事情，然而，如果在你的团队中还没有能形成一个特定有效的工作流程，那么混乱就将是不可避免的。基本上你可以定义一个完全适合你自己项目的工作流程，或者使用一个别人定义好的。就像代码需要代码规范一样，代码管理同样需要一个清晰的流程和规范。 Git flow 工作流是经典模型，体现了工作流的经验和精髓。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.maoning.pro/images/65966314_p8_meitu_1_meitu_3.jpg">
+<meta property="og:updated_time" content="2019-08-16T02:04:33.762Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流">
+<meta name="twitter:description" content="前言当在团队开发中使用版本控制系统时，商定一个统一的工作流程是至关重要的。Git 的确可以在各个方面做很多事情，然而，如果在你的团队中还没有能形成一个特定有效的工作流程，那么混乱就将是不可避免的。基本上你可以定义一个完全适合你自己项目的工作流程，或者使用一个别人定义好的。就像代码需要代码规范一样，代码管理同样需要一个清晰的流程和规范。 Git flow 工作流是经典模型，体现了工作流的经验和精髓。">
+<meta name="twitter:image" content="http://blog.maoning.pro/images/65966314_p8_meitu_1_meitu_3.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="猫宁i" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://blog.maoning.pro/archives/c0dca125.html">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流 | 猫宁i</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">猫宁i</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">趁着年轻，好好生活，用心折腾。</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives menu-item-active">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/books/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/c0dca125.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-06-29 14:31:41" itemprop="dateCreated datePublished" datetime="2019-06-29T14:31:41+08:00">2019-06-29</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/archives/c0dca125.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/archives/c0dca125.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/archives/c0dca125.html" class="leancloud_visitors" data-flag-title="Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">9.8k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">9 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/65966314_p8_meitu_1_meitu_3.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>当在团队开发中使用版本控制系统时，商定一个统一的工作流程是至关重要的。Git 的确可以在各个方面做很多事情，然而，如果在你的团队中还没有能形成一个特定有效的工作流程，那么混乱就将是不可避免的。基本上你可以定义一个完全适合你自己项目的工作流程，或者使用一个别人定义好的。就像代码需要代码规范一样，代码管理同样需要一个清晰的流程和规范。</p>
+<p>Git flow 工作流是经典模型，体现了工作流的经验和精髓。随着项目过程复杂化，会感受到这个工作流中深思熟虑和威力！Git flow 工作流没有用超出功能分支工作流的概念和命令，而是为不同的分支分配一个很明确的角色，并定义分支之间如何和什么时候进行交互。在这章节中我们将一起学习一个当前非常流行的工作流 Git flow。</p>
+<a id="more"></a>
+<h2 id="Git-flow-工作介绍"><a href="#Git-flow-工作介绍" class="headerlink" title="Git flow 工作介绍"></a>Git flow 工作介绍</h2><h3 id="版本管理的挑战"><a href="#版本管理的挑战" class="headerlink" title="版本管理的挑战"></a>版本管理的挑战</h3><p>虽然有这么优秀的版本管理工具，但是我们面对版本管理的时候，依然有非常大得挑战，我们都知道大家工作在同一个仓库上，那么彼此的代码协作必然带来很多问题和挑战，如下：</p>
+<ul>
+<li>如何开始一个 Feature 的开发，而不影响别的 Feature？</li>
+<li>由于很容易创建新分支，分支多了如何管理，时间久了，如何知道每个分支是干什么的？</li>
+<li>哪些分支已经合并回了主干？</li>
+<li>如何进行 Release 的管理？开始一个 Release 的时候如何冻结 Feature, 如何在 Prepare Release 的时候，开发人员可以继续开发新的功能？</li>
+<li>线上代码出 Bug 了，如何快速修复？而且修复的代码要包含到开发人员的分支以及下一个 Release?</li>
+</ul>
+<p>大部分开发人员现在使用 Git 就只是用三个甚至两个分支，一个是 Master, 一个是 Develop, 还有一个是基于 Develop 打得各种分支。这个在小项目规模的时候还勉强可以支撑，因为很多人做项目就只有一个 Release, 但是人员一多，而且项目周期一长就会出现各种问题。</p>
+<h3 id="Git-flow-流程"><a href="#Git-flow-流程" class="headerlink" title="Git flow 流程"></a>Git flow 流程</h3><p>荷兰程序员 Vincent Driessen 曾发表了一篇博客 <a href="https://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="noopener">A Successful Git Branching Model</a>，让一个分支策略广为人知。</p>
+<p>下面是 Git flow 的流程图：</p>
+<p><img src="/media/15619490256878/git-model@2x.png" alt="git-model@2x"></p>
+<p>这一流程最大的亮点是考虑了紧急 Bug 的应对措施，整个流程显得过于复杂，所以在实施该方案前，需要对整个开发流程进行系统的学习。也需要借助 Git flow 等工具的辅助。</p>
+<h2 id="Git-flow-安装以及初始化"><a href="#Git-flow-安装以及初始化" class="headerlink" title="Git flow 安装以及初始化"></a>Git flow 安装以及初始化</h2><p>工具 Git-flow 是按照 Vincent Driessen 的 branch 模型，实现的一个高层次（级别）的 git 仓库操作扩展集合。 </p>
+<h3 id="Linux-安装-Git-flow"><a href="#Linux-安装-Git-flow" class="headerlink" title="Linux 安装 Git flow"></a>Linux 安装 Git flow</h3><p>Ubuntu 中使用 apt-get 安装 Git flow 的方法</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-<span class="builtin-name">get</span> install git-flow</span><br></pre></td></tr></table></figure>
+<p>CentOS7 中使用 wget 安装 Git flow 的方法</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>wget --no-check-certificate -q  <span class="symbol">https:</span>/<span class="regexp">/raw.githubusercontent.com/petervanderdoes</span><span class="regexp">/gitflow-avh/develop</span><span class="regexp">/contrib/gitflow</span>-installer.sh &amp;&amp; sudo bash gitflow-installer.sh install develop; rm gitflow-installer.sh</span><br></pre></td></tr></table></figure>
+<h3 id="Mac-安装-Git-flow"><a href="#Mac-安装-Git-flow" class="headerlink" title="Mac 安装 Git flow"></a>Mac 安装 Git flow</h3><p>Mac 中使用 brew 安装 Git flow 的方法</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">brew </span><span class="keyword">install </span>git-flow-avh</span><br></pre></td></tr></table></figure>
+<h3 id="Windows-安装-Git-flow"><a href="#Windows-安装-Git-flow" class="headerlink" title="Windows 安装 Git flow"></a>Windows 安装 Git flow</h3><p>Windows 中使用 wget 安装 Git flow 的方法</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>wget -q -O - --no-check-certificate <span class="symbol">https:</span>/<span class="regexp">/raw.github.com/petervanderdoes</span><span class="regexp">/gitflow-avh/develop</span><span class="regexp">/contrib/gitflow</span>-installer.sh install stable | bash</span><br></pre></td></tr></table></figure>
+<h3 id="Git-flow-初始化"><a href="#Git-flow-初始化" class="headerlink" title="Git flow 初始化"></a>Git flow 初始化</h3><p>回答几个关于分支的命名约定的问题，建议使用默认值。</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ git flow init</span><br><span class="line"></span><br><span class="line"><span class="symbol">No</span> <span class="keyword">branches </span>exist yet. <span class="keyword">Base </span><span class="keyword">branches </span>must <span class="keyword">be </span>created now.</span><br><span class="line"><span class="keyword">Branch </span>name for production releases: [master] </span><br><span class="line"><span class="keyword">Branch </span>name for <span class="string">"next release"</span> development: [develop] </span><br><span class="line"></span><br><span class="line"><span class="symbol">How</span> to name your supporting <span class="keyword">branch </span>prefixes?</span><br><span class="line"><span class="symbol">Feature</span> <span class="keyword">branches? </span>[feature/] </span><br><span class="line"><span class="keyword">Bugfix </span><span class="keyword">branches? </span>[<span class="keyword">bugfix/] </span></span><br><span class="line"><span class="symbol">Release</span> <span class="keyword">branches? </span>[release/] </span><br><span class="line"><span class="symbol">Hotfix</span> <span class="keyword">branches? </span>[hotfix/] </span><br><span class="line"><span class="symbol">Support</span> <span class="keyword">branches? </span>[support/] </span><br><span class="line"><span class="symbol">Version</span> tag prefix? [v] </span><br><span class="line"><span class="symbol">Hooks</span> <span class="keyword">and </span>filters directory? [/home/ubuntu/study/.git/hooks]</span><br></pre></td></tr></table></figure>
+<h2 id="Git-flow-分支模型的介绍"><a href="#Git-flow-分支模型的介绍" class="headerlink" title="Git flow 分支模型的介绍"></a>Git flow 分支模型的介绍</h2><p>Git flow 工作流仍然用中央仓库作为所有开发者的交互中心。和其它的工作流一样，开发者在本地工作并 push 分支到要中央仓库中。</p>
+<ul>
+<li>Master 分支 - 生产分支<br>最为稳定功能比较完整的随时可发布的代码，即代码开发完成，经过测试，没有明显的 bug，才能合并到 master 中。请注意永远不要在 master 分支上直接开发和提交代码，以确保 master 上的代码一直可用。</li>
+<li>Develop 分支 - 开发分支<br>用作平时开发的主分支，并一直存在，永远是功能最新最全的分支，包含所有要发布到下一个 release 的代码，主要用于合并其他分支，比如 feature 分支；如果修改代码，新建 feature 分支修改完再合并到 develop 分支。所有的 feature、release 分支都是从 develop 分支上拉的。</li>
+<li>Feature 分支 - 功能分支<br>这个分支主要是用来开发新的功能，一旦开发完成，通过测试没问题（这个测试，测试新功能没问题），我们合并回 develop 分支进入下一个 release。</li>
+<li>Release 分支 - 发布分支<br>用于发布准备的专门分支。当开发进行到一定程度，或者说快到了既定的发布日，可以发布时，建立一个 release 分支并指定版本号（可以在 finish 的时候添加）。开发人员可以对 release 分支上的代码进行集中测试和修改 bug。（这个测试，测试新功能与已有的功能是否有冲突，兼容性）全部完成经过测试没有问题后，将 release 分支上的代码合并到 master 分支和 develop 分支。</li>
+<li>Hotfix 分支 - 热修复分支<br>用于修复线上代码的 bug。从 master 分支上拉，完成 hotfix 后，打上 tag 我们合并回 master 和 develop 分支。</li>
+</ul>
+<h3 id="功能分支-Feature-分支"><a href="#功能分支-Feature-分支" class="headerlink" title="功能分支 - Feature 分支"></a>功能分支 - Feature 分支</h3><p><img src="/media/15619490256878/20151223121021496.jpg" alt="20151223121021496"></p>
+<p>功能分支：通常为即将发布或者未来发布版开发新的功能，这通常只存在开发者的库中。当新功能开始研发，包含该功能的发布版本在这个还是无法确定发布时间的。功能版本的实质是只要这个功能处于开发状态它就会存在，但是最终会或合并到 develop 分支（确定将新功能添加到不久的发布版中）或取消（譬如一次令人失望的测试）。</p>
+<p>分支命名规则：分支名称以 feature/* 开头</p>
+<ol>
+<li>使用 Git 命令开发功能分支 - Feature 分支流程：</li>
+</ol>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">1</span>. 开始一项功能的开发工作时, 基于'develop'创建分支</span><br><span class="line">$ git checkout -b <span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span> develop</span><br><span class="line"></span><br><span class="line"># <span class="number">2</span>. 推送到远程 -&gt; 可选</span><br><span class="line">$ git <span class="built_in">push</span> -u <span class="built_in">origin</span> <span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">3</span>. 在'<span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span>'功能分支上开发完成后, 提交至仓库</span><br><span class="line">$ git commit -a -m <span class="string">"some feature"</span></span><br><span class="line"></span><br><span class="line"># <span class="number">4</span>. 切换到'develop'分支</span><br><span class="line">$ git checkout develop</span><br><span class="line"></span><br><span class="line"># <span class="number">5</span>. 从远程仓库拉去最新'develop'</span><br><span class="line">$ git pull <span class="built_in">origin</span> develop</span><br><span class="line"></span><br><span class="line"># <span class="number">6</span>. 'develop'分支合并'<span class="built_in">feature</span>'功能分支   </span><br><span class="line">$ git merge --no-ff <span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">7</span>. 推送'develop'分支至远程仓库   </span><br><span class="line">$ git <span class="built_in">push</span> <span class="built_in">origin</span> develop</span><br><span class="line"></span><br><span class="line"># <span class="number">8</span>. 删除'<span class="built_in">feature</span>'功能分支</span><br><span class="line">$ git branch -d <span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">9</span>. 删除远程'<span class="built_in">feature</span>'功能分支</span><br><span class="line">$ git <span class="built_in">push</span> <span class="built_in">origin</span> --<span class="built_in">delete</span> <span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span></span><br></pre></td></tr></table></figure>
+<p>–no-ff 标志导致合并操作创建一个新 commit 对象，即使该合并操作可以 fast-forward。这避免了丢失这个功能分支存在的历史信息，将该功能的所有提交组合在一起。</p>
+<p><img src="/media/15619490256878/20151223121138110.jpg" alt="20151223121138110"></p>
+<ol start="2">
+<li>使用 Git-flow 命令开发功能分支 - Feature 分支流程：</li>
+</ol>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">1</span>. 增加新特性 P.S.[创建了一个基于'develop'的功能分支'<span class="built_in">some</span>-<span class="built_in">feature</span>', 并切换到这个分支之下]</span><br><span class="line">$ git flow <span class="built_in">feature</span> start <span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">2</span>. 完成新特性 P.S.[<span class="number">1</span>. 合并'<span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span>'分支到'develop';<span class="number">2</span>. 删除这个新特性分支; <span class="number">3</span>. 切换回'develop'分支]</span><br><span class="line">    Summary of actions:</span><br><span class="line">    - The <span class="built_in">feature</span> branch '<span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span>' was merged into 'develop'</span><br><span class="line">    - Feature branch '<span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span>' has been locally deleted</span><br><span class="line">    - You are now on branch 'develop'</span><br><span class="line">$ git flow <span class="built_in">feature</span> finsh --no-ff <span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">3</span>. 推送'develop'分支至远程仓库   </span><br><span class="line">$ git <span class="built_in">push</span> <span class="built_in">origin</span> develop</span><br></pre></td></tr></table></figure>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">1</span>. 发布新特性 P.S.[发布新特性分支到远程服务器, 所以, 其它用户也可以使用这分支]</span><br><span class="line">$ git flow <span class="built_in">feature</span> publish <span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">2</span>. 取得一个发布的新特性分支 P.S.[取得其它用户发布的新特性分支, 并签出远程的变更]</span><br><span class="line">$ git flow <span class="built_in">feature</span> pull <span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">3</span>. 跟踪在 <span class="built_in">origin</span> 上的特性分支]</span><br><span class="line">$ git flow <span class="built_in">feature</span> <span class="built_in">track</span> <span class="built_in">some</span>-<span class="built_in">feature</span></span><br></pre></td></tr></table></figure>
+<h3 id="热修复分支-Hotfix-分支"><a href="#热修复分支-Hotfix-分支" class="headerlink" title="热修复分支 - Hotfix 分支"></a>热修复分支 - Hotfix 分支</h3><p><img src="/media/15619490256878/20151223121423096.jpg" alt="20151223121423096"></p>
+<p>热修复分支：热修复分支与发布分支很相似，他们都为新的生成环境发布做准备，尽管这是未经计划的。他们来自生产环境的处于异常状态压力。当生成环境验证缺陷必须马上修复是，热修复分支可以基于 master 分支上对应与线上版本的 tag 创建。</p>
+<p>分支命名规则：分支名称以 hotfix/* 开头</p>
+<ol>
+<li>使用 Git 命令开发热修复分支 - Hotfix 分支流程：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 1. 基于<span class="string">'master'</span>创建热修复分支</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git checkout -b hotfix/some-hotfix-0.1.1 master</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2. 在<span class="string">'hotfix/some-hotfix-0.1.1'</span>热修复分支上完成紧急修复, 提交至仓库</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git commit -a -m <span class="string">"some hotfix"</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 3. 切换到<span class="string">'master'</span>分支</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git checkout master</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 4. <span class="string">'master'</span>分支合并<span class="string">'hotfix/some-hotfix-0.1.1'</span>热修复分支   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git merge --no-ff hotfix/some-hotfix-0.1.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 5. 推送<span class="string">'master'</span>分支至远程仓库   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git push origin master</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 6. 切换到<span class="string">'master'</span>分支</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git checkout develop</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 7. <span class="string">'develop'</span>分支合并<span class="string">'hotfix/some-hotfix-0.1.1'</span>功能分支   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git merge --no-ff hotfix/some-hotfix-0.1.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 7. 推送<span class="string">'develop'</span>分支至远程仓库   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git push origin develop</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 8. 删除<span class="string">'hotfix/some-hotfix-0.1.1'</span>热修复分支   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git branch -d hotfix/some-hotfix-0.1.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 9. 重新打标签 </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git tag -a v0.1.1 master</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 10. 提交所有 tag</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git push --tags</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>使用 Git-flow 命令开发热修复分支 - Hotfix 分支流程：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 1. 开始 git flow 紧急修复 P.S.[创建了一个基于<span class="string">'master'</span>的热修复分支, 并切换到这个分支之下]</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git flow hotfix start 0.1.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2. 完成新特性 P.S.[1. 合并<span class="string">'hotfix/0.1.1'</span>分支到<span class="string">'master'</span>;2. 给<span class="string">'master 打标签'</span>v0.1.1<span class="string">';3. 合并'</span>v0.1.1<span class="string">'分支到'</span>develop<span class="string">';4. 删除本地'</span>hotfix/v0.1.1<span class="string">'分支; 5. 切换回'</span>develop<span class="string">'分支]</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git flow hotfix finish --no-ff 0.1.1</span></span><br><span class="line">    Summary of actions:</span><br><span class="line">    - Hotfix branch 'hotfix/0.1.1' has been merged into 'master'</span><br><span class="line">    - The hotfix was tagged 'v0.1.1'</span><br><span class="line">    - Hotfix tag 'v0.1.1' has been back-merged into 'develop'</span><br><span class="line">    - Hotfix branch 'hotfix/0.1.1' has been locally deleted</span><br><span class="line">    - You are now on branch 'develop'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 3. 切换到<span class="string">'master'</span>分支</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git checkout master</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 4. 推送<span class="string">'master'</span>分支至远程仓库   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git push origin master</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 5. 切换到<span class="string">'develop'</span>分支</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git checkout develop</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 6. 推送<span class="string">'develop'</span>分支至远程仓库   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git push origin develop</span></span><br></pre></td></tr></table></figure>
+<h3 id="发布分支-Release-分支"><a href="#发布分支-Release-分支" class="headerlink" title="发布分支 - Release 分支"></a>发布分支 - Release 分支</h3><p>发布分支：Release 分支是为新产品的发布做准备的，它允许我们在最后时刻做一些细小的修改，它们允许小 bugs 的修改和准备发布元数据（版本号，开发时间等等）。Release 分支基于 develop 分支创建； 一旦创建了 release 分支，不能在从 develop 分支合并新的改动到 release 分支，可以基于 release 分支进行测试和 bug 修改，测试不用再另外创建用于测试的分支。</p>
+<p>分支命名规则：分支名称以 release/* 开头</p>
+<ol>
+<li>使用 Git 命令开发发布分支 - Release 分支流程：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 1. 基于<span class="string">'develop'</span>创建发布分支, 在此分支上小 bugs 的修改和准备发布元数据</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git checkout -b release/some-release-0.1.1 develop</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2. 切换到<span class="string">'master'</span>分支</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git checkout master</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 3. <span class="string">'master'</span>分支合并<span class="string">'release/some-release-0.1.1'</span>热修复分支   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git merge --no-ff release/some-release-0.1.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 4. 推送<span class="string">'master'</span>发布分支至远程仓库   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git push origin master</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 5. 切换到<span class="string">'master'</span>分支</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git checkout develop</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 6. <span class="string">'develop'</span>开发分支合并<span class="string">'release/some-release-0.1.1'</span>功能分支   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git merge --no-ff release/some-release-0.1.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 7. 推送<span class="string">'develop'</span>开发分支至远程仓库   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git push origin develop</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 8. 删除<span class="string">'release/some-release-0.1.1'</span>发布分支   </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git branch -d release/some-release-0.1.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 9. 重新打标签 </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git tag -a v0.1.1 master</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 10. 提交所有 tag</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git push --tags</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>使用 Git-flow 命令开发发布分支 - Release 分支流程：</li>
+</ol>
+<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">1</span>. 开始准备 <span class="keyword">release</span> 版本 P.S.[创建了一个基于<span class="symbol">'develop</span>'的热修复分支, 并切换到这个分支之下]</span><br><span class="line">$ git flow <span class="keyword">release</span> start <span class="number">0.1</span>.<span class="number">1</span></span><br><span class="line"></span><br><span class="line"># <span class="number">2</span>. 完成 <span class="keyword">release</span> 版本 P.S.[<span class="number">1</span>. 合并<span class="symbol">'release</span>/<span class="number">0.1</span>.<span class="number">1</span>'分支到<span class="symbol">'master</span>';<span class="number">2</span>. 给<span class="symbol">'master</span> 打标签<span class="symbol">'v0</span>.<span class="number">1.1</span>';<span class="number">3</span>. 合并<span class="symbol">'v0</span>.<span class="number">1.1</span>'分支到<span class="symbol">'develop</span>';<span class="number">4</span>. 删除本地<span class="symbol">'release</span>/v0.<span class="number">1.1</span>'分支; <span class="number">5</span>. 切换回<span class="symbol">'develop</span>'分支]</span><br><span class="line">$ git flow <span class="keyword">release</span> finish <span class="number">0.1</span>.<span class="number">1</span></span><br><span class="line">    Summary <span class="keyword">of</span> actions:</span><br><span class="line">    - <span class="keyword">Release</span> branch <span class="symbol">'release</span>/<span class="number">0.1</span>.<span class="number">1</span>' has been merged into <span class="symbol">'master</span>'</span><br><span class="line">    - The <span class="keyword">release</span> was tagged <span class="symbol">'v0</span>.<span class="number">1.1</span>'</span><br><span class="line">    - <span class="keyword">Release</span> tag <span class="symbol">'v0</span>.<span class="number">1.1</span>' has been back-merged into <span class="symbol">'develop</span>'</span><br><span class="line">    - <span class="keyword">Release</span> branch <span class="symbol">'release</span>/<span class="number">0.1</span>.<span class="number">1</span>' has been locally deleted</span><br><span class="line">    - You are now <span class="keyword">on</span> branch <span class="symbol">'develop</span>'	</span><br><span class="line"></span><br><span class="line"># <span class="number">3</span>. 切换到<span class="symbol">'master</span>'分支</span><br><span class="line">$ git checkout master</span><br><span class="line"></span><br><span class="line"># <span class="number">4</span>. 推送<span class="symbol">'master</span>'分支至远程仓库   </span><br><span class="line">$ git push origin master</span><br><span class="line"></span><br><span class="line"># <span class="number">5</span>. 切换到<span class="symbol">'develop</span>'分支</span><br><span class="line">$ git checkout develop</span><br><span class="line"></span><br><span class="line"># <span class="number">6</span>. 推送<span class="symbol">'develop</span>'分支至远程仓库   </span><br><span class="line">$ git push origin develop</span><br></pre></td></tr></table></figure>
+<h2 id="Git-的分支工作流与-Pull-Request"><a href="#Git-的分支工作流与-Pull-Request" class="headerlink" title="Git 的分支工作流与 Pull Request"></a>Git 的分支工作流与 Pull Request</h2><p>Pull request 是 github/bitbucket 给开发人员实现便利合作提供的一个 feature。他们提供一个用户友好的 web 界面在进代码之前来讨论这些变更。</p>
+<p>简单说，Pull request 是一种为了开发人员通知 team member 他们已经完成了一个 feature 的机制。一旦他们的 feature branch ready 了，开发人员就通过他们的 github 帐号执行一个 pull request。这将使得每个相干人知晓这个事件，他们需要 review 这个 feature branch 的代码，并且需要决定是否 merge 到 master 分支上去。</p>
+<p>但是 pull request 并不仅仅是一种 notification, 他也是一个专门用于讨论这些即将落地代码的细节的论坛。如果有任何问题或意见，同事们可以在 pull request 中提 comments，甚至直接在这个 Pull request 中修改要落地的代码。所有这些活动都由 pull request 来跟踪。</p>
+<p>下面通过例子介绍：热修复分支 - Hotfix 分支 Git flow 工作流和 Pull Request</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">1.</span> <span class="string">'master'</span>创建<span class="string">'hotfix'</span>分支并发布<span class="string">'hotfix'</span>分支到远程服务器</span><br><span class="line"><span class="symbol">$</span> git flow hotfix start [hotfix version <span class="keyword">No</span>.] [release version <span class="keyword">No</span>.]</span><br><span class="line"><span class="symbol">$</span> git flow hotfix publish [hotfix version <span class="keyword">No</span>.] </span><br><span class="line"></span><br><span class="line"># <span class="number">2.</span> <span class="string">'developer'</span>更新代码, 切换到<span class="string">'hotfix'</span>分支</span><br><span class="line"><span class="symbol">$</span> git pull</span><br><span class="line"><span class="symbol">$</span> git checkout hotfix/[hotfix version <span class="keyword">No</span>.]</span><br><span class="line"></span><br><span class="line"># <span class="number">3.</span> <span class="string">'developer'</span>修复代码, 然后提交到远程仓库, 申请 pull request 从 hotfixbug-[hotfix version <span class="keyword">No</span>.]/[bug name] 到 hotfix/[hotfix version <span class="keyword">No</span>.]</span><br><span class="line"><span class="symbol">$</span> git checkout –b hotfixbug-[hotfix version <span class="keyword">No</span>.]/[bug name]</span><br><span class="line"><span class="symbol">$</span> <span class="comment">// todo fix bug</span></span><br><span class="line"><span class="symbol">$</span> git push –u origin hotfixbug-[hotfix version <span class="keyword">No</span>.]/[bug name]</span><br><span class="line"><span class="symbol">$</span> <span class="comment">// create pull request to hotfix/[hotfix version No.]</span></span><br><span class="line"></span><br><span class="line"># <span class="number">4.</span> <span class="string">'master'</span>处理 merge 后, 测试人员跟进测试; 无误后, 申请 pull request 从 hotfix/[hotfix version <span class="keyword">No</span>.] 到 master</span><br><span class="line"><span class="symbol">$</span> <span class="comment">// create pull request to master</span></span><br><span class="line"></span><br><span class="line"># <span class="number">5.</span> <span class="string">'master'</span>merge to master. 针对项目维护者: git pull 和 git merge 是最常用的 merge Pull Requests 的方式, 在命令行下 merge 之后, PullRequest 也会相应地自动关闭; 或者在网站上点击同意合并</span><br><span class="line"><span class="symbol">$</span> git flow hotfix finish --<span class="keyword">no</span>-ff [hotfix version <span class="keyword">No</span>.]</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="https://weyunx.com/2019/02/28/gitflow-branching-model/" target="_blank" rel="noopener">「译」浅谈 Gitflow</a><br>[2]. <a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="noopener">git-flow 备忘清单</a><br>[3]. <a href="http://marklodato.github.io/visual-git-guide/index-zh-cn.html" target="_blank" rel="noopener">图解 Git</a></p>
+<hr>
+<h2 id="Git-在团队中的最佳实践系列"><a href="#Git-在团队中的最佳实践系列" class="headerlink" title="Git 在团队中的最佳实践系列"></a>Git 在团队中的最佳实践系列</h2><ul>
+<li><a href="1cad84b0.html">Git 在团队中的最佳实践（一）：Git 备忘清单</a></li>
+<li><a href="c0dca125.html">Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流</a></li>
+</ul>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>谢谢你长得那么好看，还打赏我！😘</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.jpg" alt="猫宁i 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.jpg" alt="猫宁i 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>猫宁i</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://blog.maoning.pro/archives/c0dca125.html" title="Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流">http://blog.maoning.pro/archives/c0dca125.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Git-flow/" rel="tag"># Git flow</a>
+          
+            <a href="/tags/工作流/" rel="tag"># 工作流</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/f30530aa.html" rel="next" title="Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱">
+                <i class="fa fa-chevron-left"></i> Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/archives/14348371.html" rel="prev" title="Redis 深度探险（三）：Redis 单机环境搭建以及配置说明">
+                Redis 深度探险（三）：Redis 单机环境搭建以及配置说明 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="猫宁i">
+            
+              <p class="site-author-name" itemprop="name">猫宁i</p>
+              <div class="site-description motion-element" itemprop="description">趁着年轻，好好生活，用心折腾。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">81</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://morning-pro.github.io/" title="https://morning-pro.github.io/" rel="noopener" target="_blank">我的镜像站</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://crossoverjie.top/" title="https://crossoverjie.top/" rel="noopener" target="_blank">crossoverJie's Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://fangjian0423.github.io/" title="http://fangjian0423.github.io/" rel="noopener" target="_blank">Format's Notes</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-flow-工作介绍"><span class="nav-number">2.</span> <span class="nav-text">Git flow 工作介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#版本管理的挑战"><span class="nav-number">2.1.</span> <span class="nav-text">版本管理的挑战</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-flow-流程"><span class="nav-number">2.2.</span> <span class="nav-text">Git flow 流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-flow-安装以及初始化"><span class="nav-number">3.</span> <span class="nav-text">Git flow 安装以及初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux-安装-Git-flow"><span class="nav-number">3.1.</span> <span class="nav-text">Linux 安装 Git flow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mac-安装-Git-flow"><span class="nav-number">3.2.</span> <span class="nav-text">Mac 安装 Git flow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Windows-安装-Git-flow"><span class="nav-number">3.3.</span> <span class="nav-text">Windows 安装 Git flow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-flow-初始化"><span class="nav-number">3.4.</span> <span class="nav-text">Git flow 初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-flow-分支模型的介绍"><span class="nav-number">4.</span> <span class="nav-text">Git flow 分支模型的介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#功能分支-Feature-分支"><span class="nav-number">4.1.</span> <span class="nav-text">功能分支 - Feature 分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#热修复分支-Hotfix-分支"><span class="nav-number">4.2.</span> <span class="nav-text">热修复分支 - Hotfix 分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发布分支-Release-分支"><span class="nav-number">4.3.</span> <span class="nav-text">发布分支 - Release 分支</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-的分支工作流与-Pull-Request"><span class="nav-number">5.</span> <span class="nav-text">Git 的分支工作流与 Pull Request</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">6.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-在团队中的最佳实践系列"><span class="nav-number">7.</span> <span class="nav-text">Git 在团队中的最佳实践系列</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-paper-plane"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">猫宁i</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">博客全站字数：</span>
+    
+    <span title="博客全站字数">447k</span>
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+  
+  <script color="0,0,0" opacity="0.3" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+  
+
+<script src="//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: '2saqKR15nDJaNg0KgkpiEIIB-gzGzoHsz',
+    appKey: 'NBf24H2IPzFCX7DjwNXFpDbH',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"react":{"opacity":0.7},"log":false,"tagMode":false});</script></body>
+</html>

@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: true,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言在 Jdk 8 中 Map 接口提供了一些新的便利的方法。因为在本文中我所提到的所有 Map 方法都是以默认值方法的方式实现的，所以现有的 Map 接口的实现可以直接拥有这些在默认值方法中定义的默认行为，而不需要新增一行代码。本文涵盖的 Jdk 8 中引进的 Map 方法有：getOrDefault(Object, V)，putIfAbsent(K, V)，remove(Object, Obj">
+<meta name="keywords" content="Java8,Map">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java8 那些事儿（四）：增强的 Map 集合">
+<meta property="og:url" content="http://blog.maoning.pro/archives/139a123e.html">
+<meta property="og:site_name" content="猫宁i">
+<meta property="og:description" content="前言在 Jdk 8 中 Map 接口提供了一些新的便利的方法。因为在本文中我所提到的所有 Map 方法都是以默认值方法的方式实现的，所以现有的 Map 接口的实现可以直接拥有这些在默认值方法中定义的默认行为，而不需要新增一行代码。本文涵盖的 Jdk 8 中引进的 Map 方法有：getOrDefault(Object, V)，putIfAbsent(K, V)，remove(Object, Obj">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.maoning.pro/images/55133220_p1.jpg">
+<meta property="og:updated_time" content="2019-10-31T07:26:03.387Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java8 那些事儿（四）：增强的 Map 集合">
+<meta name="twitter:description" content="前言在 Jdk 8 中 Map 接口提供了一些新的便利的方法。因为在本文中我所提到的所有 Map 方法都是以默认值方法的方式实现的，所以现有的 Map 接口的实现可以直接拥有这些在默认值方法中定义的默认行为，而不需要新增一行代码。本文涵盖的 Jdk 8 中引进的 Map 方法有：getOrDefault(Object, V)，putIfAbsent(K, V)，remove(Object, Obj">
+<meta name="twitter:image" content="http://blog.maoning.pro/images/55133220_p1.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="猫宁i" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://blog.maoning.pro/archives/139a123e.html">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java8 那些事儿（四）：增强的 Map 集合 | 猫宁i</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">猫宁i</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">趁着年轻，好好生活，用心折腾。</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives menu-item-active">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/books/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/139a123e.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java8 那些事儿（四）：增强的 Map 集合
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-23 19:51:12" itemprop="dateCreated datePublished" datetime="2018-11-23T19:51:12+08:00">2018-11-23</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java8/" itemprop="url" rel="index"><span itemprop="name">Java8</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/archives/139a123e.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/archives/139a123e.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/archives/139a123e.html" class="leancloud_visitors" data-flag-title="Java8 那些事儿（四）：增强的 Map 集合">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">7.7k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">7 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/55133220_p1.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在 Jdk 8 中 Map 接口提供了一些新的便利的方法。因为在本文中我所提到的所有 Map 方法都是以默认值方法的方式实现的，所以现有的 Map 接口的实现可以直接拥有这些在默认值方法中定义的默认行为，而不需要新增一行代码。本文涵盖的 Jdk 8 中引进的 Map 方法有：getOrDefault(Object, V)，putIfAbsent(K, V)，remove(Object, Object)，replace(K, V)，andreplace(K, V, V）。</p>
+<a id="more"></a>
+<h2 id="Map-范例"><a href="#Map-范例" class="headerlink" title="Map 范例"></a>Map 范例</h2><h3 id="Map-getOrDefault-Object-key-V-defaultValue"><a href="#Map-getOrDefault-Object-key-V-defaultValue" class="headerlink" title="Map.getOrDefault(Object key, V defaultValue)"></a>Map.getOrDefault(Object key, V defaultValue)</h3><p>Map 的新方法 getOrDefault(Object key, V defaultValue) 允许调用者在代码语句中规定获得在 map 中符合提供的键的值，否则在没有找到提供的键的匹配项的时候返回一个 “默认值”。</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">default</span> V getOrDefault(<span class="keyword">Object</span> <span class="built_in">key</span>, V defaultValue) &#123;</span><br><span class="line">    V v;</span><br><span class="line">    <span class="keyword">return</span> (((v = <span class="built_in">get</span>(<span class="built_in">key</span>)) != <span class="keyword">null</span>) || containsKey(<span class="built_in">key</span>))</span><br><span class="line">        ? v</span><br><span class="line">        : defaultValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Map-putIfAbsent-K-key-V-value"><a href="#Map-putIfAbsent-K-key-V-value" class="headerlink" title="Map.putIfAbsent(K key, V value)"></a>Map.putIfAbsent(K key, V value)</h3><p>Map 的新方法 putIfAbsent(K key, V value) 允许调用者在代码语句中规定添加在 map 中符合提供的键的值，若 map 中有对应 K 映射的 V 且不为 null 则直接返回，否则执行 put。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">default</span> V <span class="title">putIfAbsent</span>(<span class="params">K key, V <span class="keyword">value</span></span>)</span> &#123;</span><br><span class="line">    V v = <span class="keyword">get</span>(key);</span><br><span class="line">    <span class="keyword">if</span> (v == <span class="literal">null</span>) &#123;</span><br><span class="line">        v = put(key, <span class="keyword">value</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> v;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Map-computeIfAbsent-K-key-Function-lt-super-K-extends-V-gt-mappingFunction"><a href="#Map-computeIfAbsent-K-key-Function-lt-super-K-extends-V-gt-mappingFunction" class="headerlink" title="Map.computeIfAbsent(K key, Function&lt; ? super K, ? extends V&gt; mappingFunction)"></a>Map.computeIfAbsent(K key, Function&lt; ? super K, ? extends V&gt; mappingFunction)</h3><p>Map.computeIfAbsent 方法原型 V computeIfAbsent(K key, Function&lt; ? super K, ? extends V&gt; mappingFunction)，如果指定的 key 不存在或相关的 value 为 null 时，设置 key 与关联一个计算出的非 null 值，计算出的值为 null 的话什么也不做(不会去删除相应的 key)。如果 key 存在并且对应 value 不为 null 的话什么也不做。同样，方法的返回值也是最终的 map.get(key)。</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">default</span> V computeIfAbsent(K key, Function&lt;? <span class="keyword">super</span> K, ? extends V&gt; mappingFunction) &#123;</span><br><span class="line">    Objects.requireNonNull(mappingFunction);</span><br><span class="line">    V v;</span><br><span class="line">    <span class="keyword">if</span> ((v = <span class="keyword">get</span>(key)) == <span class="literal">null</span>) &#123;</span><br><span class="line">        V <span class="keyword">new</span><span class="type">Value</span>;</span><br><span class="line">        <span class="keyword">if</span> ((<span class="keyword">new</span><span class="type">Value</span> = mappingFunction.apply(key)) != <span class="literal">null</span>) &#123;</span><br><span class="line">            put(key, <span class="keyword">new</span><span class="type">Value</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span><span class="type">Value</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> v;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Map-computeIfPresent-K-key-BiFunction-lt-super-K-super-V-extends-V-gt-remappingFunction"><a href="#Map-computeIfPresent-K-key-BiFunction-lt-super-K-super-V-extends-V-gt-remappingFunction" class="headerlink" title="Map.computeIfPresent(K key, BiFunction&lt; ? super K, ? super V, ? extends V&gt; remappingFunction)"></a>Map.computeIfPresent(K key, BiFunction&lt; ? super K, ? super V, ? extends V&gt; remappingFunction)</h3><p>Map.computeIfPresent 方法原型 V computeIfPresent(K key, BiFunction&lt; ? super K, ? super V, ? extends V&gt; remappingFunction)，如果指定的 key 存在并且相关联的 value 不为 null 时，根据旧的 key 和 value 计算 newValue 替换旧值，newValue 为 null 则从 map 中删除该 key；key 不存在或相应的值为 null 时则什么也不做，方法的返回值为最终的 map.get(key)。</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">default</span> V computeIfPresent(K key,</span><br><span class="line">        BiFunction&lt;? <span class="keyword">super</span> K, ? <span class="keyword">super</span> V, ? extends V&gt; remappingFunction) &#123;</span><br><span class="line">    Objects.requireNonNull(remappingFunction);</span><br><span class="line">    V oldValue;</span><br><span class="line">    <span class="keyword">if</span> ((oldValue = <span class="keyword">get</span>(key)) != <span class="literal">null</span>) &#123;</span><br><span class="line">        V <span class="keyword">new</span><span class="type">Value</span> = remappingFunction.apply(key, oldValue);</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">new</span><span class="type">Value</span> != <span class="literal">null</span>) &#123;</span><br><span class="line">            put(key, <span class="keyword">new</span><span class="type">Value</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span><span class="type">Value</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            remove(key);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Map-remove-Object-key-Object-value"><a href="#Map-remove-Object-key-Object-value" class="headerlink" title="Map.remove(Object key, Object value)"></a>Map.remove(Object key, Object value)</h3><p>Map 的新方法 remove(Object key, Object value) 超越了长期有效的 Map.remove(Object key)方法，只有在提供的键和值都匹配的时候才会删除该 map 项（之前的有效版本只是查找 “键” 的匹配来删除）。</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">default</span> <span class="built_in">boolean</span> remove(<span class="keyword">Object</span> <span class="built_in">key</span>, <span class="keyword">Object</span> value) &#123;</span><br><span class="line">    <span class="keyword">Object</span> curValue = <span class="built_in">get</span>(<span class="built_in">key</span>);</span><br><span class="line">    <span class="keyword">if</span> (!Objects.equals(curValue, value) ||</span><br><span class="line">        (curValue == <span class="keyword">null</span> &amp;&amp; !containsKey(<span class="built_in">key</span>))) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    remove(<span class="built_in">key</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Map-replace-K-key-V-value-Map-replace-K-key-V-oldValue-V-newValue"><a href="#Map-replace-K-key-V-value-Map-replace-K-key-V-oldValue-V-newValue" class="headerlink" title="Map.replace(K key, V value)  / Map.replace(K key, V oldValue, V newValue)"></a>Map.replace(K key, V value)  / Map.replace(K key, V oldValue, V newValue)</h3><p>Map.replace(K key, V value)  方法只有在指定的键已经存在并且有与之相关的映射值时才会将指定的键映射到指定的值（新值）。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">default</span> V<span class="built_in"> replace</span>(K<span class="built_in"> key</span>, V <span class="keyword">value</span>) &#123;</span><br><span class="line">    V curValue;</span><br><span class="line">    <span class="keyword">if</span> (((curValue = get<span class="built_in">(key</span>)) != null) || containsKey<span class="built_in">(key</span>)) &#123;</span><br><span class="line">        curValue = put<span class="built_in">(key</span>, <span class="keyword">value</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> curValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Map.replace(K key, V oldValue, V newValue) 方法接受一个额外的（第三个）参数，只有在指定的键和值都匹配的情况下才会替换。 </p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">default</span> <span class="built_in">boolean</span> replace(K <span class="built_in">key</span>, V oldValue, V newValue) &#123;</span><br><span class="line">    <span class="keyword">Object</span> curValue = <span class="built_in">get</span>(<span class="built_in">key</span>);</span><br><span class="line">    <span class="keyword">if</span> (!Objects.equals(curValue, oldValue) ||</span><br><span class="line">        (curValue == <span class="keyword">null</span> &amp;&amp; !containsKey(<span class="built_in">key</span>))) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    put(<span class="built_in">key</span>, newValue);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Map-merge-K-key-V-value-BiFunction-lt-super-V-super-V-extends-V-gt-remappingFunction"><a href="#Map-merge-K-key-V-value-BiFunction-lt-super-V-super-V-extends-V-gt-remappingFunction" class="headerlink" title="Map.merge(K key, V value, BiFunction&lt; ? super V, ? super V, ? extends V&gt; remappingFunction)"></a>Map.merge(K key, V value, BiFunction&lt; ? super V, ? super V, ? extends V&gt; remappingFunction)</h3><p>Map.merge(K key, V value, BiFunction&lt; ? super V, ? super V, ? extends V&gt; remappingFunction) 方法，如果指定的 key 不存在，或相应的值为 null 时，则设置 value 为相关联的值。否则根据 key 对应的旧值和 value 计算出新的值 newValue，newValue 为 null 时，删除该 key，否则设置 key 对应的值为 newValue。方法的返回值也是最终的 map.get(key) 值。</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">default</span> V merge(K key, V value,</span><br><span class="line">        BiFunction&lt;? <span class="keyword">super</span> V, ? <span class="keyword">super</span> V, ? extends V&gt; remappingFunction) &#123;</span><br><span class="line">    Objects.requireNonNull(remappingFunction);</span><br><span class="line">    Objects.requireNonNull(value);</span><br><span class="line">    V oldValue = <span class="keyword">get</span>(key);</span><br><span class="line">    V <span class="keyword">new</span><span class="type">Value</span> = (oldValue == <span class="literal">null</span>) ? value :<span class="type"></span></span><br><span class="line"><span class="type">               remappingFunction</span>.apply(oldValue, value);</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">new</span><span class="type">Value</span> == <span class="literal">null</span>) &#123;</span><br><span class="line">        remove(key);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        put(key, <span class="keyword">new</span><span class="type">Value</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span><span class="type">Value</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Map-forEach-BiConsumer-lt-super-K-super-V-gt-action"><a href="#Map-forEach-BiConsumer-lt-super-K-super-V-gt-action" class="headerlink" title="Map.forEach(BiConsumer&lt; ? super K, ? super V&gt; action)"></a>Map.forEach(BiConsumer&lt; ? super K, ? super V&gt; action)</h3><p>Map.forEach(BiConsumer&lt; ? super K, ? super V&gt; action) 方法用于遍历 map。</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JDK8 之前的实现方式 方式一 这是最常见的并且在大多数情况下也是最可取的遍历方式</span></span><br><span class="line"><span class="keyword">for</span> (Map.Entry&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt; entry : statesAndCapitals.entrySet()) &#123;</span><br><span class="line">    System.out.<span class="built_in">println</span>(<span class="string">"Key ="</span> + entry.getKey() + <span class="string">", Value ="</span> + entry.getValue());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// JDK8 之前的实现方式 方法二 在 for-each 循环中遍历 keys 或 values</span></span><br><span class="line"><span class="comment">// 遍历 map 中的键</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">String</span> <span class="built_in">key</span> : statesAndCapitals.keySet()) &#123;</span><br><span class="line">    System.out.<span class="built_in">println</span>(<span class="string">"Key ="</span> + <span class="built_in">key</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 遍历 map 中的值</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">String</span> value : statesAndCapitals.values()) &#123;</span><br><span class="line">    System.out.<span class="built_in">println</span>(<span class="string">"Value ="</span> + value);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// JDK8 之前的实现方式 方法三使用 Iterator 遍历</span></span><br><span class="line">Iterator&lt;Map.Entry&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;&gt; entries = statesAndCapitals.entrySet().iterator();</span><br><span class="line"><span class="keyword">while</span> (entries.hasNext()) &#123;</span><br><span class="line">    Map.Entry&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt; entry = entries.next();</span><br><span class="line">    System.out.<span class="built_in">println</span>(<span class="string">"Key ="</span> + entry.getKey() + <span class="string">", Value ="</span> + entry.getValue());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// JDK8 之前的实现方式 通过键找值遍历（效率低）</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">String</span> <span class="built_in">key</span> : statesAndCapitals.keySet()) &#123;</span><br><span class="line">    <span class="keyword">String</span> value = statesAndCapitals.<span class="built_in">get</span>(<span class="built_in">key</span>);</span><br><span class="line">    System.out.<span class="built_in">println</span>(<span class="string">"Key ="</span> + <span class="built_in">key</span> + <span class="string">", Value ="</span> + value);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// JDK8 的实现方式</span></span><br><span class="line">statesAndCapitals.forEach((s, s2) -&gt; System.out.<span class="built_in">println</span>(<span class="string">"Key ="</span> + s + <span class="string">", Value ="</span> + s2));</span><br></pre></td></tr></table></figure>
+<h3 id="Map-sorted"><a href="#Map-sorted" class="headerlink" title="Map.sorted"></a>Map.sorted</h3><p>Map.sorted 方法用于排序 map。</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 1. 第一层括弧实际是定义了一个匿名内部类 (Anonymous Inner Class)</span></span><br><span class="line"><span class="comment"> * 2. 第二层括弧实际上是一个实例初始化块 (instance initializer block), 这个块在内部匿名类构造时被执行, 这个块之所以被叫做 “实例初始化块” 是因为它们被定义在了一个类的实例范围内</span></span><br><span class="line"><span class="comment"> * 3. 如果 value 为 java 对象, 则需要实现 Comparable 接口, 重写 compareTo 方法</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="built_in">Integer</span>&gt; <span class="built_in">map</span> = <span class="literal">new</span> HashMap&lt;<span class="built_in">String</span>, <span class="built_in">Integer</span>&gt;() &#123;</span><br><span class="line">    &#123;</span><br><span class="line">        put(<span class="string">"A"</span>, <span class="number">3</span>);</span><br><span class="line">        put(<span class="string">"B"</span>, <span class="number">5</span>);</span><br><span class="line">        put(<span class="string">"C"</span>, <span class="number">1</span>);</span><br><span class="line">        put(<span class="string">"D"</span>, <span class="number">1</span>);</span><br><span class="line">        put(<span class="string">"E"</span>, <span class="number">9</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">System.out.println(<span class="built_in">map</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. 根据 value 对 map 进行 ASC 排序</span></span><br><span class="line"><span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="built_in">Integer</span>&gt; sortedMap = <span class="literal">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line"><span class="built_in">map</span>.entrySet()</span><br><span class="line">        .stream()</span><br><span class="line">        .sorted(<span class="built_in">Map</span>.Entry.comparingByValue())</span><br><span class="line">        .forEachOrdered(x -&gt; sortedMap.put(x.getKey(), x.getValue()));</span><br><span class="line">System.out.println(sortedMap);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. 根据 value 对 map 进行 DESC 排序</span></span><br><span class="line"><span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="built_in">Integer</span>&gt; sortedMap2 = <span class="literal">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line"><span class="built_in">map</span>.entrySet()</span><br><span class="line">        .stream()</span><br><span class="line">        <span class="comment">// DESC .sorted(Map.Entry.&lt;String, Integer&gt;comparingByValue().reversed())</span></span><br><span class="line">        .sorted(Collections.reverseOrder(<span class="built_in">Map</span>.Entry.comparingByValue()))</span><br><span class="line">        .forEachOrdered(x -&gt; sortedMap2.put(x.getKey(), x.getValue()));</span><br><span class="line">System.out.println(sortedMap2);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3.Collectors.toMap 直接返回排好序的 map</span></span><br><span class="line"><span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="built_in">Integer</span>&gt; sortedMap3;</span><br><span class="line">sortedMap3 = <span class="built_in">map</span>.entrySet()</span><br><span class="line">        .stream()</span><br><span class="line">        .sorted(<span class="built_in">Map</span>.Entry.&lt;<span class="built_in">String</span>, <span class="built_in">Integer</span>&gt;comparingByValue().reversed())</span><br><span class="line">        <span class="comment">// .collect(Collectors.toMap(x -&gt; x.getKey(), x -&gt; x.getValue(), (x1, x2) -&gt; x2, LinkedHashMap::new));</span></span><br><span class="line">        .collect(Collectors.toMap(<span class="built_in">Map</span>.Entry<span class="type">::getKey</span>, <span class="built_in">Map</span>.Entry<span class="type">::getValue</span>, (x1, x2) -&gt; x2, LinkedHashMap<span class="type">::new</span>));</span><br><span class="line">System.out.println(sortedMap3);</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="https://www.javacodegeeks.com/2014/04/handy-new-map-default-methods-in-jdk-8.html" target="_blank" rel="noopener">Handy New Map Default Methods in JDK 8</a><br>[2]. <a href="http://www.cnblogs.com/qdwyg2013/p/5631057.html" target="_blank" rel="noopener">Java8 之 Stream/Map</a><br>[3]. <a href="https://www.jb51.net/article/149944.htm" target="_blank" rel="noopener">Java8 Map 中新增的方法使用总结</a></p>
+<hr>
+<h2 id="Java8-那些事儿系列"><a href="#Java8-那些事儿系列" class="headerlink" title="Java8 那些事儿系列"></a>Java8 那些事儿系列</h2><ul>
+<li><a href="8cef11db.html">Java8 那些事儿（一）：Stream 函数式编程</a></li>
+<li><a href="8eb6feba.html">Java8 那些事儿（二）：Optional 类解决空指针异常</a></li>
+<li><a href="d66032e3.html">Java8 那些事儿（三）：Date/Time API(JSR 310)</a></li>
+<li><a href="139a123e.html">Java8 那些事儿（四）：增强的 Map 集合</a></li>
+<li><a href="43810ae.html">Java8 那些事儿（五）：函数式接口</a></li>
+</ul>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>谢谢你长得那么好看，还打赏我！😘</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.jpg" alt="猫宁i 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.jpg" alt="猫宁i 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>猫宁i</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://blog.maoning.pro/archives/139a123e.html" title="Java8 那些事儿（四）：增强的 Map 集合">http://blog.maoning.pro/archives/139a123e.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java8/" rel="tag"># Java8</a>
+          
+            <a href="/tags/Map/" rel="tag"># Map</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/q1e3r5t42.html" rel="next" title="Java 并发编程之美（三）：异步执行框架 Eexecutor">
+                <i class="fa fa-chevron-left"></i> Java 并发编程之美（三）：异步执行框架 Eexecutor
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/archives/c2d5e679.html" rel="prev" title="MySQL 进阶讲解（一）：MySQL 索引原理">
+                MySQL 进阶讲解（一）：MySQL 索引原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="猫宁i">
+            
+              <p class="site-author-name" itemprop="name">猫宁i</p>
+              <div class="site-description motion-element" itemprop="description">趁着年轻，好好生活，用心折腾。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">81</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://morning-pro.github.io/" title="https://morning-pro.github.io/" rel="noopener" target="_blank">我的镜像站</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://crossoverjie.top/" title="https://crossoverjie.top/" rel="noopener" target="_blank">crossoverJie's Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://fangjian0423.github.io/" title="http://fangjian0423.github.io/" rel="noopener" target="_blank">Format's Notes</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Map-范例"><span class="nav-number">2.</span> <span class="nav-text">Map 范例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Map-getOrDefault-Object-key-V-defaultValue"><span class="nav-number">2.1.</span> <span class="nav-text">Map.getOrDefault(Object key, V defaultValue)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Map-putIfAbsent-K-key-V-value"><span class="nav-number">2.2.</span> <span class="nav-text">Map.putIfAbsent(K key, V value)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Map-computeIfAbsent-K-key-Function-lt-super-K-extends-V-gt-mappingFunction"><span class="nav-number">2.3.</span> <span class="nav-text">Map.computeIfAbsent(K key, Function&lt; ? super K, ? extends V&gt; mappingFunction)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Map-computeIfPresent-K-key-BiFunction-lt-super-K-super-V-extends-V-gt-remappingFunction"><span class="nav-number">2.4.</span> <span class="nav-text">Map.computeIfPresent(K key, BiFunction&lt; ? super K, ? super V, ? extends V&gt; remappingFunction)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Map-remove-Object-key-Object-value"><span class="nav-number">2.5.</span> <span class="nav-text">Map.remove(Object key, Object value)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Map-replace-K-key-V-value-Map-replace-K-key-V-oldValue-V-newValue"><span class="nav-number">2.6.</span> <span class="nav-text">Map.replace(K key, V value)  / Map.replace(K key, V oldValue, V newValue)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Map-merge-K-key-V-value-BiFunction-lt-super-V-super-V-extends-V-gt-remappingFunction"><span class="nav-number">2.7.</span> <span class="nav-text">Map.merge(K key, V value, BiFunction&lt; ? super V, ? super V, ? extends V&gt; remappingFunction)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Map-forEach-BiConsumer-lt-super-K-super-V-gt-action"><span class="nav-number">2.8.</span> <span class="nav-text">Map.forEach(BiConsumer&lt; ? super K, ? super V&gt; action)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Map-sorted"><span class="nav-number">2.9.</span> <span class="nav-text">Map.sorted</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">3.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java8-那些事儿系列"><span class="nav-number">4.</span> <span class="nav-text">Java8 那些事儿系列</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-paper-plane"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">猫宁i</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">博客全站字数：</span>
+    
+    <span title="博客全站字数">447k</span>
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+  
+  <script color="0,0,0" opacity="0.3" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+  
+
+<script src="//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: '2saqKR15nDJaNg0KgkpiEIIB-gzGzoHsz',
+    appKey: 'NBf24H2IPzFCX7DjwNXFpDbH',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"react":{"opacity":0.7},"log":false,"tagMode":false});</script></body>
+</html>

@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: true,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言“一个网站有 20 亿 url 存在一个黑名单中，这个黑名单要怎么存？若此时随便输入一个 url，你如何快速判断该 url 是否在这个黑名单中？并且需在给定内存空间（比如：500M）内快速判断出。” 这是一道经常在面试中出现的算法题。 很多人脑海中首先想到的可能是 HashSet，因为 HashSet 的底层是采用 HashMap 实现的，理论上时间复杂度为：O(1)。达到了快速的目的，但是空">
+<meta name="keywords" content="数据结构,排序算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大话数据结构（二）：大白话布隆过滤器 Bloom Filter">
+<meta property="og:url" content="http://blog.maoning.pro/archives/6e0aae0d.html">
+<meta property="og:site_name" content="猫宁i">
+<meta property="og:description" content="前言“一个网站有 20 亿 url 存在一个黑名单中，这个黑名单要怎么存？若此时随便输入一个 url，你如何快速判断该 url 是否在这个黑名单中？并且需在给定内存空间（比如：500M）内快速判断出。” 这是一道经常在面试中出现的算法题。 很多人脑海中首先想到的可能是 HashSet，因为 HashSet 的底层是采用 HashMap 实现的，理论上时间复杂度为：O(1)。达到了快速的目的，但是空">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.maoning.pro/images/f4b50708-7545-42ad-b1c7-cf0938d92f9d.jpg">
+<meta property="og:updated_time" content="2019-10-11T10:31:56.528Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="大话数据结构（二）：大白话布隆过滤器 Bloom Filter">
+<meta name="twitter:description" content="前言“一个网站有 20 亿 url 存在一个黑名单中，这个黑名单要怎么存？若此时随便输入一个 url，你如何快速判断该 url 是否在这个黑名单中？并且需在给定内存空间（比如：500M）内快速判断出。” 这是一道经常在面试中出现的算法题。 很多人脑海中首先想到的可能是 HashSet，因为 HashSet 的底层是采用 HashMap 实现的，理论上时间复杂度为：O(1)。达到了快速的目的，但是空">
+<meta name="twitter:image" content="http://blog.maoning.pro/images/f4b50708-7545-42ad-b1c7-cf0938d92f9d.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="猫宁i" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://blog.maoning.pro/archives/6e0aae0d.html">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>大话数据结构（二）：大白话布隆过滤器 Bloom Filter | 猫宁i</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">猫宁i</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">趁着年轻，好好生活，用心折腾。</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives menu-item-active">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/books/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/6e0aae0d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">大话数据结构（二）：大白话布隆过滤器 Bloom Filter
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-11 18:12:18" itemprop="dateCreated datePublished" datetime="2019-10-11T18:12:18+08:00">2019-10-11</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数据结构/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/archives/6e0aae0d.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/archives/6e0aae0d.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/archives/6e0aae0d.html" class="leancloud_visitors" data-flag-title="大话数据结构（二）：大白话布隆过滤器 Bloom Filter">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">9.7k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">9 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/f4b50708-7545-42ad-b1c7-cf0938d92f9d.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>“一个网站有 20 亿 url 存在一个黑名单中，这个黑名单要怎么存？若此时随便输入一个 url，你如何快速判断该 url 是否在这个黑名单中？并且需在给定内存空间（比如：500M）内快速判断出。” 这是一道经常在面试中出现的算法题。</p>
+<p>很多人脑海中首先想到的可能是 HashSet，因为 HashSet 的底层是采用 HashMap 实现的，理论上时间复杂度为：O(1)。达到了快速的目的，但是空间复杂度呢？URL 字符串通过 Hash 得到一个 Integer 的值，Integer 占 4 个字节，那 20 亿个 URL 理论上需要：4 字节 (byte) * 20 亿  =  80 亿 (byte)  ≈ 7.45G   的内存空间，不满足空间复杂度的要求。</p>
+<p>还有一种方法就是位图法<sup>[1]</sup>，每个 URL 取整数哈希值，置于位图相应的位置上，看上去是可行的。但位图适合对海量的、取值分布很均匀的集合去重。位图法的所占空间随集合内最大元素的增大而增大，即空间复杂度随集合内最大元素增大而线性增大。要设计冲突率很低的哈希函数，势必要增加哈希值的取值范围，4G 的位图最大值是 320 亿左右，为 50 亿条 URL 设计冲突率很低、最大值为 320 亿的哈希函数比较困难。这就会带来一个问题，如果查找的元素数量少但其中某个元素的值很大，比如数字范围是 1 到 1000 亿，那消耗的空间不容乐观。因此，出于性能和内存占用的考虑，在这里使用布隆过滤器才是最好的解决方案：布隆过滤器是对位图的一种改进。</p>
+<p>这里就引出本文要介绍的 “布隆过滤器”。</p>
+<a id="more"></a>
+<h2 id="Bloom-Filter-概述"><a href="#Bloom-Filter-概述" class="headerlink" title="Bloom Filter 概述"></a>Bloom Filter 概述</h2><p>布隆过滤器（Bloom Filter）是 1970 年由布隆提出的。它实际上是一个很长的二进制向量和一系列随机映射函数。布隆过滤器可以用于检索一个元素是否在一个集合中。它的优点是空间效率和查询时间都远远超过一般的算法，缺点是有一定的误识别率和删除困难。</p>
+<p>本质上布隆过滤器是一种数据结构，比较巧妙的概率型数据结构（probabilistic data structure），特点是高效地插入和查询，可以用来告诉你 “某样东西一定不存在或者可能存在”。相比于传统的 List、Set、Map 等数据结构，它更高效、占用空间更少，但是缺点是其返回的结果是概率性的，而不是确切的。</p>
+<p>布隆过滤器可以理解为一个不怎么精确的 set 结构，当你使用它的 contains 方法判断某个对象是否存在时，它可能会误判。但是布隆过滤器也不是特别不精确，只要参数设置的合理，它的精确度可以控制的相对足够精确，只会有小小的误判概率。</p>
+<h2 id="Bloom-Filter-原理"><a href="#Bloom-Filter-原理" class="headerlink" title="Bloom Filter 原理"></a>Bloom Filter 原理</h2><p>布隆过滤器的原理是，当一个元素被加入集合时，通过 K 个散列函数将这个元素映射成一个位数组中的 K 个点，把它们置为 1。检索时，我们只要看看这些点是不是都是 1 就（大约）知道集合中有没有它了：如果这些点有任何一个 0，则被检元素一定不在；如果都是 1，则被检元素很可能在。这就是布隆过滤器的基本思想。</p>
+<p>Bloom Filter 跟单哈希函数 Bit-Map 不同之处在于：Bloom Filter 使用了 k 个哈希函数，每个字符串跟 k 个 bit 对应，从而降低了冲突的概率。</p>
+<p><img src="/media/15697553373443/740591-20180623183045586-692673875.jpg" alt="740591-20180623183045586-692673875"></p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>主要是解决大规模数据下不需要精确过滤的场景。</p>
+<ul>
+<li>检查垃圾邮件地址：如果用哈希表，每存储一亿个 email 地址，就需要 1.6GB 的内存（用哈希表实现的具体办法是将每一个 email 地址对应成一个八字节的信息指纹，然后将这些信息指纹存入哈希表，由于哈希表的存储效率一般只有 50%，因此一个 email 地址需要占用十六个字节。一亿个地址大约要 1.6GB，即十六亿字节的内存）。因此存贮几十亿个邮件地址可能需要上百 GB 的内存。而 Bloom Filter 只需要哈希表 1/8 到 1/4 的大小就能解决同样的问题。布隆过滤器决不会漏掉任何一个在黑名单中的可疑地址。至于误判问题，常见的补救办法是在建立一个小的白名单，存储那些可能被误判的清白邮件地址。</li>
+<li>解决缓存穿透：缓存穿透，是指查询一个数据库中不一定存在的数据。正常情况下，查询先进行缓存查询，如果 key 不存在或者 key 已经过期，再对数据库进行查询，并将查询到的对象放进缓存。如果每次都查询一个数据库中不存在的 key，由于缓存中没有数据，每次都会去查询数据库，很可能会对数据库造成影响。缓存穿透的一种解决办法是为不存在的 key 缓存一个空值，直接在缓存层返回。这样做的弊端就是缓存太多空值占用了太多额外的空间，这点可以通过给缓存层空值设立一个较短的过期时间来解决。另一种解决办法就是使用布隆过滤器，查询一个 key 时，先使用布隆过滤器进行过滤，如果判断请求查询 key 值存在，则继续查询数据库；如果判断请求查询不存在，直接丢弃。</li>
+<li>Key-Value 缓存系统的 Key 校验：在很多 Key-Value 系统中也使用了布隆过滤器来加快查询过程，如 Hbase，Accumulo，Leveldb，一般而言，Value 保存在磁盘中，访问磁盘需要花费大量时间，然而使用布隆过滤器可以快速判断某个 Key 对应的 Value 是否存在，因此可以避免很多不必要的磁盘 IO 操作，只是引入布隆过滤器会带来一定的内存消耗。</li>
+<li>Google 的 BigTable：Google 的 BigTable 也使用了布隆过滤器，以减少不存在的行或列在磁盘上的 I/O。</li>
+<li>新闻客户端推荐系统：推荐系统给用户推荐新闻，避免重复推送。</li>
+<li>爬虫 URL 地址去重：爬虫时判断某个 URL 是否已经被爬取过。</li>
+<li>单词拼写检查</li>
+<li>黑名单过滤</li>
+<li>…</li>
+</ul>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><h3 id="HashSet-实现"><a href="#HashSet-实现" class="headerlink" title="HashSet 实现"></a>HashSet 实现</h3><p>利用 HashSet 实现黑名单过滤，写入和判断元素是否存在都有对应的 API，所以实现起来也比较简单。</p>
+<p>通过单元测试演示 HashSet 实现黑名单过滤功能；同时为了前后的对比将堆内存写死（-Xms64m -Xmx64m），为了方便调试加入了 GC 日志的打印（-XX:+PrintHeapAtGC），以及内存溢出后 Dump 内存（-XX:+HeapDumpOnOutOfMemoryError）。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">-Xms64m</span> <span class="selector-tag">-Xmx64m</span> <span class="selector-tag">-XX</span><span class="selector-pseudo">:+PrintHeapAtGC</span> <span class="selector-tag">-XX</span><span class="selector-pseudo">:+HeapDumpOnOutOfMemoryError</span></span><br></pre></td></tr></table></figure>
+<p>1、写入 100 条数据时：</p>
+<figure class="highlight irpf90"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line"><span class="keyword">public</span> void testHashSet() &#123;</span><br><span class="line">    long start = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">    Set&lt;<span class="keyword">Integer</span>&gt; hashSet = new HashSet&lt;&gt;(<span class="number">10000000</span>);</span><br><span class="line">    for (<span class="built_in">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">        hashSet.add(i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">Assert</span>.assertTrue(hashSet.<span class="keyword">contains</span>(<span class="number">1</span>));</span><br><span class="line">    <span class="keyword">Assert</span>.assertTrue(hashSet.<span class="keyword">contains</span>(<span class="number">2</span>));</span><br><span class="line">    <span class="keyword">Assert</span>.assertTrue(hashSet.<span class="keyword">contains</span>(<span class="number">3</span>));</span><br><span class="line"></span><br><span class="line">    long <span class="keyword">end</span> = System.currentTimeMillis();</span><br><span class="line">    System.<span class="keyword">out</span>.printf(<span class="string">"执行时间：%s \n"</span>, <span class="keyword">end</span> - start);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2、写入 1000 W 条数据时：</p>
+<figure class="highlight irpf90"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line"><span class="keyword">public</span> void testHashSet() &#123;</span><br><span class="line">    long start = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">    Set&lt;<span class="keyword">Integer</span>&gt; hashSet = new HashSet&lt;&gt;(<span class="number">10000000</span>);</span><br><span class="line">    for (<span class="built_in">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">        hashSet.add(i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">Assert</span>.assertTrue(hashSet.<span class="keyword">contains</span>(<span class="number">1</span>));</span><br><span class="line">    <span class="keyword">Assert</span>.assertTrue(hashSet.<span class="keyword">contains</span>(<span class="number">2</span>));</span><br><span class="line">    <span class="keyword">Assert</span>.assertTrue(hashSet.<span class="keyword">contains</span>(<span class="number">3</span>));</span><br><span class="line"></span><br><span class="line">    long <span class="keyword">end</span> = System.currentTimeMillis();</span><br><span class="line">    System.<span class="keyword">out</span>.printf(<span class="string">"执行时间：%s \n"</span>, <span class="keyword">end</span> - start);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行后马上就内存溢出，可见在内存有限的情况下我们不能使用这种方式。</p>
+<p><img src="/media/15697553373443/20191008192956.png" alt="20191008192956"></p>
+<h3 id="Guava-中的布隆过滤器"><a href="#Guava-中的布隆过滤器" class="headerlink" title="Guava 中的布隆过滤器"></a>Guava 中的布隆过滤器</h3><p>BloomFilter 实现的一个重点就是怎么利用 hash 函数把数据映射到 bit 数组中。Guava 的实现是对元素通过 MurmurHash3 计算 hash 值，将得到的 hash 值取高 8 个字节以及低 8 个字节进行计算，以得当前元素在 bit 数组中对应的多个位置。</p>
+<p>Guava 会通过你预计的数量以及误报率帮你计算出你应当会使用的数组大小 numBits 以及需要计算几次 Hash 函数 numHashFunctions 。</p>
+<p>1、组件依赖：通过 Maven 引入 Guava 开源组件，在 pom.xml 文件加入下面的代码：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.google.guava<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>guava<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>28.1-jre<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>2、代码实现：通过 Java 代码实现布隆过滤器</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testGuava</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">long</span> start = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 预期数据量</span></span><br><span class="line">    <span class="keyword">long</span> expectedInsertions = <span class="number">10000000</span>;</span><br><span class="line">    <span class="comment">// 预期误判率</span></span><br><span class="line">    <span class="keyword">double</span> fpp = <span class="number">0.001</span>;</span><br><span class="line">    <span class="comment">// 创建存储 Integer 数据的布隆过滤器</span></span><br><span class="line">    BloomFilter&lt;Integer&gt; bloomFilter = BloomFilter.create(Funnels.integerFunnel(), expectedInsertions, fpp);</span><br><span class="line">    <span class="comment">// 插入数据</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">        bloomFilter.put(i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 判断过滤器中是否存在元素</span></span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (bloomFilter.mightContain(i)) &#123;</span><br><span class="line">            count++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    System.<span class="keyword">out</span>.printf(<span class="string">"预期数据量：%s，判断数量：%s，预期误判率：%s，存在比率：%s \n"</span>, <span class="number">10000000</span>, count, fpp, count * <span class="number">1.0</span> / expectedInsertions);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 判断误判比例</span></span><br><span class="line">    <span class="keyword">int</span> fppCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">10000000</span>; i &lt; <span class="number">20000000</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (bloomFilter.mightContain(i)) &#123;</span><br><span class="line">            fppCount++;</span><br><span class="line">            System.<span class="keyword">out</span>.println(i + <span class="string">"误判了"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    System.<span class="keyword">out</span>.printf(<span class="string">"预期数据量：%s，误判数量：%s，预期误判率：%s，实际误判率：%s \n"</span>, <span class="number">10000000</span>, fppCount, fpp, fppCount * <span class="number">1.0</span> / expectedInsertions);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">long</span> end = System.currentTimeMillis();</span><br><span class="line">    System.<span class="keyword">out</span>.printf(<span class="string">"执行时间：%s \n"</span>, end - start);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码分析：我们的定义了一个预期数据量为 1000 W、预期误判率为 0.001 的布隆过滤器，接下来向布隆过滤器中插入了 0-10000000 数据，然后用 0- 10000000 以及 10000000-20000000 数据来测试误判率。</p>
+<p>（1）经过测试：“预期数据量：10000000，判断数量：10000000，预期误判率：0.001，存在比率：1.0 ”，可发现当过滤器判断 0-10000000 的数据时，存在比率为 1.0，即布隆过滤器对于已经见过的元素肯定不会误判，它只会误判那些没见过的元素。</p>
+<p>（2）经过测试：“预期数据量：10000000，误判数量：10132，预期误判率：0.001，实际误判率：0.0010132” ，符合预期误判率：0.001。</p>
+<h3 id="Redis-中的布隆过滤器"><a href="#Redis-中的布隆过滤器" class="headerlink" title="Redis 中的布隆过滤器"></a>Redis 中的布隆过滤器</h3><h4 id="安装-Rebloom-插件"><a href="#安装-Rebloom-插件" class="headerlink" title="安装 Rebloom 插件"></a>安装 Rebloom 插件</h4><p>1、安装 Rebloom 插件：Redis 安装在这里就不介绍了，这里讲一下 Rebloom 插件安装。</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 下载 Rebloom 源文件</span></span><br><span class="line"><span class="symbol">$</span> git clone git:<span class="comment">//github.com/RedisLabsModules/rebloom</span></span><br><span class="line"><span class="comment">// 进入 Rebloom 目录</span></span><br><span class="line"><span class="symbol">$</span> cd rebloom</span><br><span class="line"><span class="comment">// 编译插件</span></span><br><span class="line"><span class="symbol">$</span> make</span><br></pre></td></tr></table></figure>
+<p>2、加载 Rebloom 插件方法</p>
+<p>（1）、在启动的 client 中使用 MODULE LOAD 命令去加载（重启 Redis 后失效）</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MODULE LOAD <span class="regexp">/usr/</span>lib64<span class="regexp">/redis/m</span>odules<span class="regexp">/rebloom/</span>redisbloom.so</span><br></pre></td></tr></table></figure>
+<p>（2）、命令行加载 Rebloom 插件</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/usr/</span>bin<span class="regexp">/redis-server /</span>etc<span class="regexp">/redis.conf --loadmodule /u</span>sr<span class="regexp">/lib64/</span>redis<span class="regexp">/modules/</span>rebloom<span class="regexp">/redisbloom.so</span></span><br></pre></td></tr></table></figure>
+<p>（3）、在 redis.conf 文件中加入配置信息</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">loadmodule <span class="regexp">/usr/</span>lib64<span class="regexp">/redis/m</span>odules<span class="regexp">/rebloom/</span>redisbloom.so</span><br></pre></td></tr></table></figure>
+<p>3、通过命令测试 Redis Bloom Filter</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建一个空的布隆过滤器，并设置一个期望的错误率和初始大小。</span></span><br><span class="line"><span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">6379</span>&gt; BF<span class="selector-class">.RESERVE</span> userid <span class="number">0.01</span> <span class="number">100000</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 往过滤器中添加元素。如果 key 不存在，过滤器会自动创建。</span></span><br><span class="line"><span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">6379</span>&gt; BF<span class="selector-class">.ADD</span> userid <span class="string">'101310299'</span></span><br><span class="line"><span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">6379</span>&gt; BF<span class="selector-class">.MADD</span> userid <span class="string">'101310299'</span> <span class="string">'101310366'</span> <span class="string">'101310211'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 判断过滤器中是否存在该元素，不存在返回 0，存在返回 1。</span></span><br><span class="line"><span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">6379</span>&gt; BF<span class="selector-class">.EXISTS</span> userid <span class="string">'101310299'</span></span><br><span class="line"><span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">6379</span>&gt; BF<span class="selector-class">.EXISTS</span> userid <span class="string">'101310299'</span> <span class="string">'10saa'</span> <span class="string">'101310211'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取该 Bloom Filter 使用的内存大小</span></span><br><span class="line"><span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">6379</span>&gt; Memory Usage userid</span><br></pre></td></tr></table></figure>
+<h4 id="通过-Java-代码实现布隆过滤器"><a href="#通过-Java-代码实现布隆过滤器" class="headerlink" title="通过 Java 代码实现布隆过滤器"></a>通过 Java 代码实现布隆过滤器</h4><p>1、组件依赖：通过 Maven 引入 Redisson <sup>[2]</sup>开源组件，在 pom.xml 文件加入下面的代码：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.redisson<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>redisson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.9.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>2、代码实现：通过 Java 代码实现布隆过滤器</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> testRedis() &#123;</span><br><span class="line">    <span class="keyword">long</span> start = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置 Redis 连接信息</span></span><br><span class="line">    Config <span class="built_in">config</span> = <span class="keyword">new</span> Config();</span><br><span class="line">    <span class="built_in">config</span>.useSingleServer().setAddress(<span class="string">"redis://127.0.0.1:6379"</span>)</span><br><span class="line">            .setPassword(<span class="string">"password"</span>)</span><br><span class="line">            .setDatabase(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建 Redisson 客户端</span></span><br><span class="line">    RedissonClient redissonClient = Redisson.create(<span class="built_in">config</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Redisson 利用 Redis 实现了 Java 分布式布隆过滤器（Bloom Filter）</span></span><br><span class="line">    RBloomFilter&lt;Integer&gt; bloomFilter = redissonClient.getBloomFilter(<span class="string">"userid"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 预期数据量</span></span><br><span class="line">    <span class="keyword">long</span> expectedInsertions = <span class="number">10000</span>;</span><br><span class="line">    <span class="comment">// 预期误判率</span></span><br><span class="line">    <span class="keyword">double</span> fpp = <span class="number">0.01</span>;</span><br><span class="line">    <span class="comment">// 初始化布隆过滤器，预计统计元素数量为 10000，期望误差率为 0.001</span></span><br><span class="line">    bloomFilter.tryInit(expectedInsertions, fpp);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 插入数据</span></span><br><span class="line">    <span class="built_in">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; expectedInsertions; i++) &#123;</span><br><span class="line">        bloomFilter.add(i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 判断误判比例</span></span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">for</span> (<span class="keyword">int</span> i = <span class="number">10000</span>; i &lt; <span class="number">20000</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">if</span> (bloomFilter.contains(i)) &#123;</span><br><span class="line">            count++;</span><br><span class="line">            System.out.<span class="built_in">println</span>(i + <span class="string">"误判了"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    System.out.printf(<span class="string">"预期数据量：%s，误判数量：%s，预期误判率：%s，实际误判率：%s \n"</span>, expectedInsertions, count, fpp, count * <span class="number">1.0</span> / <span class="number">10000</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">long</span> <span class="built_in">end</span> = System.currentTimeMillis();</span><br><span class="line">    System.out.printf(<span class="string">"执行时间：%s \n"</span>, <span class="built_in">end</span> - start);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码分析：Redisson 利用 Redis 实现了 Java 分布式布隆过滤器（Bloom Filter），通过 RedissonClient 初始化布隆过滤器，预计统计元素数量为 10000，期望误差率为 0.001。“预期数据量：10000，误判数量：51，预期误判率：0.001，实际误判率：0.00255 ”。我们看到了误判率大约 0.255%，比预计的 0.1% 高，不过布隆的概率是有误差的，只要不比预计误判率高太多，都是正常现象。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>在使用 Bloom Filter 时，绕不过的两点是预估数据量 n 以及期望的误判率 fpp，在实现 Bloom Filter 时，绕不过的两点就是 hash 函数的选取以及 bit 数组的大小。</p>
+<p>期望的误判率越低，需要的空间越大。预估数据量，当实际数量超出这个数值时，误判率会上升。因此用户在使用之前一定要尽可能地精确估计好元素数量，还需要加上一定的冗余空间以避免实际元素可能会意外高出估计值很多导致误判率升高。</p>
+<p>布隆过滤器的空间占用有一个简单的计算公式，但是推导比较繁琐，这里就省去推导过程了，感兴趣的读者可以点击「延伸阅读」深入理解公式的推导过程。虽然存在布隆过滤器的空间占用的计算公司，但是有很多现成的网站已经支持计算空间占用的功能了，我们只要把参数输进去，就可以直接看到结果，比如 <a href="https://krisives.github.io/bloom-calculator/" target="_blank" rel="noopener">布隆计算器</a>。</p>
+<h2 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h2><ul>
+<li><a href="https://www.cnblogs.com/allensun/archive/2011/02/16/1956532.html" target="_blank" rel="noopener">布隆过滤器 (Bloom Filter) 详解</a>：详解布隆过滤器的相关算法和参数设计。</li>
+<li><a href="https://zh.wikipedia.org/zh-hans/Murmur%E5%93%88%E5%B8%8C" target="_blank" rel="noopener">Murmur 哈希</a>：Murmur 哈希，于 2008 年被发明。这个算法 hbase、redis、kafka 都在使用。</li>
+<li><a href="https://zh.wikipedia.org/zh-hans/Murmur%E5%93%88%E5%B8%8C" target="_blank" rel="noopener">Counting Bloom Filter</a>：要实现删除元素，可以采用 Counting Bloom Filter。它将标准布隆过滤器位图的每一位扩展为一个小的计数器 (Counter)，插入元素时将对应的 k 个 Counter 的值分别加 1，删除元素时则分别减 1。</li>
+<li><a href="https://juejin.im/post/5cfb9c74e51d455d6d5357db" target="_blank" rel="noopener">布谷鸟过滤器</a>：为了解决布隆过滤器不能删除元素的问题，布谷鸟过滤器横空出世。相比布谷鸟过滤器而言布隆过滤器有以下不足：查询性能弱、空间利用效率低、不支持反向操作（删除）以及不支持计数。</li>
+</ul>
+<hr>
+<h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="https://crossoverjie.top/2018/11/26/guava/guava-bloom-filter/" target="_blank" rel="noopener">如何判断一个元素在亿级数据中是否存在？</a><br>[2]. <a href="https://www.cnblogs.com/z941030/p/9218356.html" target="_blank" rel="noopener">大数据量下的集合过滤—Bloom Filter</a><br>[3]. <a href="https://my.oschina.net/LucasZhu/blog/1813110" target="_blank" rel="noopener">布隆过滤器 (Bloom Filter) 的原理、实现和探究</a></p>
+<hr>
+<h2 id="注脚"><a href="#注脚" class="headerlink" title="注脚"></a>注脚</h2><p><small>[1]. 位图法：位图法就是 BitMap 的缩写，所谓 BitMap，就是用每一位来存放某种状态，适用于大规模数据，但数据状态又不是很多的情况。通常是用来判断某个数据存不存在的。</small><br><small>[2]. Redisson：<br>Redisson 在基于 NIO 的 Netty 框架上，充分的利用了 Redis 键值数据库提供的一系列优势，在 Java 实用工具包中常用接口的基础上，为使用者提供了一系列具有分布式特性的常用工具类。使得原本作为协调单机多线程并发程序的工具包获得了协调分布式多机多线程并发系统的能力，大大降低了设计和研发大规模分布式系统的难度。同时结合各富特色的分布式服务，更进一步简化了分布式环境中程序相互之间的协作。</small></p>
+<hr>
+<h2 id="大话数据结构系列"><a href="#大话数据结构系列" class="headerlink" title="大话数据结构系列"></a>大话数据结构系列</h2><ul>
+<li><a href="9c51d4e.html">大话数据结构（一）：那些年面试常见的 Java 排序算法</a></li>
+<li><a href="6e0aae0d.html">大话数据结构（二）：大白话布隆过滤器 Bloom Filter</a></li>
+</ul>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>谢谢你长得那么好看，还打赏我！😘</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.jpg" alt="猫宁i 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.jpg" alt="猫宁i 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>猫宁i</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://blog.maoning.pro/archives/6e0aae0d.html" title="大话数据结构（二）：大白话布隆过滤器 Bloom Filter">http://blog.maoning.pro/archives/6e0aae0d.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据结构/" rel="tag"># 数据结构</a>
+          
+            <a href="/tags/排序算法/" rel="tag"># 排序算法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/91027543.html" rel="next" title="深入浅出集合框架（二）：为并发而生的 ConcurrentHashMap">
+                <i class="fa fa-chevron-left"></i> 深入浅出集合框架（二）：为并发而生的 ConcurrentHashMap
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/archives/d63e1e23.html" rel="prev" title="Redis 深度探险（四）：Redis 高可用性解决方案之哨兵与集群">
+                Redis 深度探险（四）：Redis 高可用性解决方案之哨兵与集群 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="猫宁i">
+            
+              <p class="site-author-name" itemprop="name">猫宁i</p>
+              <div class="site-description motion-element" itemprop="description">趁着年轻，好好生活，用心折腾。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">81</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://morning-pro.github.io/" title="https://morning-pro.github.io/" rel="noopener" target="_blank">我的镜像站</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://crossoverjie.top/" title="https://crossoverjie.top/" rel="noopener" target="_blank">crossoverJie's Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://fangjian0423.github.io/" title="http://fangjian0423.github.io/" rel="noopener" target="_blank">Format's Notes</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bloom-Filter-概述"><span class="nav-number">2.</span> <span class="nav-text">Bloom Filter 概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bloom-Filter-原理"><span class="nav-number">3.</span> <span class="nav-text">Bloom Filter 原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景"><span class="nav-number">4.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实现"><span class="nav-number">5.</span> <span class="nav-text">代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HashSet-实现"><span class="nav-number">5.1.</span> <span class="nav-text">HashSet 实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Guava-中的布隆过滤器"><span class="nav-number">5.2.</span> <span class="nav-text">Guava 中的布隆过滤器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-中的布隆过滤器"><span class="nav-number">5.3.</span> <span class="nav-text">Redis 中的布隆过滤器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装-Rebloom-插件"><span class="nav-number">5.3.1.</span> <span class="nav-text">安装 Rebloom 插件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过-Java-代码实现布隆过滤器"><span class="nav-number">5.3.2.</span> <span class="nav-text">通过 Java 代码实现布隆过滤器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#延伸阅读"><span class="nav-number">6.</span> <span class="nav-text">延伸阅读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">7.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注脚"><span class="nav-number">8.</span> <span class="nav-text">注脚</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#大话数据结构系列"><span class="nav-number">9.</span> <span class="nav-text">大话数据结构系列</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-paper-plane"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">猫宁i</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">博客全站字数：</span>
+    
+    <span title="博客全站字数">447k</span>
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+  
+  <script color="0,0,0" opacity="0.3" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+  
+
+<script src="//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: '2saqKR15nDJaNg0KgkpiEIIB-gzGzoHsz',
+    appKey: 'NBf24H2IPzFCX7DjwNXFpDbH',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"react":{"opacity":0.7},"log":false,"tagMode":false});</script></body>
+</html>

@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: true,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言并发编程是 Java 程序员最重要的技能之一，也是最难掌握的一种技能。而在本人的工作中也经常会接触到并发编程的情况，队列、线程池、线程本地变量等等在本人的工作项目中都有大量的应用，为了更深入的理解并发编程，了解其运行原理，本人决定对工作中接触到的并发编程技术进行进一步的梳理。 本篇是我学习 Java 并发编程系列的开篇，主要内容介绍一下队列 Queue 概念以及方法，然后对工作中常用的几个队列">
+<meta name="keywords" content="Queue,BlockingQueue,阻塞队列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 并发编程之美（一）：并发队列 Queue 原理剖析">
+<meta property="og:url" content="http://blog.maoning.pro/archives/a290319j.html">
+<meta property="og:site_name" content="猫宁i">
+<meta property="og:description" content="前言并发编程是 Java 程序员最重要的技能之一，也是最难掌握的一种技能。而在本人的工作中也经常会接触到并发编程的情况，队列、线程池、线程本地变量等等在本人的工作项目中都有大量的应用，为了更深入的理解并发编程，了解其运行原理，本人决定对工作中接触到的并发编程技术进行进一步的梳理。 本篇是我学习 Java 并发编程系列的开篇，主要内容介绍一下队列 Queue 概念以及方法，然后对工作中常用的几个队列">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.maoning.pro/images/54120216_p0.jpg">
+<meta property="og:updated_time" content="2019-08-13T11:35:49.054Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 并发编程之美（一）：并发队列 Queue 原理剖析">
+<meta name="twitter:description" content="前言并发编程是 Java 程序员最重要的技能之一，也是最难掌握的一种技能。而在本人的工作中也经常会接触到并发编程的情况，队列、线程池、线程本地变量等等在本人的工作项目中都有大量的应用，为了更深入的理解并发编程，了解其运行原理，本人决定对工作中接触到的并发编程技术进行进一步的梳理。 本篇是我学习 Java 并发编程系列的开篇，主要内容介绍一下队列 Queue 概念以及方法，然后对工作中常用的几个队列">
+<meta name="twitter:image" content="http://blog.maoning.pro/images/54120216_p0.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="猫宁i" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://blog.maoning.pro/archives/a290319j.html">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java 并发编程之美（一）：并发队列 Queue 原理剖析 | 猫宁i</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">猫宁i</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">趁着年轻，好好生活，用心折腾。</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives menu-item-active">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/books/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/a290319j.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java 并发编程之美（一）：并发队列 Queue 原理剖析
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-01-15 23:12:12" itemprop="dateCreated datePublished" datetime="2018-01-15T23:12:12+08:00">2018-01-15</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/并发/" itemprop="url" rel="index"><span itemprop="name">并发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/archives/a290319j.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/archives/a290319j.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/archives/a290319j.html" class="leancloud_visitors" data-flag-title="Java 并发编程之美（一）：并发队列 Queue 原理剖析">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">14k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">12 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/54120216_p0.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>并发编程是 Java 程序员最重要的技能之一，也是最难掌握的一种技能。而在本人的工作中也经常会接触到并发编程的情况，队列、线程池、线程本地变量等等在本人的工作项目中都有大量的应用，为了更深入的理解并发编程，了解其运行原理，本人决定对工作中接触到的并发编程技术进行进一步的梳理。</p>
+<p>本篇是我学习 Java 并发编程系列的开篇，主要内容介绍一下队列 Queue 概念以及方法，然后对工作中常用的几个队列进行分析，介绍其主要使用场景。</p>
+<a id="more"></a>
+<h2 id="什么是队列？"><a href="#什么是队列？" class="headerlink" title="什么是队列？"></a>什么是队列？</h2><p>队列是一种特殊的线性表，其插入和删除的操作分别在表的两端进行，队列的特点就是先进先出 (First In First Out)。但这并不是必须的，比如优先度队列就是一个例外，它是以元素的值来排序。我们把向队列中插入元素的过程称为入队 (Enqueue)，删除元素的过程称为出队 (Dequeue)；并把允许入队的一端称为队尾，允许出队一端称为队头，没有任何元素的队列则称为空队列。通常，队列不允许随机访问队列中的元素。</p>
+<p>在 Java5 中新增加了 java.util.Queue 接口，用以支持队列的常见操作。该接口扩展了 java.util.Collection 接口。Queue 接口与 List、Set 同一级别，都是继承了 Collection 接口。</p>
+<p>Queue 接口中定义了如下的几个方法：</p>
+<ul>
+<li>void add(Object e):　将指定元素插入到队列的尾部。如果队列已满，则抛出一个 IllegalStateException 异常。</li>
+<li>boolean offer(Object e):　将指定的元素插入此队列的尾部。当使用容量有限的队列时，此方法通常比 add(Object e) 有效，如果队列已满，则返回 false。</li>
+<li>object element():　获取队列头部的元素，但是不删除该元素。如果队列为空，则抛出一个 NoSuchElementException 异常。</li>
+<li>Object peek():　返回队列头部的元素，但是不删除该元素。如果队列为空，则返回 null。</li>
+<li>Object remove():　获取队列头部的元素，并删除该元素。如果队列为空，则抛出一个 NoSuchElementException 异常。</li>
+<li>Object poll():　返回队列头部的元素，并删除该元素。如果队列为空，则返回 null。</li>
+</ul>
+<p><img src="/media/15470357464140/15470525413230.jpg" alt="-w468"></p>
+<h2 id="通用队列-Queue"><a href="#通用队列-Queue" class="headerlink" title="通用队列 Queue"></a>通用队列 Queue</h2><p>Queue 接口有一个 PriorityQueue 实现类。除此之外，Queue 还有一个 Deque 接口，Deque 代表一个 “双端队列”，双端队列可以同时从两端删除或添加元素，因此 Deque 可以当作栈来使用。java 为 Deque 提供了 ArrayDeque 实现类和 LinkedList 实现类。</p>
+<h3 id="PriorityQueue"><a href="#PriorityQueue" class="headerlink" title="PriorityQueue"></a>PriorityQueue</h3><p>PriorityQueue 是一个基于堆结构的优先级队列，它可以根据元素的自然排序或者给定的排序器进行排序。PriorityQueue 是一种比较标准的队列实现类，而不是绝对标准的。这是因为 PriorityQueue 保存队列元素的顺序不是按照元素添加的顺序来保存的，而是在添加元素的时候对元素的大小排序后再保存的。因此在 PriorityQueue 中使用 peek() 或 pool() 取出队列中头部的元素，取出的不是最先添加的元素，而是最小的元素。
+　　</p>
+<figure class="highlight pony"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">PriorityQueue</span> priorityQueue = <span class="function"><span class="keyword">new</span> <span class="title">PriorityQueue</span>();</span></span><br><span class="line"><span class="function"><span class="title">priorityQueue</span>.<span class="title">offer</span>(<span class="number">6</span>);</span></span><br><span class="line"><span class="function"><span class="title">priorityQueue</span>.<span class="title">add</span>(<span class="number">-3</span>);</span></span><br><span class="line"><span class="function"><span class="title">priorityQueue</span>.<span class="title">add</span>(<span class="number">20</span>);</span></span><br><span class="line"><span class="function"><span class="title">priorityQueue</span>.<span class="title">offer</span>(<span class="number">18</span>);</span></span><br><span class="line"><span class="function"><span class="comment">// 输出：[-3, 6, 20, 18]</span></span></span><br><span class="line"><span class="function"><span class="title">System</span>.<span class="title">out</span>.<span class="title">println</span>(priorityQueue);</span></span><br></pre></td></tr></table></figure>
+<p>PriorityQueue 不允许插入 null 元素，它还需要对队列元素进行排序，PriorityQueue 有两种排序方式：[1]. 自然排序：采用自然排序的 PriorityQueue 集合中的元素必须实现 Compareable 接口，重写 CompareTo 方法，而且应该是一个类的多个实例，否则可能导致 ClassCastException 异常。[2]. 定制排序：创建 PriorityQueue 队列时，传入一个 Comparator 对象，该对象负责对所有队列中的所有元素进行排序。采用定制排序不要求必须实现 Compareable 接口。</p>
+<p>总结：[1].Jdk 内置的优先队列 PriorityQueue 内部使用一个堆维护数据，每当有数据 add 进来或者 poll 出去的时候会对堆做从下往上的调整和从上往下的调整。[2].PriorityQueue 不是一个线程安全的类，如果要在多线程环境下使用，可以使用 PriorityBlockingQueue 这个优先阻塞队列。其中 add、poll、remove 方法都使用 ReentrantLock 锁来保持同步，take() 方法中如果元素为空，则会一直保持阻塞。</p>
+<h3 id="Deque-ArrayDeque"><a href="#Deque-ArrayDeque" class="headerlink" title="Deque/ArrayDeque"></a>Deque/ArrayDeque</h3><p>DeQueue(Double-endedqueue) 为接口，继承了 Queue 接口，创建双向队列，灵活性更强，可以前向或后向迭代，在队头队尾均可心插入或删除元素。它的两个主要实现类是 ArrayDeque 和 LinkedList。</p>
+<p>Deque 接口继承自 Queue 接口，但 Deque 支持同时从两端添加或移除元素，因此又被成为双端队列。鉴于此，Deque 接口的实现可以被当作 FIFO 队列使用，也可以当作 LIFO 队列（栈）来使用。官方也是推荐使用 Deque 的实现来替代 Stack。</p>
+<p>ArrayDeque 是 Deque 接口的一种具体实现，是依赖于可变数组来实现的。ArrayDeque 没有容量限制，可根据需求自动进行扩容。ArrayDeque 不支持值为 null 的元素。</p>
+<p>Deque 接口是 Queue 接口的子接口，它代表一个双端队列，Deque 定义了一些方法：</p>
+<ul>
+<li>void addFirst(Object e): 将指定元素添加到双端队列的头部。</li>
+<li>void addLast(Object e): 将指定元素添加到双端队列的尾部。</li>
+<li>Iteratord descendingItrator(): 返回该双端队列对应的迭代器，该迭代器以逆向顺序来迭代队列中的元素。</li>
+<li>Object getFirst(): 获取但不删除双端队列的第一个元素。</li>
+<li>Object getLast(): 获取但不删除双端队列的最后一个元素。</li>
+<li>boolean offFirst(Object e): 将指定元素添加到双端队列的头部。</li>
+<li>boolean offLast(OBject e): 将指定元素添加到双端队列的尾部。</li>
+<li>Object peekFirst(): 获取但不删除双端队列的第一个元素；如果双端队列为空，则返回 null。</li>
+<li>Object peekLast(): 获取但不删除双端队列的最后一个元素；如果双端队列为空，则返回 null。</li>
+<li>Object pollFirst(): 获取并删除双端队列的第一个元素；如果双端队列为空，则返回 null。</li>
+<li>Object pollLast(): 获取并删除双端队列的最后一个元素；如果双端队列为空，则返回 null。</li>
+<li>Object pop()(栈方法): pop 出该双端队列所表示的栈的栈顶元素。相当于 removeFirst()。</li>
+<li>void push(Object e)(栈方法)： 将一个元素 push 进该双端队列所表示的栈的栈顶。相当于 addFirst()。</li>
+<li>Object removeFirst(): 获取并删除该双端队列的第一个元素。</li>
+<li>Object removeFirstOccurence(Object o): 删除该双端队列的第一次出现的元素 o。</li>
+<li>Object removeLast(): 获取并删除该双端队列的最后一个元素 o。</li>
+<li>Object removeLastOccurence(Object o): 删除该双端队列的最后一次出现的元素 o。</li>
+</ul>
+<h3 id="LinkedList"><a href="#LinkedList" class="headerlink" title="LinkedList"></a>LinkedList</h3><p>LinkedList 是 List 接口的实现类，因此它可以是一个集合，可以根据索引来随机访问集合中的元素。此外，它还是 Duque 接口的实现类，因此也可以作为一个双端队列，或者栈来使用。</p>
+<p>LinkedList 与 ArrayList、ArrayDeque 的实现机制完全不同，ArrayList 和 ArrayDeque 内部以数组的形式来保存集合中的元素，因此随机访问集合元素时有较好的性能；而 LinkedList 以链表的形式来保存集合中的元素，因此随机访问集合元素时性能较差，但是插入和删除元素时性能比较出色（只需改变指针所指的地址即可），需要指出的是，虽然 Vector 也是以数组的形式来存储集合但因为它实现了线程同步（而且实现的机制不好），故各方面的性能都比较差。</p>
+<h2 id="并发队列-Queue"><a href="#并发队列-Queue" class="headerlink" title="并发队列 Queue"></a>并发队列 Queue</h2><p>JDK 中常用的并发队列有阻塞队列和非阻塞队列，使用阻塞算法的队列可以用一个锁（入队和出队用同一把锁）或两个锁（入队和出队用不同的锁）等方式来实现，而非阻塞的实现方式则可以使用循环 CAS 的方式来实现。其中阻塞队列的典型例子是 BlockingQueue，非阻塞队列的典型例子是 ConcurrentLinkedQueue，在实际应用中要根据实际需要选用阻塞队列或者非阻塞队列。</p>
+<h3 id="ConcurrentLinkedQueue"><a href="#ConcurrentLinkedQueue" class="headerlink" title="ConcurrentLinkedQueue"></a>ConcurrentLinkedQueue</h3><p>ConcurrentLinkedQueue 是一个适用于高并发场景下的队列，通过无锁的方式，实现了高并发状态下的高性能，通常 ConcurrentLinkedQueue 性能好于 BlockingQueue，它是一个基于链接节点的无界线程安全队列，它采用的是先进先出的规则，当我们增加一个元素时，它会添加到队列的末尾，当我们取一个元素时，它会返回一个队列头部的元素。收集关于队列大小的信息会很慢，需要遍历队列。</p>
+<h3 id="BlockingQueue"><a href="#BlockingQueue" class="headerlink" title="BlockingQueue"></a>BlockingQueue</h3><p><img src="/media/15470357464140/2010112414472791.jpg" alt="2010112414472791"></p>
+<p>阻塞队列（BlockingQueue）是一个支持两个附加操作的队列。这两个附加的操作是：在队列为空时，获取元素的线程会等待队列变为非空。当队列满时，存储元素的线程会等待队列可用。阻塞队列常用于生产者和消费者的场景，生产者是往队列里添加元素的线程，消费者是从队列里拿元素的线程。阻塞队列就是生产者存放元素的容器，而消费者也只从容器里拿元素。</p>
+<p><img src="/media/15470357464140/15473934989159.jpg" alt="-w873"></p>
+<ul>
+<li>抛出异常：是指当阻塞队列满时候，再往队列里插入元素，会抛出 IllegalStateException(“Queue full”) 异常。当队列为空时，从队列里获取元素时会抛出 NoSuchElementException 异常。</li>
+<li>返回特殊值：插入方法会返回是否成功，成功则返回 true。移除方法，则是从队列里拿出一个元素，如果没有则返回 null。</li>
+<li>一直阻塞：当阻塞队列满时，如果生产者线程往队列里 put 元素，队列会一直阻塞生产者线程，直到拿到数据，或者响应中断退出。当队列空时，消费者线程试图从队列里 take 元素，队列也会阻塞消费者线程，直到队列可用。</li>
+<li>超时退出：当阻塞队列满时，队列会阻塞生产者线程一段时间，如果超过一定的时间，生产者线程就会退出。</li>
+</ul>
+<p>JDK7 提供了 7 个阻塞队列，分别是：</p>
+<blockquote>
+<p>ArrayBlockingQueue ：一个由数组结构组成的有界阻塞队列。<br>LinkedBlockingQueue ：一个由链表结构组成的可选有界阻塞队列。<br>PriorityBlockingQueue ：一个支持优先级排序的无界阻塞队列。<br>DelayQueue：一个使用优先级队列实现的无界阻塞队列。<br>SynchronousQueue：一个不存储元素的阻塞队列。<br>LinkedTransferQueue：一个由链表结构组成的无界阻塞队列。<br>LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列。</p>
+</blockquote>
+<h4 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h4><p>基于数组的阻塞队列实现（有界缓存的等待队列），初始化时必须指定队列的容量。在 ArrayBlockingQueue 内部，维护了一个定长数组，以便缓存队列中的数据对象，这是一个常用的阻塞队列，除了一个定长数组外，ArrayBlockingQueue 内部还保存着两个整形变量，分别标识着队列的头部和尾部在数组中的位置。</p>
+<p>ArrayBlockingQueue 在生产者放入数据和消费者获取数据，都是共用同一个锁对象，由此也意味着两者无法真正并行运行，这点尤其不同于 LinkedBlockingQueue。在创建 ArrayBlockingQueue 时，我们还可以设置内部的 ReentrantLock 是否使用公平锁，但是公平性会使你在性能上付出代价，只有在的确非常需要的时候再使用它，默认采用非公平锁。</p>
+<p>ArrayBlockingQueue 和 LinkedBlockingQueue 间还有一个明显的不同之处在于，前者在插入或删除元素时不会产生或销毁任何额外的对象实例，而后者则会生成一个额外的 Node 对象。这在长时间内需要高效并发地处理大批量数据的系统中，其对于 GC 的影响还是存在一定的区别。</p>
+<h4 id="LinkedBlockingQueue"><a href="#LinkedBlockingQueue" class="headerlink" title="LinkedBlockingQueue"></a>LinkedBlockingQueue</h4><p>基于链表的阻塞队列实现（可选有界缓存的等待队列），初始化时不需要指定队列的容量，默认是 Integer.MAX_VALUE，也可以看成容量无限大。同 ArrayBlockingQueue 类似，其内部也维持着一个数据缓冲队列（该队列由一个链表构成），当生产者往队列中放入一个数据时，队列会从生产者手中获取数据，并缓存在队列内部，而生产者立即返回；只有当队列缓冲区达到最大值缓存容量时（LinkedBlockingQueue 可以通过构造函数指定该值），才会阻塞生产者线程，直到消费者从队列中消费掉一份数据，生产者线程会被唤醒，反之对于消费者这端的处理也基于同样的原理。</p>
+<p>而 LinkedBlockingQueue 之所以能够高效的处理并发数据，还因为其对于生产者端和消费者端分别采用了独立的锁来控制数据同步，这也意味着在高并发的情况下生产者和消费者可以并行地操作队列中的数据，以此来提高整个队列的并发性能。</p>
+<p>作为开发者，我们需要注意的是，如果构造一个 LinkedBlockingQueue 对象，而没有指定其容量大小，LinkedBlockingQueue 会默认一个类似无限大小的容量（Integer.MAX_VALUE），这样的话，如果生产者的速度一旦大于消费者的速度，也许还没有等到队列满阻塞产生，系统内存就有可能已被消耗殆尽了。</p>
+<h4 id="PriorityBlockingQueue"><a href="#PriorityBlockingQueue" class="headerlink" title="PriorityBlockingQueue"></a>PriorityBlockingQueue</h4><p>基于优先级堆的阻塞队列实现（无界缓存的优先级等待队列），初始化时不需要指定队列的容量，默认是 DEFAULT_INITIAL_CAPACITY=11，最大可分配队列容量 Integer.MAX_VALUE-8。PriorityBlockingQueue 是对 PriorityQueue 的再次包装，队列中的元素按优先级顺序被移除，在实现 PriorityBlockingQueue 时，内部控制线程同步的锁采用的是公平锁。</p>
+<p>PriorityBlockingQueue 该类不保证同等优先级的元素顺序，如果你想要强制顺序，就需要考虑自定义顺序或者是 Comparator 使用第二个比较属性。</p>
+<h4 id="DelayQueue"><a href="#DelayQueue" class="headerlink" title="DelayQueue"></a>DelayQueue</h4><p>基于优先级堆支持的、基于时间的阻塞队列实现（无界缓存的优先级等待队列）。DelayQueue 是一个支持延时获取元素的无界阻塞队列，队列使用 PriorityQueue 来实现，队列中的元素必须实现 Delayed 接口，队列中存放 Delayed 元素，只有在延迟期满后才能从队列中提取元素。当一个元素的 getDelay() 方法返回值小于等于 0 时才能从队列中 poll 元素，否则 poll() 方法会返回 null。</p>
+<p>DelayQueue 是一个没有大小限制的队列，应用场景很多，比如对缓存超时的数据进行移除、任务超时处理、空闲连接的关闭等等：</p>
+<ul>
+<li>缓存系统的设计：使用 DelayQueue 保存缓存元素的有效期，使用一个线程循环查询 DelayQueue，一旦能从 DelayQueue 中获取元素时，就表示有缓存到期了。 </li>
+<li>定时任务调度：使用 DelayQueue 保存要执行的任务和执行时间，一旦从 DelayQueue 中获取到任务就开始执行，比如 Timer 就是使用 DelayQueue 实现的。</li>
+</ul>
+<p>Delayed 接口使对象成为延迟对象，它使存放在 DelayQueue 类中的对象具有了激活日期。该接口强制实现下列两个方法：</p>
+<ul>
+<li>CompareTo(Delayed o)：Delayed 接口继承了 Comparable 接口，因此有了这个方法。</li>
+<li>getDelay(TimeUnit unit)：这个方法返回到激活日期的剩余时间，时间单位由单位参数指定。</li>
+</ul>
+<p>DelayQueue 中比较重要的字段如下：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 全局独占锁, 用于实现线程安全 [可重入锁]</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">transient</span> ReentrantLock lock = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line"><span class="comment">// 根据 delay 时间排序优先级队列, 用于存储元素, 并按优先级排序</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> PriorityQueue&lt;E&gt; q = <span class="keyword">new</span> PriorityQueue&lt;E&gt;();</span><br><span class="line"><span class="comment">// 用于优化阻塞通知的线程元素 leader</span></span><br><span class="line"><span class="keyword">private</span> Thread leader = <span class="keyword">null</span>;</span><br><span class="line"><span class="comment">// 用于实现阻塞和通知的 Condition 对象</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Condition available = lock.newCondition();</span><br></pre></td></tr></table></figure>
+<p>DelayQueue 的大致实现思路：以支持优先级的 PriorityQueue 无界队列作为一个容器，因为元素都必须实现 Delayed 接口，可以根据元素的过期时间来对元素进行排列，因此，先过期的元素会在队首，每次从队列里取出来都是最先要过期的元素。</p>
+<h5 id="入队"><a href="#入队" class="headerlink" title="入队"></a>入队</h5><p>由于 DelayQueue 不限制长度，添加元素的时候不会因为队列已满产生阻塞，因此 add(E e) 方法以及 put(E e) 方法通过调用 offer(E e) 方法来添加元素。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> boolean <span class="title">offer</span>(<span class="params">E e</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 1. 获取全局独占锁</span></span><br><span class="line">    final ReentrantLock <span class="keyword">lock</span> = <span class="keyword">this</span>.<span class="keyword">lock</span>;</span><br><span class="line">    <span class="comment">// 2. 执行加锁操作</span></span><br><span class="line">    <span class="keyword">lock</span>.<span class="keyword">lock</span>();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 3. 向优先队列中插入元素</span></span><br><span class="line">        q.offer(e);</span><br><span class="line">        <span class="comment">// 4. 如果队首元素是刚插入的元素, 则设置 leader 为 null, 并唤醒阻塞在 available 上的线程</span></span><br><span class="line">        <span class="keyword">if</span> (q.peek() == e) &#123;</span><br><span class="line">            leader = <span class="literal">null</span>;</span><br><span class="line">            available.signal(); <span class="comment">// 激活 available 变量条件队列里面的线程</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="comment">// 5. 释放全局独占锁</span></span><br><span class="line">        <span class="keyword">lock</span>.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="出队"><a href="#出队" class="headerlink" title="出队"></a>出队</h5><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">take</span>(<span class="params"></span>) throws InterruptedException</span> &#123;</span><br><span class="line">    <span class="comment">// 1. 获取全局独占锁</span></span><br><span class="line">    final ReentrantLock <span class="keyword">lock</span> = <span class="keyword">this</span>.<span class="keyword">lock</span>;</span><br><span class="line">    <span class="comment">// 2. 执行加锁操作</span></span><br><span class="line">    <span class="keyword">lock</span>.lockInterruptibly();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 死循环 []</span></span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">            <span class="comment">// 3. 获取优先队列中队首元素</span></span><br><span class="line">            E first = q.peek();</span><br><span class="line">            <span class="comment">// 4. 队首为空，则阻塞当前线程</span></span><br><span class="line">            <span class="keyword">if</span> (first == <span class="literal">null</span>)</span><br><span class="line">                available.<span class="keyword">await</span>();</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 5. 获取队首元素的超时时间</span></span><br><span class="line">                <span class="keyword">long</span> delay = first.getDelay(NANOSECONDS);</span><br><span class="line">                <span class="comment">// 6. 已超时, 调用 poll() 方法弹出该元素, 跳出方法</span></span><br><span class="line">                <span class="keyword">if</span> (delay &lt;= <span class="number">0</span>)</span><br><span class="line">                    <span class="keyword">return</span> q.poll();</span><br><span class="line">                <span class="comment">// 7. 释放 first 的引用, 避免内存泄漏</span></span><br><span class="line">                first = <span class="literal">null</span>; <span class="comment">// don't retain ref while waiting</span></span><br><span class="line">                <span class="comment">// 8.leader != null 表明有其他线程在操作, 阻塞当前线程</span></span><br><span class="line">                <span class="keyword">if</span> (leader != <span class="literal">null</span>)</span><br><span class="line">                    available.<span class="keyword">await</span>();</span><br><span class="line">                <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// 9.leader 指向当前线程</span></span><br><span class="line">                    Thread thisThread = Thread.currentThread();</span><br><span class="line">                    leader = thisThread;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="comment">// 10. 超时阻塞</span></span><br><span class="line">                        available.awaitNanos(delay);</span><br><span class="line">                    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                        <span class="comment">// 11. 释放 leader</span></span><br><span class="line">                        <span class="keyword">if</span> (leader == thisThread)</span><br><span class="line">                            leader = <span class="literal">null</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="comment">// 12.leader 为 null 并且队列不为空, 说明没有其他线程在等待, 那就通知条件队列</span></span><br><span class="line">        <span class="keyword">if</span> (leader == <span class="literal">null</span> &amp;&amp; q.peek() != <span class="literal">null</span>)</span><br><span class="line">            available.signal();</span><br><span class="line">        <span class="comment">// 13. 释放全局独占锁</span></span><br><span class="line">        <span class="keyword">lock</span>.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>leader 元素的使用：leader 是等待获取队列头元素的线程，应用主从式设计减少不必要的等待。如果 leader 不等于空，表示已经有线程在等待获取队列的头元素。所以，使用 await() 方法让当前线程等待信号。如果 leader 等于空，则把当前线程设置成 leader，并使用 awaitNanos() 方法让当前线程等待接收信号或等待 delay 时间。</p>
+<p>为什么如果不设置 first=null，则会引起内存泄漏呢？线程 A 到达，列首元素没有到期，设置 leader = 线程 A，这是线程 B 来了因为 leader!=null，则会阻塞，线程 C 一样。假如线程阻塞完毕了，获取列首元素成功，出列。这个时候列首元素应该会被回收掉，但是问题是它还被线程 B、线程 C 持有着，所以不会回收，这里只有两个线程，如果有线程 D、线程 E 等呢？这样会无限期的不能回收，就会造成内存泄漏。</p>
+<h4 id="SynchronousQueue"><a href="#SynchronousQueue" class="headerlink" title="SynchronousQueue"></a>SynchronousQueue</h4><p>SynchronousQueue 是一种无缓冲的等待队列，但是由于该 Queue 本身的特性，在某次添加元素后必须等待其他线程取走后才能继续添加；SynchronousQueue 是一个不存储元素的阻塞队列，会直接将任务交给消费者，必须等队列中的添加元素被消费后才能继续添加新的元素，isEmpty() 方法永远返回是 true，remainingCapacity() 方法永远返回是 0，remove() 和 removeAll() 方法永远返回是 false，iterator() 方法永远返回空，peek() 方法永远返回 null。</p>
+<p>声明一个 SynchronousQueue 有两种不同的方式，它们之间有着不太一样的行为。SynchronousQueue 有一个 fair 选项，如果 fair 为 true，称为 fair 模式，否则就是 unfair 模式，公平性使用 TransferQueue，非公平性采用 TransferStack。在 fair 模式下，所有等待的生产者线程或者消费者线程会按照开始等待时间依次排队，然后按照等待先后顺序进行匹配交易。由于 SynchronousQueue 支持公平策略和非公平策略，所以 SynchronousQueue 的底层实现包含两种数据结构：队列（实现公平策略）和栈（实现非公平策略），队列与栈都是通过链表来实现的。</p>
+<p>公平策略和非公平策略的区别：如果采用公平策略，SynchronousQueue 会采用公平锁，并配合一个 FIFO（Queue）队列来阻塞多余的生产者和消费者，从而体系整体的公平策略；如果采用非公平策略（SynchronousQueue 默认），SynchronousQueue 采用非公平锁，同时配合一个 LIFO（Stack）队列来管理多余的生产者和消费者，而后一种模式，如果生产者和消费者的处理速度有差距，则很容易出现饥渴的情况，即可能有某些生产者或者是消费者的数据永远都得不到处理。一般情况下，FIFO 通常可以支持更大的吞吐量，但 LIFO 可以更大程度的保持线程的本地化。</p>
+<p>SynchronousQueue 的一个使用场景是在线程池里。Executors.newCachedThreadPool() 就使用了 SynchronousQueue，这个线程池根据需要（新任务到来时）创建新的线程，如果有空闲线程则会重复使用，线程空闲了 60 秒后会被回收。</p>
+<h4 id="LinkedTransferQueue"><a href="#LinkedTransferQueue" class="headerlink" title="LinkedTransferQueue"></a>LinkedTransferQueue</h4><p>LinkedTransferQueue 是 JDK1.7 才添加的阻塞队列，基于链表实现的 FIFO 无界阻塞队列，是 ConcurrentLinkedQueue（循环 CAS+volatile 实现的 wait-free 并发算法）、SynchronousQueue（公平模式下转交元素）、LinkedBlockingQueue（阻塞 Queue 的基本方法）的超集。而且 LinkedTransferQueue 更好用，因为它不仅仅综合了这几个类的功能，同时也提供了更高效的实现。</p>
+<p>LinkedTransferQueue 采用的一种预占模式。意思就是消费者线程取元素时，如果队列为空，那就生成一个节点（节点元素为 null）入队，然后消费者线程被等待在这个节点上，后面生产者线程入队时发现有一个元素为 null 的节点，生产者线程就不入队了，直接就将元素填充到该节点，唤醒该节点等待的线程，被唤醒的消费者线程取走元素，从调用的方法返回。</p>
+<p>LinkedTransferQueue 类继承自 AbstractQueue 抽象类，并且实现了 TransferQueue 接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">TransferQueue</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">BlockingQueue</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 如果存在一个消费者已经等待接收它, 则立即传送指定的元素, 否则返回 false, 并且不进入队列.</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">tryTransfer</span><span class="params">(E e)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果存在一个消费者已经等待接收它, 则立即传送指定的元素, 否则等待直到元素被消费者接收.</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">transfer</span><span class="params">(E e)</span> <span class="keyword">throws</span> InterruptedException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在上述方法的基础上设置超时时间</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">tryTransfer</span><span class="params">(E e, <span class="keyword">long</span> timeout, TimeUnit unit)</span> <span class="keyword">throws</span> InterruptedException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果至少有一位消费者在等待, 则返回 true</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">hasWaitingConsumer</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取所有等待获取元素的消费线程数量</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getWaitingConsumerCount</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们知道，在普通阻塞队列中，当队列为空时，消费者线程（调用 take 或 poll 方法的线程）一般会阻塞等待生产者线程往队列中存入元素。而 LinkedTransferQueue 的 transfer 方法则比较特殊：1、当有消费者线程阻塞等待时，调用 transfer 方法的生产者线程不会将元素存入队列，而是直接将元素传递给消费者；2、如果调用 transfer 方法的生产者线程发现没有正在等待的消费者线程，则会将元素入队，然后会阻塞等待，直到有一个消费者线程来获取该元素。</p>
+<p>和 SynchronousQueue 相比，LinkedTransferQueue 多了一个可以存储的队列，与 LinkedBlockingQueue 相比，LinkedTransferQueue 多了直接传递元素，少了用锁来同步。</p>
+<p><img src="/media/15470357464140/15535927607681.jpg" alt></p>
+<h4 id="LinkedBlockingDeque"><a href="#LinkedBlockingDeque" class="headerlink" title="LinkedBlockingDeque"></a>LinkedBlockingDeque</h4><p>LinkedBlockingDeque 是双向链表实现的双向并发阻塞队列。该阻塞队列同时支持 FIFO 和 FILO 两种操作方式，即可以从队列的头和尾同时操作 (插入 / 删除)；并且，该阻塞队列是支持线程安全。此外，LinkedBlockingDeque 还是可选容量的 (防止过度膨胀)，即可以指定队列的容量。如果不指定，默认容量大小等于 Integer.MAX_VALUE。</p>
+<p><img src="/media/15470357464140/15535935315147.jpg" alt="-w616"></p>
+<p>四组不同的行为方式解释：</p>
+<ul>
+<li>抛异常：如果试图的操作无法立即执行，抛一个异常。</li>
+<li>特定值：如果试图的操作无法立即执行，返回一个特定的值 (常常是 true/false)。</li>
+<li>阻塞：如果试图的操作无法立即执行，该方法调用将会发生阻塞，直到能够执行。</li>
+<li>超时：如果试图的操作无法立即执行，该方法调用将会发生阻塞，直到能够执行，但等待时间不会超过给定值。返回一个特定值以告知该操作是否成功 (典型的是 true/false)。</li>
+</ul>
+<hr>
+<h2 id="小知识点"><a href="#小知识点" class="headerlink" title="小知识点"></a>小知识点</h2><p><small>[1]. Queue 的实现通常不允许插入 null 值，除了 LinkedList 这个例外，出于历史原因它允许插入 null 值，但是必须十分注意的是 null 也是 poll 和 peek 方法返回的特别值。</small><br><small>[2]. 虽然 ConcurrentLinkedQueue 的性能很好，但是在调用 size() 方法的时候，会遍历一遍集合，对性能损害较大，执行很慢，因此应该尽量的减少使用这个方法，如果判断是否为空，最好用 isEmpty() 方法。</small></p>
+<hr>
+<h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="https://www.jianshu.com/p/2659eb72134b" target="_blank" rel="noopener">并发队列 - 无界阻塞延迟队列 DelayQueue 原理探究</a></p>
+<hr>
+<h2 id="Java-并发编程之美系列"><a href="#Java-并发编程之美系列" class="headerlink" title="Java 并发编程之美系列"></a>Java 并发编程之美系列</h2><ul>
+<li><a href="a290319j.html">Java 并发编程之美（一）：并发队列 Queue 原理剖析</a></li>
+<li><a href="e230219b.html">Java 并发编程之美（二）：线程池 ThreadPoolExecutor 原理探究</a></li>
+<li><a href="q1e3r5t42.html">Java 并发编程之美（三）：异步执行框架 Eexecutor</a></li>
+<li><a href="b9c60c0e.html">Java 并发编程之美（四）：深入剖析 ThreadLocal</a></li>
+<li><a href="f30530aa.html">Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱</a></li>
+<li><a href="f4f43ede.html">Java 并发编程之美（六）：J.U.C 之线程同步辅助工具类</a></li>
+</ul>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>谢谢你长得那么好看，还打赏我！😘</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.jpg" alt="猫宁i 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.jpg" alt="猫宁i 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>猫宁i</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://blog.maoning.pro/archives/a290319j.html" title="Java 并发编程之美（一）：并发队列 Queue 原理剖析">http://blog.maoning.pro/archives/a290319j.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Queue/" rel="tag"># Queue</a>
+          
+            <a href="/tags/BlockingQueue/" rel="tag"># BlockingQueue</a>
+          
+            <a href="/tags/阻塞队列/" rel="tag"># 阻塞队列</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/8cef11db.html" rel="next" title="Java8 那些事儿（一）：Stream 函数式编程">
+                <i class="fa fa-chevron-left"></i> Java8 那些事儿（一）：Stream 函数式编程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/archives/f54a7b9d.html" rel="prev" title="论编码重要性（二）：你所不了解的编码解码技术">
+                论编码重要性（二）：你所不了解的编码解码技术 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="猫宁i">
+            
+              <p class="site-author-name" itemprop="name">猫宁i</p>
+              <div class="site-description motion-element" itemprop="description">趁着年轻，好好生活，用心折腾。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">81</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://morning-pro.github.io/" title="https://morning-pro.github.io/" rel="noopener" target="_blank">我的镜像站</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://crossoverjie.top/" title="https://crossoverjie.top/" rel="noopener" target="_blank">crossoverJie's Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://fangjian0423.github.io/" title="http://fangjian0423.github.io/" rel="noopener" target="_blank">Format's Notes</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是队列？"><span class="nav-number">2.</span> <span class="nav-text">什么是队列？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通用队列-Queue"><span class="nav-number">3.</span> <span class="nav-text">通用队列 Queue</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PriorityQueue"><span class="nav-number">3.1.</span> <span class="nav-text">PriorityQueue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deque-ArrayDeque"><span class="nav-number">3.2.</span> <span class="nav-text">Deque/ArrayDeque</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LinkedList"><span class="nav-number">3.3.</span> <span class="nav-text">LinkedList</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#并发队列-Queue"><span class="nav-number">4.</span> <span class="nav-text">并发队列 Queue</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ConcurrentLinkedQueue"><span class="nav-number">4.1.</span> <span class="nav-text">ConcurrentLinkedQueue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BlockingQueue"><span class="nav-number">4.2.</span> <span class="nav-text">BlockingQueue</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ArrayBlockingQueue"><span class="nav-number">4.2.1.</span> <span class="nav-text">ArrayBlockingQueue</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LinkedBlockingQueue"><span class="nav-number">4.2.2.</span> <span class="nav-text">LinkedBlockingQueue</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PriorityBlockingQueue"><span class="nav-number">4.2.3.</span> <span class="nav-text">PriorityBlockingQueue</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DelayQueue"><span class="nav-number">4.2.4.</span> <span class="nav-text">DelayQueue</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#入队"><span class="nav-number">4.2.4.1.</span> <span class="nav-text">入队</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#出队"><span class="nav-number">4.2.4.2.</span> <span class="nav-text">出队</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SynchronousQueue"><span class="nav-number">4.2.5.</span> <span class="nav-text">SynchronousQueue</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LinkedTransferQueue"><span class="nav-number">4.2.6.</span> <span class="nav-text">LinkedTransferQueue</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LinkedBlockingDeque"><span class="nav-number">4.2.7.</span> <span class="nav-text">LinkedBlockingDeque</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小知识点"><span class="nav-number">5.</span> <span class="nav-text">小知识点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">6.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-并发编程之美系列"><span class="nav-number">7.</span> <span class="nav-text">Java 并发编程之美系列</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-paper-plane"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">猫宁i</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">博客全站字数：</span>
+    
+    <span title="博客全站字数">447k</span>
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+  
+  <script color="0,0,0" opacity="0.3" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+  
+
+<script src="//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: '2saqKR15nDJaNg0KgkpiEIIB-gzGzoHsz',
+    appKey: 'NBf24H2IPzFCX7DjwNXFpDbH',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"react":{"opacity":0.7},"log":false,"tagMode":false});</script></body>
+</html>

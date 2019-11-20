@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: true,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言博客《Java 并发编程之美（四）：深入剖析 ThreadLocal》提到 ThreadLocal 变量的基本使用方式，ThreadLocal 是一个本地线程副本变量工具类，主要用于将私有线程和该线程存放的副本对象做一个映射，各个线程之间的变量互不干扰，在高并发场景下，可以实现无状态的调用，特别适用于各个线程依赖不同的变量值完成操作的场景。但是在实际的开发中，有这样的一种需求：父线程生成的变量">
+<meta name="keywords" content="InheritableThreadLocal,ThreadLocal">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱">
+<meta property="og:url" content="http://blog.maoning.pro/archives/f30530aa.html">
+<meta property="og:site_name" content="猫宁i">
+<meta property="og:description" content="前言博客《Java 并发编程之美（四）：深入剖析 ThreadLocal》提到 ThreadLocal 变量的基本使用方式，ThreadLocal 是一个本地线程副本变量工具类，主要用于将私有线程和该线程存放的副本对象做一个映射，各个线程之间的变量互不干扰，在高并发场景下，可以实现无状态的调用，特别适用于各个线程依赖不同的变量值完成操作的场景。但是在实际的开发中，有这样的一种需求：父线程生成的变量">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.maoning.pro/images/65966314_p2.jpg">
+<meta property="og:updated_time" content="2019-08-13T11:34:52.291Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱">
+<meta name="twitter:description" content="前言博客《Java 并发编程之美（四）：深入剖析 ThreadLocal》提到 ThreadLocal 变量的基本使用方式，ThreadLocal 是一个本地线程副本变量工具类，主要用于将私有线程和该线程存放的副本对象做一个映射，各个线程之间的变量互不干扰，在高并发场景下，可以实现无状态的调用，特别适用于各个线程依赖不同的变量值完成操作的场景。但是在实际的开发中，有这样的一种需求：父线程生成的变量">
+<meta name="twitter:image" content="http://blog.maoning.pro/images/65966314_p2.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="猫宁i" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="http://blog.maoning.pro/archives/f30530aa.html">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱 | 猫宁i</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">猫宁i</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">趁着年轻，好好生活，用心折腾。</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives menu-item-active">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/books/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/f30530aa.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-06-03 19:45:12" itemprop="dateCreated datePublished" datetime="2019-06-03T19:45:12+08:00">2019-06-03</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/并发/" itemprop="url" rel="index"><span itemprop="name">并发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/archives/f30530aa.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/archives/f30530aa.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/archives/f30530aa.html" class="leancloud_visitors" data-flag-title="Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">14k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">12 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/65966314_p2.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>博客《Java 并发编程之美（四）：深入剖析 ThreadLocal》提到 ThreadLocal 变量的基本使用方式，ThreadLocal 是一个本地线程副本变量工具类，主要用于将私有线程和该线程存放的副本对象做一个映射，各个线程之间的变量互不干扰，在高并发场景下，可以实现无状态的调用，特别适用于各个线程依赖不同的变量值完成操作的场景。但是在实际的开发中，有这样的一种需求：父线程生成的变量需要传递到子线程中进行使用，那么在使用 ThreadLocal 似乎就解决不了这个问题。由于 ThreadLocal 设计之初就是为了绑定当前线程，如果希望当前线程的 ThreadLocal 能够被子线程使用，实现方式就会相当困难。在此背景下，InheritableThreadLocal 应运而生，使用 InheritableThreadLocal 这个变量就可以轻松的在子线程中依旧使用父线程中的本地变量。</p>
+<a id="more"></a>
+<h2 id="ThreadLocal-与-InheritableThreadLocal-区别"><a href="#ThreadLocal-与-InheritableThreadLocal-区别" class="headerlink" title="ThreadLocal 与 InheritableThreadLocal 区别"></a>ThreadLocal 与 InheritableThreadLocal 区别</h2><p>ThreadLocal 声明的变量是线程私有的成员变量，每个线程都有该变量的副本，线程对变量的修改对其他线程不可见。</p>
+<p>InheritableThreadLocal 声明的变量同样是线程私有的，但是子线程可以使用同样的 InheritableThreadLocal 类型变量从父线程继承 InheritableThreadLocal 声明的变量，父线程无法拿到其子线程的。即使可以继承，但是子线程对变量的修改对父线程也是不可见的。</p>
+<h2 id="对-InheritableThreadLocal-的理解"><a href="#对-InheritableThreadLocal-的理解" class="headerlink" title="对 InheritableThreadLocal 的理解"></a>对 InheritableThreadLocal 的理解</h2><p>InheritableThreadLocal 类是 ThreadLocal 类的子类。ThreadLocal 中每个线程拥有它自己的值，与 ThreadLocal 不同的是，InheritableThreadLocal 允许一个线程以及该线程创建的所有子线程都可以访问它保存的值。</p>
+<p>ThreadLocal 是不支持继承性的，所谓继承性也是针对父线程和子线程来说，代码示例：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Scratch</span> &#123;<span class="keyword">public</span> <span class="keyword">static</span> final ThreadLocal&lt;String&gt; localVariable = <span class="keyword">new</span> ThreadLocal&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(<span class="params">String[] args</span>)</span> &#123;</span><br><span class="line">        localVariable.<span class="keyword">set</span>(<span class="string">"I'm variable in main"</span>);</span><br><span class="line">        System.<span class="keyword">out</span>.println(Thread.currentThread().getName() + <span class="string">":"</span> + localVariable.<span class="keyword">get</span>());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; System.<span class="keyword">out</span>.println(Thread.currentThread().getName() + <span class="string">":"</span> + localVariable.<span class="keyword">get</span>())).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Output</span></span><br><span class="line"><span class="comment">// main:I'm variable in main</span></span><br><span class="line"><span class="comment">// Thread-0:null</span></span><br></pre></td></tr></table></figure>
+<p>InheritableThreadLocal 用于子线程能够拿到父线程往 ThreadLocal 里设置的值，代码示例：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Scratch</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> final ThreadLocal&lt;String&gt; localVariable = <span class="keyword">new</span> InheritableThreadLocal&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(<span class="params">String[] args</span>)</span> &#123;</span><br><span class="line">        localVariable.<span class="keyword">set</span>(<span class="string">"I'm variable in main"</span>);</span><br><span class="line">        System.<span class="keyword">out</span>.println(Thread.currentThread().getName() + <span class="string">":"</span> + localVariable.<span class="keyword">get</span>());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; System.<span class="keyword">out</span>.println(Thread.currentThread().getName() + <span class="string">":"</span> + localVariable.<span class="keyword">get</span>())).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Output</span></span><br><span class="line"><span class="comment">// main:I'm variable in main</span></span><br><span class="line"><span class="comment">// Thread-0:I'm variable in main</span></span><br></pre></td></tr></table></figure>
+<h2 id="深入解析-InheritableThreadLocal-类"><a href="#深入解析-InheritableThreadLocal-类" class="headerlink" title="深入解析 InheritableThreadLocal 类"></a>深入解析 InheritableThreadLocal 类</h2><p>InheritableThreadLocal 类重写了 ThreadLocal 的 3 个函数：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">InheritableThreadLocal&lt;T&gt;</span> <span class="keyword">extends</span> <span class="title">ThreadLocal&lt;T&gt;</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 该函数在父线程创建子线程，向子线程赋值 InheritableThreadLocal 变量时使用</span></span><br><span class="line"><span class="comment">     * 可重写 childValue() 方法实现子线程与父线程之间互不影响</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="type">T</span> childValue(<span class="type">T</span> parentValue) &#123;</span><br><span class="line">        <span class="keyword">return</span> parentValue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 由于重写了 getMap，操作 InheritableThreadLocal 时，</span></span><br><span class="line"><span class="comment">     * 将只影响 Thread 类中的 inheritableThreadLocals 变量，</span></span><br><span class="line"><span class="comment">     * 与 threadLocals 变量不再有关系</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="type">ThreadLocalMap</span> getMap(<span class="type">Thread</span> t) &#123;</span><br><span class="line">        <span class="keyword">return</span> t.inheritableThreadLocals;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 类似于 getMap，操作 InheritableThreadLocal 时，</span></span><br><span class="line"><span class="comment">     * 将只影响 Thread 类中的 inheritableThreadLocals 变量，</span></span><br><span class="line"><span class="comment">     * 与 threadLocals 变量不再有关系</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    void createMap(<span class="type">Thread</span> t, <span class="type">T</span> firstValue) &#123;</span><br><span class="line">        t.inheritableThreadLocals = <span class="keyword">new</span> <span class="type">ThreadLocalMap</span>(<span class="keyword">this</span>, firstValue);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="InheritableThreadLocal-赋值"><a href="#InheritableThreadLocal-赋值" class="headerlink" title="InheritableThreadLocal 赋值"></a>InheritableThreadLocal 赋值</h3><p>从源码上看，跟 ThreadLocal 不一样的无非是 ThreadLocalMap 的引用不一样了，从逻辑上来讲，这并不能做到子线程得到父线程里的值。那么秘密在那里呢？通过跟踪 Thread 的构造方法，你能够发现是在构造 Thread 对象的时候对父线程的 InheritableThreadLocal 进行了赋值。下面是 Thread 的部分源码：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Thread</span> <span class="title">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 默认人构造方法, 会调用 init 方法进行初使化</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> Thread() &#123;</span><br><span class="line">        <span class="keyword">init</span>(<span class="literal">null</span>, <span class="literal">null</span>, <span class="string">"Thread-"</span> + nextThreadNum(), <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 最终初始化线程的方法</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> void <span class="keyword">init</span>(ThreadGroup g, Runnable target, String name,</span><br><span class="line">                      long stackSize, AccessControlContext acc,</span><br><span class="line">                      boolean inheritThreadLocals) &#123;</span><br><span class="line">        <span class="keyword">if</span> (name == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> new NullPointerException(<span class="string">"name cannot be null"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// parent 为当前线程, 也就是调用了 new Thread(); 方法的线程</span></span><br><span class="line">        Thread parent = currentThread();</span><br><span class="line">        SecurityManager security = System.getSecurityManager();</span><br><span class="line">        <span class="keyword">if</span> (g == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="comment">/* Determine if it's an applet or not */</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">/* If there is a security manager, ask the security manager</span></span><br><span class="line"><span class="comment">               what to do. */</span></span><br><span class="line">            <span class="keyword">if</span> (security != <span class="literal">null</span>) &#123;</span><br><span class="line">                g = security.getThreadGroup();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* If the security doesn't have a strong opinion of the matter</span></span><br><span class="line"><span class="comment">               use the parent thread group. */</span></span><br><span class="line">            <span class="keyword">if</span> (g == <span class="literal">null</span>) &#123;</span><br><span class="line">                g = parent.getThreadGroup();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* checkAccess regardless of whether or not threadgroup is</span></span><br><span class="line"><span class="comment">           explicitly passed in. */</span></span><br><span class="line">        g.checkAccess();</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * Do we have the required permissions?</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">if</span> (security != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (isCCLOverridden(getClass())) &#123;</span><br><span class="line">                security.checkPermission(SUBCLASS_IMPLEMENTATION_PERMISSION);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        g.addUnstarted();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 在这里会继承父线程是否为后台线程的属性还有父线程的优先级</span></span><br><span class="line">        <span class="keyword">this</span>.group = g;</span><br><span class="line">        <span class="keyword">this</span>.daemon = parent.isDaemon();</span><br><span class="line">        <span class="keyword">this</span>.priority = parent.getPriority();</span><br><span class="line">        <span class="keyword">if</span> (security == <span class="literal">null</span> || isCCLOverridden(parent.getClass()))</span><br><span class="line">            <span class="keyword">this</span>.contextClassLoader = parent.getContextClassLoader();</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">this</span>.contextClassLoader = parent.contextClassLoader;</span><br><span class="line">        <span class="keyword">this</span>.inheritedAccessControlContext =</span><br><span class="line">                acc != <span class="literal">null</span> ? acc : AccessController.getContext();</span><br><span class="line">        <span class="keyword">this</span>.target = target;</span><br><span class="line">        setPriority(priority);</span><br><span class="line">        <span class="comment">// 这里是重点, 当父线程的 inheritableThreadLocals 不为空的时候, 会调用 ThreadLocal.createInheritedMap 方法, 传入的是父线程的 inheritableThreadLocals。原来复制变量的秘密在这里</span></span><br><span class="line">        <span class="keyword">if</span> (inheritThreadLocals &amp;&amp; parent.inheritableThreadLocals != <span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">this</span>.inheritableThreadLocals =</span><br><span class="line">                    ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);</span><br><span class="line">        <span class="comment">/* Stash the specified stack size in case the VM cares */</span></span><br><span class="line">        <span class="keyword">this</span>.stackSize = stackSize;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Set thread ID */</span></span><br><span class="line">        tid = nextThreadID();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过跟踪 Thread 的构造方法，我们发现只要父线程在构造子线程（调用 new Thread()）的时候 inheritableThreadLocals 变量不为空。新生成的子线程会通过 ThreadLocal.createInheritedMap 方法将父线程 inheritableThreadLocals 变量有的对象复制到子线程的 inheritableThreadLocals 变量上。这样就完成了线程间变量的继承与传递。</p>
+<h3 id="ThreadLocal-createInheritedMap"><a href="#ThreadLocal-createInheritedMap" class="headerlink" title="ThreadLocal.createInheritedMap"></a>ThreadLocal.createInheritedMap</h3><figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> class ThreadLocal&lt;T&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据传入的 map, 构造一个新的 ThreadLocalMap</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">static</span> ThreadLocalMap createInheritedMap(ThreadLocalMap parentMap) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ThreadLocalMap(parentMap);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> class ThreadLocalMap &#123;</span><br><span class="line">        <span class="comment">// 这个 private 的构造方法就是专门给 ThreadLocal 使用的</span></span><br><span class="line">        <span class="keyword">private</span> ThreadLocalMap(ThreadLocalMap parentMap) &#123;</span><br><span class="line">            <span class="comment">// ThreadLocalMap 还是用 Entry 数组来存储对象的</span></span><br><span class="line">            Entry[] parentTable = parentMap.table;</span><br><span class="line">            <span class="built_in">int</span> len = parentTable.length;</span><br><span class="line">            setThreshold(len);</span><br><span class="line">            <span class="comment">// 创建跟父线程相同大小的 table</span></span><br><span class="line">            table = <span class="keyword">new</span> Entry[len];</span><br><span class="line">            <span class="comment">// 这里是复制 parentMap 数据的逻辑</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="built_in">int</span> j = <span class="number">0</span>; j &lt; len; j++) &#123;</span><br><span class="line">                Entry e = parentTable[j];</span><br><span class="line">                <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="comment">// 得到父线程中变量对应的 key, 即 ThreadLocal 对象</span></span><br><span class="line">                    ThreadLocal <span class="built_in">key</span> = e.<span class="built_in">get</span>();</span><br><span class="line">                    <span class="keyword">if</span> (<span class="built_in">key</span> != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="comment">// 此处会调用 InheritableThreadLocal 重写的方法, 默认直接返回入参值</span></span><br><span class="line">                        <span class="keyword">Object</span> value = <span class="built_in">key</span>.childValue(e.value);</span><br><span class="line">                        Entry c = <span class="keyword">new</span> Entry(<span class="built_in">key</span>, value);</span><br><span class="line">                        <span class="comment">// 通过位与运算找到索引位置</span></span><br><span class="line">                        <span class="built_in">int</span> h = <span class="built_in">key</span>.threadLocalHashCode &amp; (len - <span class="number">1</span>);</span><br><span class="line">                        <span class="comment">// 如果该索引位置已经被占, 则寻找下一个索引位置</span></span><br><span class="line">                        <span class="keyword">while</span> (table[h] != <span class="keyword">null</span>)</span><br><span class="line">                            h = nextIndex(h, len);</span><br><span class="line">                        <span class="comment">// 将 Entry 放在对应的位置</span></span><br><span class="line">                        table[h] = c;</span><br><span class="line">                        <span class="built_in">size</span>++;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="InheritableThreadLocal-和线程池搭配使用存在的问题"><a href="#InheritableThreadLocal-和线程池搭配使用存在的问题" class="headerlink" title="InheritableThreadLocal 和线程池搭配使用存在的问题"></a>InheritableThreadLocal 和线程池搭配使用存在的问题</h2><h3 id="问题展示"><a href="#问题展示" class="headerlink" title="问题展示"></a>问题展示</h3><p>代码示例：</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Scratch</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> final ThreadLocal&lt;<span class="keyword">String</span>&gt; localVariable = <span class="keyword">new</span> <span class="type">InheritableThreadLocal</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) throws InterruptedException &#123;</span><br><span class="line">        ExecutorService executorService = Executors.<span class="keyword">new</span><span class="type">FixedThreadPool</span>(<span class="number">2</span>);</span><br><span class="line">        CountDownLatch doneSignal = <span class="keyword">new</span> <span class="type">CountDownLatch</span>(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 1.main 线程第一次赋值 "I'm variable_1 in main"localVariable.set("I'm variable_1 in main");</span></span><br><span class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">":"</span> + localVariable.<span class="keyword">get</span>());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 2. 线程池执行方法, 查看线程中线程 InheritableThreadLocal 赋值情况</span></span><br><span class="line">        executorService.submit(<span class="keyword">new</span> <span class="type">Worker</span>(doneSignal));</span><br><span class="line">        executorService.submit(<span class="keyword">new</span> <span class="type">Worker</span>(doneSignal));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 3.wait for all to finish[等待线程 pool-1-thread-1/pool-1-thread-2 执行完后, 在对主线程的 InheritableThreadLocal 进行赋值, 查看赋值后, 线程池中线程的 InheritableThreadLocal 是否发生变法]</span></span><br><span class="line">        doneSignal.await();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 4.main 线程第二次赋值 "I'm variable_2 in main"localVariable.set("I'm variable_2 in main");</span></span><br><span class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">":"</span> + localVariable.<span class="keyword">get</span>());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 5. 线程池执行方法, 查看线程中线程 InheritableThreadLocal 赋值情况</span></span><br><span class="line">        executorService.submit(<span class="keyword">new</span> <span class="type">Worker</span>(doneSignal));</span><br><span class="line">        executorService.submit(<span class="keyword">new</span> <span class="type">Worker</span>(doneSignal));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 6. 关闭线程池</span></span><br><span class="line">        executorService.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Worker</span> <span class="keyword"><span class="keyword">implements</span> <span class="type">Runnable</span></span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> final CountDownLatch doneSignal;</span><br><span class="line"></span><br><span class="line">        Worker(CountDownLatch doneSignal) &#123;</span><br><span class="line">            <span class="built_in">this</span>.doneSignal = doneSignal;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        <span class="keyword">public</span> void run() &#123;</span><br><span class="line">            doneSignal.countDown();</span><br><span class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">":"</span> + localVariable.<span class="keyword">get</span>());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// Output</span></span><br><span class="line"><span class="comment">// main:I'm variable_1 in main</span></span><br><span class="line"><span class="comment">// pool-1-thread-2:I'm variable_1 in main</span></span><br><span class="line"><span class="comment">// pool-1-thread-1:I'm variable_1 in main</span></span><br><span class="line"><span class="comment">// main:I'm variable_2 in main</span></span><br><span class="line"><span class="comment">// pool-1-thread-2:I'm variable_1 in main</span></span><br><span class="line"><span class="comment">// pool-1-thread-1:I'm variable_1 in main</span></span><br></pre></td></tr></table></figure>
+<p>前后两次调用获取的值是一开始赋值的值，因为线程池中是缓存使用过的线程，当线程被重复调用的时候并没有再重新初始化 init() 线程，而是直接使用已经创建过的线程，所以这里的值并不会被再次操作。因为实际的项目中线程池的使用频率非常高，每一次从线程池中取出线程不能够直接使用之前缓存的变量，所以要解决这一个问题，网上大部分是推荐使用 alibaba 的开源项目 <a href="https://github.com/alibaba/transmittable-thread-local" target="_blank" rel="noopener">transmittable-thread-local</a>。</p>
+<h3 id="transmittable-thread-local"><a href="#transmittable-thread-local" class="headerlink" title="transmittable-thread-local"></a>transmittable-thread-local</h3><p>JDK 的 InheritableThreadLocal 类可以完成父线程到子线程的值传递。但对于使用线程池等会池化复用线程的组件的情况，线程由线程池创建好，并且线程是池化起来反复使用的；这时父子线程关系的 ThreadLocal 值传递已经没有意义，应用需要的实际上是把任务提交给线程池时的 ThreadLocal 值传递到任务执行时。</p>
+<p>在 ThreadLocal 的需求场景即是 TTL（装饰器模式）的潜在需求场景，如果你的业务需要『在使用线程池等会池化复用线程的组件情况下传递 ThreadLocal』则是 TTL 目标场景。下面是几个典型场景例子：1、分布式跟踪系统；2、日志收集记录系统上下文；3 应用容器或上层框架跨应用代码给下层 SDK 传递信息。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>transmittable-thread-local<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.10.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>代码示例：</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Scratch</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> final ThreadLocal&lt;<span class="keyword">String</span>&gt; localVariable = <span class="keyword">new</span> <span class="type">TransmittableThreadLocal</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) throws InterruptedException &#123;</span><br><span class="line">        ExecutorService executorService = Executors.<span class="keyword">new</span><span class="type">FixedThreadPool</span>(<span class="number">2</span>);</span><br><span class="line">        <span class="comment">// 额外的处理，生成修饰了的对象 executorService</span></span><br><span class="line">        executorService = TtlExecutors.getTtlExecutorService(executorService);</span><br><span class="line"></span><br><span class="line">        CountDownLatch doneSignal = <span class="keyword">new</span> <span class="type">CountDownLatch</span>(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 1.main 线程第一次赋值 "I'm variable_1 in main"localVariable.set("I'm variable_1 in main");</span></span><br><span class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">":"</span> + localVariable.<span class="keyword">get</span>());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 2. 线程池执行方法, 查看线程中线程 InheritableThreadLocal 赋值情况</span></span><br><span class="line">        executorService.submit(<span class="keyword">new</span> <span class="type">Worker</span>(doneSignal));</span><br><span class="line">        executorService.submit(<span class="keyword">new</span> <span class="type">Worker</span>(doneSignal));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 3.wait for all to finish[等待线程 pool-1-thread-1/pool-1-thread-2 执行完后, 在对主线程的 InheritableThreadLocal 进行赋值, 查看赋值后, 线程池中线程的 InheritableThreadLocal 是否发生变法]</span></span><br><span class="line">        doneSignal.await();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 4.main 线程第二次赋值 "I'm variable_2 in main"localVariable.set("I'm variable_2 in main");</span></span><br><span class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">":"</span> + localVariable.<span class="keyword">get</span>());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 5. 线程池执行方法, 查看线程中线程 InheritableThreadLocal 赋值情况</span></span><br><span class="line">        executorService.submit(<span class="keyword">new</span> <span class="type">Worker</span>(doneSignal));</span><br><span class="line">        executorService.submit(<span class="keyword">new</span> <span class="type">Worker</span>(doneSignal));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 6. 关闭线程池</span></span><br><span class="line">        executorService.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Worker</span> <span class="keyword"><span class="keyword">implements</span> <span class="type">Runnable</span></span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> final CountDownLatch doneSignal;</span><br><span class="line"></span><br><span class="line">        Worker(CountDownLatch doneSignal) &#123;</span><br><span class="line">            <span class="built_in">this</span>.doneSignal = doneSignal;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        <span class="keyword">public</span> void run() &#123;</span><br><span class="line">            doneSignal.countDown();</span><br><span class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">":"</span> + localVariable.<span class="keyword">get</span>());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Output</span></span><br><span class="line"><span class="comment">// main:I'm variable_1 in main</span></span><br><span class="line"><span class="comment">// pool-1-thread-2:I'm variable_1 in main</span></span><br><span class="line"><span class="comment">// pool-1-thread-1:I'm variable_1 in main</span></span><br><span class="line"><span class="comment">// main:I'm variable_2 in main</span></span><br><span class="line"><span class="comment">// pool-1-thread-1:I'm variable_2 in main</span></span><br><span class="line"><span class="comment">// pool-1-thread-2:I'm variable_2 in main</span></span><br></pre></td></tr></table></figure>
+<p>整个过程的完整时序图：</p>
+<p><img src="/media/15633498026981/r45yw78ty.png" alt="r45yw78ty"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>ThreadLocal 和 InheritableThreadLocal 本质上只是为了方便编码给的工具类，具体存数据是 ThreadLocalMap 对象。</li>
+<li>ThreadLocalMap 存的 key 对象是 ThreadLocal，value 就是真正需要存的业务对象。</li>
+<li>Thread 里通过两个变量持用 ThreadLocalMap 对象，分别为：threadLocals 和 inheritableThreadLocals。</li>
+<li>InheritableThreadLocal 之所以能够完成线程间变量的传递，是在 newThread() 的时候对 inheritableThreadLocals 对象里的值进行了复制。</li>
+<li>子线程通过继承得到的 InheritableThreadLocal 里的值与父线程里的 InheritableThreadLocal 的值具有相同的引用，如果父子线程想实现不影响各自的对象，可以重写 InheritableThreadLocal 的 childValue 方法。</li>
+</ul>
+<hr>
+<h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="https://www.jianshu.com/p/1af4f7582b80" target="_blank" rel="noopener">ThreadLocal 和 InheritableThreadLocal 深入分析</a><br>[2]. <a href="https://github.com/alibaba/transmittable-thread-local" target="_blank" rel="noopener">transmittable-thread-local</a><br>[3]. <a href="https://www.jianshu.com/p/94ba4a918ff5" target="_blank" rel="noopener">InheritableThreadLocal 详解</a></p>
+<hr>
+<h2 id="Java-并发编程之美系列"><a href="#Java-并发编程之美系列" class="headerlink" title="Java 并发编程之美系列"></a>Java 并发编程之美系列</h2><ul>
+<li><a href="a290319j.html">Java 并发编程之美（一）：并发队列 Queue 原理剖析</a></li>
+<li><a href="e230219b.html">Java 并发编程之美（二）：线程池 ThreadPoolExecutor 原理探究</a></li>
+<li><a href="q1e3r5t42.html">Java 并发编程之美（三）：异步执行框架 Eexecutor</a></li>
+<li><a href="b9c60c0e.html">Java 并发编程之美（四）：深入剖析 ThreadLocal</a></li>
+<li><a href="f30530aa.html">Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱</a></li>
+<li><a href="f4f43ede.html">Java 并发编程之美（六）：J.U.C 之线程同步辅助工具类</a></li>
+</ul>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>谢谢你长得那么好看，还打赏我！😘</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.jpg" alt="猫宁i 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.jpg" alt="猫宁i 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>猫宁i</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://blog.maoning.pro/archives/f30530aa.html" title="Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱">http://blog.maoning.pro/archives/f30530aa.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/InheritableThreadLocal/" rel="tag"># InheritableThreadLocal</a>
+          
+            <a href="/tags/ThreadLocal/" rel="tag"># ThreadLocal</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/9c51d4e.html" rel="next" title="大话数据结构（一）：那些年面试常见的 Java 排序算法">
+                <i class="fa fa-chevron-left"></i> 大话数据结构（一）：那些年面试常见的 Java 排序算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/archives/c0dca125.html" rel="prev" title="Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流">
+                Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="猫宁i">
+            
+              <p class="site-author-name" itemprop="name">猫宁i</p>
+              <div class="site-description motion-element" itemprop="description">趁着年轻，好好生活，用心折腾。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">81</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://morning-pro.github.io/" title="https://morning-pro.github.io/" rel="noopener" target="_blank">我的镜像站</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://crossoverjie.top/" title="https://crossoverjie.top/" rel="noopener" target="_blank">crossoverJie's Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://fangjian0423.github.io/" title="http://fangjian0423.github.io/" rel="noopener" target="_blank">Format's Notes</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ThreadLocal-与-InheritableThreadLocal-区别"><span class="nav-number">2.</span> <span class="nav-text">ThreadLocal 与 InheritableThreadLocal 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对-InheritableThreadLocal-的理解"><span class="nav-number">3.</span> <span class="nav-text">对 InheritableThreadLocal 的理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#深入解析-InheritableThreadLocal-类"><span class="nav-number">4.</span> <span class="nav-text">深入解析 InheritableThreadLocal 类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#InheritableThreadLocal-赋值"><span class="nav-number">4.1.</span> <span class="nav-text">InheritableThreadLocal 赋值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ThreadLocal-createInheritedMap"><span class="nav-number">4.2.</span> <span class="nav-text">ThreadLocal.createInheritedMap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InheritableThreadLocal-和线程池搭配使用存在的问题"><span class="nav-number">5.</span> <span class="nav-text">InheritableThreadLocal 和线程池搭配使用存在的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题展示"><span class="nav-number">5.1.</span> <span class="nav-text">问题展示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#transmittable-thread-local"><span class="nav-number">5.2.</span> <span class="nav-text">transmittable-thread-local</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">7.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-并发编程之美系列"><span class="nav-number">8.</span> <span class="nav-text">Java 并发编程之美系列</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-paper-plane"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">猫宁i</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">博客全站字数：</span>
+    
+    <span title="博客全站字数">447k</span>
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+  
+  <script color="0,0,0" opacity="0.3" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+  
+
+<script src="//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: '2saqKR15nDJaNg0KgkpiEIIB-gzGzoHsz',
+    appKey: 'NBf24H2IPzFCX7DjwNXFpDbH',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"react":{"opacity":0.7},"log":false,"tagMode":false});</script></body>
+</html>
