@@ -96,11 +96,11 @@
     
       <category term="Java8" scheme="http://blog.maoning.pro/tags/Java8/"/>
     
-      <category term="ConcurrentHashMap" scheme="http://blog.maoning.pro/tags/ConcurrentHashMap/"/>
-    
       <category term="集合" scheme="http://blog.maoning.pro/tags/%E9%9B%86%E5%90%88/"/>
     
       <category term="Java7" scheme="http://blog.maoning.pro/tags/Java7/"/>
+    
+      <category term="ConcurrentHashMap" scheme="http://blog.maoning.pro/tags/ConcurrentHashMap/"/>
     
   </entry>
   
@@ -215,9 +215,9 @@
       <category term="MySQL" scheme="http://blog.maoning.pro/categories/MySQL/"/>
     
     
-      <category term="索引" scheme="http://blog.maoning.pro/tags/%E7%B4%A2%E5%BC%95/"/>
-    
       <category term="EXPLAIN" scheme="http://blog.maoning.pro/tags/EXPLAIN/"/>
+    
+      <category term="索引" scheme="http://blog.maoning.pro/tags/%E7%B4%A2%E5%BC%95/"/>
     
   </entry>
   
@@ -241,9 +241,9 @@
     
       <category term="安装教程" scheme="http://blog.maoning.pro/tags/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/"/>
     
-      <category term="配置说明" scheme="http://blog.maoning.pro/tags/%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/"/>
-    
       <category term="Redis" scheme="http://blog.maoning.pro/tags/Redis/"/>
+    
+      <category term="配置说明" scheme="http://blog.maoning.pro/tags/%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/"/>
     
   </entry>
   
@@ -447,11 +447,11 @@
     
       <category term="Java8" scheme="http://blog.maoning.pro/tags/Java8/"/>
     
+      <category term="HashMap" scheme="http://blog.maoning.pro/tags/HashMap/"/>
+    
       <category term="集合" scheme="http://blog.maoning.pro/tags/%E9%9B%86%E5%90%88/"/>
     
       <category term="Java7" scheme="http://blog.maoning.pro/tags/Java7/"/>
-    
-      <category term="HashMap" scheme="http://blog.maoning.pro/tags/HashMap/"/>
     
   </entry>
   
@@ -473,9 +473,9 @@
       <category term="MySQL" scheme="http://blog.maoning.pro/categories/MySQL/"/>
     
     
-      <category term="MySQL" scheme="http://blog.maoning.pro/tags/MySQL/"/>
-    
       <category term="索引" scheme="http://blog.maoning.pro/tags/%E7%B4%A2%E5%BC%95/"/>
+    
+      <category term="MySQL" scheme="http://blog.maoning.pro/tags/MySQL/"/>
     
       <category term="Btree" scheme="http://blog.maoning.pro/tags/Btree/"/>
     
