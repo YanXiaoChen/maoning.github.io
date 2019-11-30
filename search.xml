@@ -90,8 +90,8 @@
         <category>MySQL</category>
       </categories>
       <tags>
-        <tag>EXPLAIN</tag>
         <tag>索引</tag>
+        <tag>EXPLAIN</tag>
       </tags>
   </entry>
   <entry>
@@ -217,8 +217,8 @@
         <category>MySQL</category>
       </categories>
       <tags>
-        <tag>索引</tag>
         <tag>MySQL</tag>
+        <tag>索引</tag>
         <tag>Btree</tag>
         <tag>Hash</tag>
       </tags>
@@ -344,8 +344,8 @@
         <category>Java8</category>
       </categories>
       <tags>
-        <tag>Optional</tag>
         <tag>Java8</tag>
+        <tag>Optional</tag>
       </tags>
   </entry>
   <entry>
@@ -394,9 +394,9 @@
         <category>Java8</category>
       </categories>
       <tags>
-        <tag>Java8</tag>
         <tag>Stream</tag>
         <tag>语法详解</tag>
+        <tag>Java8</tag>
       </tags>
   </entry>
   <entry>

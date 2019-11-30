@@ -215,9 +215,9 @@
       <category term="MySQL" scheme="http://blog.maoning.pro/categories/MySQL/"/>
     
     
-      <category term="EXPLAIN" scheme="http://blog.maoning.pro/tags/EXPLAIN/"/>
-    
       <category term="索引" scheme="http://blog.maoning.pro/tags/%E7%B4%A2%E5%BC%95/"/>
+    
+      <category term="EXPLAIN" scheme="http://blog.maoning.pro/tags/EXPLAIN/"/>
     
   </entry>
   
@@ -473,9 +473,9 @@
       <category term="MySQL" scheme="http://blog.maoning.pro/categories/MySQL/"/>
     
     
-      <category term="索引" scheme="http://blog.maoning.pro/tags/%E7%B4%A2%E5%BC%95/"/>
-    
       <category term="MySQL" scheme="http://blog.maoning.pro/tags/MySQL/"/>
+    
+      <category term="索引" scheme="http://blog.maoning.pro/tags/%E7%B4%A2%E5%BC%95/"/>
     
       <category term="Btree" scheme="http://blog.maoning.pro/tags/Btree/"/>
     
