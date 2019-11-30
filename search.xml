@@ -35,9 +35,9 @@
       </categories>
       <tags>
         <tag>Java8</tag>
+        <tag>ConcurrentHashMap</tag>
         <tag>集合</tag>
         <tag>Java7</tag>
-        <tag>ConcurrentHashMap</tag>
       </tags>
   </entry>
   <entry>
@@ -204,9 +204,9 @@
       </categories>
       <tags>
         <tag>Java8</tag>
-        <tag>HashMap</tag>
         <tag>集合</tag>
         <tag>Java7</tag>
+        <tag>HashMap</tag>
       </tags>
   </entry>
   <entry>
@@ -344,8 +344,8 @@
         <category>Java8</category>
       </categories>
       <tags>
-        <tag>Java8</tag>
         <tag>Optional</tag>
+        <tag>Java8</tag>
       </tags>
   </entry>
   <entry>
@@ -394,9 +394,9 @@
         <category>Java8</category>
       </categories>
       <tags>
+        <tag>Java8</tag>
         <tag>Stream</tag>
         <tag>语法详解</tag>
-        <tag>Java8</tag>
       </tags>
   </entry>
   <entry>
@@ -447,8 +447,8 @@
         <category>编码</category>
       </categories>
       <tags>
-        <tag>字符编码</tag>
         <tag>编码</tag>
+        <tag>字符编码</tag>
       </tags>
   </entry>
   <entry>

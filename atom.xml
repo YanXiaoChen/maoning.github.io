@@ -96,11 +96,11 @@
     
       <category term="Java8" scheme="http://blog.maoning.pro/tags/Java8/"/>
     
+      <category term="ConcurrentHashMap" scheme="http://blog.maoning.pro/tags/ConcurrentHashMap/"/>
+    
       <category term="集合" scheme="http://blog.maoning.pro/tags/%E9%9B%86%E5%90%88/"/>
     
       <category term="Java7" scheme="http://blog.maoning.pro/tags/Java7/"/>
-    
-      <category term="ConcurrentHashMap" scheme="http://blog.maoning.pro/tags/ConcurrentHashMap/"/>
     
   </entry>
   
@@ -447,11 +447,11 @@
     
       <category term="Java8" scheme="http://blog.maoning.pro/tags/Java8/"/>
     
-      <category term="HashMap" scheme="http://blog.maoning.pro/tags/HashMap/"/>
-    
       <category term="集合" scheme="http://blog.maoning.pro/tags/%E9%9B%86%E5%90%88/"/>
     
       <category term="Java7" scheme="http://blog.maoning.pro/tags/Java7/"/>
+    
+      <category term="HashMap" scheme="http://blog.maoning.pro/tags/HashMap/"/>
     
   </entry>
   
