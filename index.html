@@ -108,9 +108,10 @@
 
 
   <meta name="description" content="趁着年轻，好好生活，用心折腾。">
+<meta name="keywords" content="趁着年轻，好好生活，用心折腾。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="猫宁i">
-<meta property="og:url" content="http://blog.maoning.pro/index.html">
+<meta property="og:url" content="https://blog.maoning.vip/index.html">
 <meta property="og:site_name" content="猫宁i">
 <meta property="og:description" content="趁着年轻，好好生活，用心折腾。">
 <meta property="og:locale" content="zh-CN">
@@ -125,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="http://blog.maoning.pro/">
+  <link rel="canonical" href="https://blog.maoning.vip/">
 
 
 
@@ -402,7 +403,232 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/d63e1e23.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/691d905d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/archives/691d905d.html" class="post-title-link" itemprop="url">分布式设计之美（二）：微服务架构下分布式事务解决方案</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-03 16:27:39" itemprop="dateCreated datePublished" datetime="2019-12-03T16:27:39+08:00">2019-12-03</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/分布式/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/archives/691d905d.html" class="leancloud_visitors" data-flag-title="分布式设计之美（二）：微服务架构下分布式事务解决方案">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">16k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">15 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/boudewijn-huysmans-J7NCMCOTNG0-unsplash.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在微服务架构中，随着服务的逐步拆分，数据库私有已经成为共识，这也导致所面临的分布式事务问题成为微服务落地过程中一个非常难以逾越的障碍，但是目前尚没有一个完整通用的解决方案。</p>
+<p>其实不仅仅是在微服务架构中，随着用户访问量的逐渐上涨，数据库甚至是服务的分片、分区、水平拆分、垂直拆分已经逐渐成为较为常用的提升瓶颈的解决方案，因此越来越多的原子操作变成了跨库甚至是跨服务的事务操作。最终结果是在对高性能、高扩展性、高可用性的追求的道路上，我们开始逐渐放松对一致性的追求，但是在很多场景下，尤其是账务，电商等业务中，不可避免的存在着一致性问题，使得我们不得不去探寻一种机制，用以在分布式环境中保证事务的一致性。</p>
+<p>分布式事务有多种主流形态，包括：</p>
+<ul>
+<li>基于 2PC（两阶段提交）实现的分布式事务</li>
+<li>基于 3PC（三阶段提交）实现的分布式事务</li>
+<li>基于 TCC（补偿事务）实现的分布式事务</li>
+<li>基于 Saga 实现的分布式事务</li>
+<li>基于可靠消息（事务消息）最终一致性实现的分布式事务</li>
+<li>基于本地消息（本地消息表）最终一致性实现的分布式事务</li>
+</ul>
+<p>接下来，本文将对这些形态的分布式事务进行剖析，然后讲解一下如何根据业务选择对应的分布式事务形态。</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/archives/691d905d.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/d63e1e23.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="猫宁i">
@@ -618,7 +844,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/6e0aae0d.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/6e0aae0d.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="猫宁i">
@@ -835,7 +1061,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/91027543.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/91027543.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="猫宁i">
@@ -1052,7 +1278,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/43810ae.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/43810ae.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="猫宁i">
@@ -1267,7 +1493,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/1c55560e.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/1c55560e.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="猫宁i">
@@ -1482,7 +1708,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/f4f43ede.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/f4f43ede.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="猫宁i">
@@ -1702,7 +1928,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/46faebc7.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/46faebc7.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="猫宁i">
@@ -1917,7 +2143,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/14348371.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/14348371.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="猫宁i">
@@ -2131,7 +2357,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/c0dca125.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/c0dca125.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="猫宁i">
@@ -2331,220 +2557,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/f30530aa.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="猫宁i">
-      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
-      <meta itemprop="image" content="/images/avatar.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="猫宁i">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/archives/f30530aa.html" class="post-title-link" itemprop="url">Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-06-03 19:45:12" itemprop="dateCreated datePublished" datetime="2019-06-03T19:45:12+08:00">2019-06-03</time>
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/并发/" itemprop="url" rel="index"><span itemprop="name">并发</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/archives/f30530aa.html" class="leancloud_visitors" data-flag-title="Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-            <div class="post-symbolscount">
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">本文字数统计：</span>
-                
-                <span title="本文字数统计">14k</span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">12 分钟</span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
-          
-          
-            <div class="post-gallery-row">
-              <img src="/images/65966314_p2.jpg" itemprop="contentUrl">
-            
-          
-
-          
-          </div>
-        </div>
-      
-
-      
-        
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>博客《Java 并发编程之美（四）：深入剖析 ThreadLocal》提到 ThreadLocal 变量的基本使用方式，ThreadLocal 是一个本地线程副本变量工具类，主要用于将私有线程和该线程存放的副本对象做一个映射，各个线程之间的变量互不干扰，在高并发场景下，可以实现无状态的调用，特别适用于各个线程依赖不同的变量值完成操作的场景。但是在实际的开发中，有这样的一种需求：父线程生成的变量需要传递到子线程中进行使用，那么在使用 ThreadLocal 似乎就解决不了这个问题。由于 ThreadLocal 设计之初就是为了绑定当前线程，如果希望当前线程的 ThreadLocal 能够被子线程使用，实现方式就会相当困难。在此背景下，InheritableThreadLocal 应运而生，使用 InheritableThreadLocal 这个变量就可以轻松的在子线程中依旧使用父线程中的本地变量。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/archives/f30530aa.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2593,7 +2605,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-count">38</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2821,7 +2833,15 @@
                     
                       
                     
-                    <span class="site-state-item-count">81</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">85</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -2914,7 +2934,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">447k</span>
+    <span title="博客全站字数">464k</span>
   
 
   

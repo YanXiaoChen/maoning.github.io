@@ -108,19 +108,19 @@
 
 
   <meta name="description" content="前言索引对查询的速度有着至关重要的影响，理解索引也是进行数据库性能调优的起点。索引在 MySQL 中也叫做“键”，存储引擎用于快速查找记录的一种数据结构，通过合理的使用数据库索引可以大大提高系统的访问性能。关于 MySQL 索引的好处，如果正确合理设计并且使用索引的 MySQL 是一辆兰博基尼的话，那么没有设计和使用索引的 MySQL 就是一个人力三轮车。对于没有索引的表，单表查询可能几十万数据就">
-<meta name="keywords" content="MySQL,索引,Btree,Hash">
+<meta name="keywords" content="索引,MySQL,Btree,Hash">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL 进阶讲解（一）：MySQL 索引原理">
-<meta property="og:url" content="http://blog.maoning.pro/archives/c2d5e679.html">
+<meta property="og:url" content="https://blog.maoning.vip/archives/c2d5e679.html">
 <meta property="og:site_name" content="猫宁i">
 <meta property="og:description" content="前言索引对查询的速度有着至关重要的影响，理解索引也是进行数据库性能调优的起点。索引在 MySQL 中也叫做“键”，存储引擎用于快速查找记录的一种数据结构，通过合理的使用数据库索引可以大大提高系统的访问性能。关于 MySQL 索引的好处，如果正确合理设计并且使用索引的 MySQL 是一辆兰博基尼的话，那么没有设计和使用索引的 MySQL 就是一个人力三轮车。对于没有索引的表，单表查询可能几十万数据就">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://blog.maoning.pro/images/65966314_p0.jpg">
+<meta property="og:image" content="https://blog.maoning.vip/images/65966314_p0.jpg">
 <meta property="og:updated_time" content="2019-08-16T02:14:07.897Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL 进阶讲解（一）：MySQL 索引原理">
 <meta name="twitter:description" content="前言索引对查询的速度有着至关重要的影响，理解索引也是进行数据库性能调优的起点。索引在 MySQL 中也叫做“键”，存储引擎用于快速查找记录的一种数据结构，通过合理的使用数据库索引可以大大提高系统的访问性能。关于 MySQL 索引的好处，如果正确合理设计并且使用索引的 MySQL 是一辆兰博基尼的话，那么没有设计和使用索引的 MySQL 就是一个人力三轮车。对于没有索引的表，单表查询可能几十万数据就">
-<meta name="twitter:image" content="http://blog.maoning.pro/images/65966314_p0.jpg">
+<meta name="twitter:image" content="https://blog.maoning.vip/images/65966314_p0.jpg">
 
 
 
@@ -129,7 +129,7 @@
 
 
 
-  <link rel="canonical" href="http://blog.maoning.pro/archives/c2d5e679.html">
+  <link rel="canonical" href="https://blog.maoning.vip/archives/c2d5e679.html">
 
 
 
@@ -405,7 +405,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.maoning.pro/archives/c2d5e679.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/c2d5e679.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="猫宁i">
@@ -722,7 +722,7 @@
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
     
-    <a href="http://blog.maoning.pro/archives/c2d5e679.html" title="MySQL 进阶讲解（一）：MySQL 索引原理">http://blog.maoning.pro/archives/c2d5e679.html</a>
+    <a href="https://blog.maoning.vip/archives/c2d5e679.html" title="MySQL 进阶讲解（一）：MySQL 索引原理">https://blog.maoning.vip/archives/c2d5e679.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
@@ -735,9 +735,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
-          
             <a href="/tags/索引/" rel="tag"># 索引</a>
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
           
             <a href="/tags/Btree/" rel="tag"># Btree</a>
           
@@ -841,7 +841,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-count">38</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1069,7 +1069,15 @@
                     
                       
                     
-                    <span class="site-state-item-count">81</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">85</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1179,7 +1187,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">447k</span>
+    <span title="博客全站字数">464k</span>
   
 
   
