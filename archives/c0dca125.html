@@ -116,7 +116,7 @@
 <meta property="og:description" content="前言当在团队开发中使用版本控制系统时，商定一个统一的工作流程是至关重要的。Git 的确可以在各个方面做很多事情，然而，如果在你的团队中还没有能形成一个特定有效的工作流程，那么混乱就将是不可避免的。基本上你可以定义一个完全适合你自己项目的工作流程，或者使用一个别人定义好的。就像代码需要代码规范一样，代码管理同样需要一个清晰的流程和规范。 Git flow 工作流是经典模型，体现了工作流的经验和精髓。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://blog.maoning.vip/images/65966314_p8_meitu_1_meitu_3.jpg">
-<meta property="og:updated_time" content="2019-08-16T02:04:33.762Z">
+<meta property="og:updated_time" content="2019-12-09T02:28:30.151Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流">
 <meta name="twitter:description" content="前言当在团队开发中使用版本控制系统时，商定一个统一的工作流程是至关重要的。Git 的确可以在各个方面做很多事情，然而，如果在你的团队中还没有能形成一个特定有效的工作流程，那么混乱就将是不可避免的。基本上你可以定义一个完全适合你自己项目的工作流程，或者使用一个别人定义好的。就像代码需要代码规范一样，代码管理同样需要一个清晰的流程和规范。 Git flow 工作流是经典模型，体现了工作流的经验和精髓。">
@@ -577,9 +577,9 @@
 <li>线上代码出 Bug 了，如何快速修复？而且修复的代码要包含到开发人员的分支以及下一个 Release?</li>
 </ul>
 <p>大部分开发人员现在使用 Git 就只是用三个甚至两个分支，一个是 Master, 一个是 Develop, 还有一个是基于 Develop 打得各种分支。这个在小项目规模的时候还勉强可以支撑，因为很多人做项目就只有一个 Release, 但是人员一多，而且项目周期一长就会出现各种问题。</p>
-<h3 id="Git-flow-流程"><a href="#Git-flow-流程" class="headerlink" title="Git flow 流程"></a>Git flow 流程</h3><p>荷兰程序员 Vincent Driessen 曾发表了一篇博客 <a href="https://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="noopener">A Successful Git Branching Model</a>，让一个分支策略广为人知。</p>
+<h3 id="Git-flow-流程"><a href="#Git-flow-流程" class="headerlink" title="Git flow 流程"></a>Git flow 流程</h3><p>荷兰程序员 Vincent Driessen 曾发表了一篇博客 <a href="https://nvie.com/posts/a-successful-git-branching-model" target="_blank" rel="noopener">A Successful Git Branching Model</a>，让一个分支策略广为人知。</p>
 <p>下面是 Git flow 的流程图：</p>
-<p><img src="/media/15619490256878/git-model@2x.png" alt="git-model@2x"></p>
+<p><img src="/media/15619490256878/git-model@2x.png" alt="Git flow 的流程图"></p>
 <p>这一流程最大的亮点是考虑了紧急 Bug 的应对措施，整个流程显得过于复杂，所以在实施该方案前，需要对整个开发流程进行系统的学习。也需要借助 Git flow 等工具的辅助。</p>
 <h2 id="Git-flow-安装以及初始化"><a href="#Git-flow-安装以及初始化" class="headerlink" title="Git flow 安装以及初始化"></a>Git flow 安装以及初始化</h2><p>工具 Git-flow 是按照 Vincent Driessen 的 branch 模型，实现的一个高层次（级别）的 git 仓库操作扩展集合。 </p>
 <h3 id="Linux-安装-Git-flow"><a href="#Linux-安装-Git-flow" class="headerlink" title="Linux 安装 Git flow"></a>Linux 安装 Git flow</h3><p>Ubuntu 中使用 apt-get 安装 Git flow 的方法</p>
@@ -600,7 +600,7 @@
 <li>Release 分支 - 发布分支<br>用于发布准备的专门分支。当开发进行到一定程度，或者说快到了既定的发布日，可以发布时，建立一个 release 分支并指定版本号（可以在 finish 的时候添加）。开发人员可以对 release 分支上的代码进行集中测试和修改 bug。（这个测试，测试新功能与已有的功能是否有冲突，兼容性）全部完成经过测试没有问题后，将 release 分支上的代码合并到 master 分支和 develop 分支。</li>
 <li>Hotfix 分支 - 热修复分支<br>用于修复线上代码的 bug。从 master 分支上拉，完成 hotfix 后，打上 tag 我们合并回 master 和 develop 分支。</li>
 </ul>
-<h3 id="功能分支-Feature-分支"><a href="#功能分支-Feature-分支" class="headerlink" title="功能分支 - Feature 分支"></a>功能分支 - Feature 分支</h3><p><img src="/media/15619490256878/20151223121021496.jpg" alt="20151223121021496"></p>
+<h3 id="功能分支-Feature-分支"><a href="#功能分支-Feature-分支" class="headerlink" title="功能分支 - Feature 分支"></a>功能分支 - Feature 分支</h3><p><img src="/media/15619490256878/20151223121021496.jpg" alt="功能分支 - Feature 分支"></p>
 <p>功能分支：通常为即将发布或者未来发布版开发新的功能，这通常只存在开发者的库中。当新功能开始研发，包含该功能的发布版本在这个还是无法确定发布时间的。功能版本的实质是只要这个功能处于开发状态它就会存在，但是最终会或合并到 develop 分支（确定将新功能添加到不久的发布版中）或取消（譬如一次令人失望的测试）。</p>
 <p>分支命名规则：分支名称以 feature/* 开头</p>
 <ol>
@@ -608,13 +608,13 @@
 </ol>
 <figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">1</span>. 开始一项功能的开发工作时, 基于'develop'创建分支</span><br><span class="line">$ git checkout -b <span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span> develop</span><br><span class="line"></span><br><span class="line"># <span class="number">2</span>. 推送到远程 -&gt; 可选</span><br><span class="line">$ git <span class="built_in">push</span> -u <span class="built_in">origin</span> <span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">3</span>. 在'<span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span>'功能分支上开发完成后, 提交至仓库</span><br><span class="line">$ git commit -a -m <span class="string">"some feature"</span></span><br><span class="line"></span><br><span class="line"># <span class="number">4</span>. 切换到'develop'分支</span><br><span class="line">$ git checkout develop</span><br><span class="line"></span><br><span class="line"># <span class="number">5</span>. 从远程仓库拉去最新'develop'</span><br><span class="line">$ git pull <span class="built_in">origin</span> develop</span><br><span class="line"></span><br><span class="line"># <span class="number">6</span>. 'develop'分支合并'<span class="built_in">feature</span>'功能分支   </span><br><span class="line">$ git merge --no-ff <span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">7</span>. 推送'develop'分支至远程仓库   </span><br><span class="line">$ git <span class="built_in">push</span> <span class="built_in">origin</span> develop</span><br><span class="line"></span><br><span class="line"># <span class="number">8</span>. 删除'<span class="built_in">feature</span>'功能分支</span><br><span class="line">$ git branch -d <span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">9</span>. 删除远程'<span class="built_in">feature</span>'功能分支</span><br><span class="line">$ git <span class="built_in">push</span> <span class="built_in">origin</span> --<span class="built_in">delete</span> <span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span></span><br></pre></td></tr></table></figure>
 <p>–no-ff 标志导致合并操作创建一个新 commit 对象，即使该合并操作可以 fast-forward。这避免了丢失这个功能分支存在的历史信息，将该功能的所有提交组合在一起。</p>
-<p><img src="/media/15619490256878/20151223121138110.jpg" alt="20151223121138110"></p>
+<p><img src="/media/15619490256878/20151223121138110.jpg" alt="Feature 分支 –no-ff 标志"></p>
 <ol start="2">
 <li>使用 Git-flow 命令开发功能分支 - Feature 分支流程：</li>
 </ol>
 <figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">1</span>. 增加新特性 P.S.[创建了一个基于'develop'的功能分支'<span class="built_in">some</span>-<span class="built_in">feature</span>', 并切换到这个分支之下]</span><br><span class="line">$ git flow <span class="built_in">feature</span> start <span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">2</span>. 完成新特性 P.S.[<span class="number">1</span>. 合并'<span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span>'分支到'develop';<span class="number">2</span>. 删除这个新特性分支; <span class="number">3</span>. 切换回'develop'分支]</span><br><span class="line">    Summary of actions:</span><br><span class="line">    - The <span class="built_in">feature</span> branch '<span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span>' was merged into 'develop'</span><br><span class="line">    - Feature branch '<span class="built_in">feature</span>/<span class="built_in">some</span>-<span class="built_in">feature</span>' has been locally deleted</span><br><span class="line">    - You are now on branch 'develop'</span><br><span class="line">$ git flow <span class="built_in">feature</span> finsh --no-ff <span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">3</span>. 推送'develop'分支至远程仓库   </span><br><span class="line">$ git <span class="built_in">push</span> <span class="built_in">origin</span> develop</span><br></pre></td></tr></table></figure>
 <figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">1</span>. 发布新特性 P.S.[发布新特性分支到远程服务器, 所以, 其它用户也可以使用这分支]</span><br><span class="line">$ git flow <span class="built_in">feature</span> publish <span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">2</span>. 取得一个发布的新特性分支 P.S.[取得其它用户发布的新特性分支, 并签出远程的变更]</span><br><span class="line">$ git flow <span class="built_in">feature</span> pull <span class="built_in">some</span>-<span class="built_in">feature</span></span><br><span class="line"></span><br><span class="line"># <span class="number">3</span>. 跟踪在 <span class="built_in">origin</span> 上的特性分支]</span><br><span class="line">$ git flow <span class="built_in">feature</span> <span class="built_in">track</span> <span class="built_in">some</span>-<span class="built_in">feature</span></span><br></pre></td></tr></table></figure>
-<h3 id="热修复分支-Hotfix-分支"><a href="#热修复分支-Hotfix-分支" class="headerlink" title="热修复分支 - Hotfix 分支"></a>热修复分支 - Hotfix 分支</h3><p><img src="/media/15619490256878/20151223121423096.jpg" alt="20151223121423096"></p>
+<h3 id="热修复分支-Hotfix-分支"><a href="#热修复分支-Hotfix-分支" class="headerlink" title="热修复分支 - Hotfix 分支"></a>热修复分支 - Hotfix 分支</h3><p><img src="/media/15619490256878/20151223121423096.jpg" alt="热修复分支 - Hotfix 分支"></p>
 <p>热修复分支：热修复分支与发布分支很相似，他们都为新的生成环境发布做准备，尽管这是未经计划的。他们来自生产环境的处于异常状态压力。当生成环境验证缺陷必须马上修复是，热修复分支可以基于 master 分支上对应与线上版本的 tag 创建。</p>
 <p>分支命名规则：分支名称以 hotfix/* 开头</p>
 <ol>
@@ -646,6 +646,7 @@
 <h2 id="Git-在团队中的最佳实践系列"><a href="#Git-在团队中的最佳实践系列" class="headerlink" title="Git 在团队中的最佳实践系列"></a>Git 在团队中的最佳实践系列</h2><ul>
 <li><a href="1cad84b0.html">Git 在团队中的最佳实践（一）：Git 备忘清单</a></li>
 <li><a href="c0dca125.html">Git 在团队中的最佳实践（二）：如何正确使用 Git flow 工作流</a></li>
+<li><a href="97ab96a0.html">Git 在团队中的最佳实践（三）：如何优雅的使用 Git？</a></li>
 </ul>
 <hr>
 
@@ -830,7 +831,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-count">39</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1066,7 +1067,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">85</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">87</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1176,7 +1181,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">464k</span>
+    <span title="博客全站字数">471k</span>
   
 
   
