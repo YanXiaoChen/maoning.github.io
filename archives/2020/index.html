@@ -107,20 +107,17 @@
 
 
 
-  <meta name="description" content="概述Java 技术体系所提倡的自动内存管理最终可以归纳为自动化的解决两个问题：给对象分配内存以及回收分配给对象的内存。关于回收内存这一点，在本系列的第二章介绍了虚拟机中的垃圾收集器体系以及运作原理，本小节我们主要探讨一下对象内存分配那点事。 对象的内存分配，往大的方向讲，就是在堆上分配（但也可能经过 JIT 编译后被拆散为标量类型并间接的在栈上分配），对象主要分配在新生代 Eden 区上，如果启动">
-<meta name="keywords" content="Jvm,内存分配,回收策略">
-<meta property="og:type" content="article">
-<meta property="og:title" content="深入理解 Java 虚拟机（三）：内存分配与回收策略">
-<meta property="og:url" content="https://blog.maoning.vip/archives/Infinity.html">
+  <meta name="description" content="趁着年轻，好好生活，用心折腾。">
+<meta name="keywords" content="趁着年轻，好好生活，用心折腾。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="猫宁i">
+<meta property="og:url" content="https://blog.maoning.vip/archives/2020/index.html">
 <meta property="og:site_name" content="猫宁i">
-<meta property="og:description" content="概述Java 技术体系所提倡的自动内存管理最终可以归纳为自动化的解决两个问题：给对象分配内存以及回收分配给对象的内存。关于回收内存这一点，在本系列的第二章介绍了虚拟机中的垃圾收集器体系以及运作原理，本小节我们主要探讨一下对象内存分配那点事。 对象的内存分配，往大的方向讲，就是在堆上分配（但也可能经过 JIT 编译后被拆散为标量类型并间接的在栈上分配），对象主要分配在新生代 Eden 区上，如果启动">
+<meta property="og:description" content="趁着年轻，好好生活，用心折腾。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://blog.maoning.vip/images/marcreation-JNDhWciiWLk-unsplash.jpg">
-<meta property="og:updated_time" content="2019-10-31T07:26:30.476Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="深入理解 Java 虚拟机（三）：内存分配与回收策略">
-<meta name="twitter:description" content="概述Java 技术体系所提倡的自动内存管理最终可以归纳为自动化的解决两个问题：给对象分配内存以及回收分配给对象的内存。关于回收内存这一点，在本系列的第二章介绍了虚拟机中的垃圾收集器体系以及运作原理，本小节我们主要探讨一下对象内存分配那点事。 对象的内存分配，往大的方向讲，就是在堆上分配（但也可能经过 JIT 编译后被拆散为标量类型并间接的在栈上分配），对象主要分配在新生代 Eden 区上，如果启动">
-<meta name="twitter:image" content="https://blog.maoning.vip/images/marcreation-JNDhWciiWLk-unsplash.jpg">
+<meta name="twitter:title" content="猫宁i">
+<meta name="twitter:description" content="趁着年轻，好好生活，用心折腾。">
 
 
 
@@ -129,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="https://blog.maoning.vip/archives/Infinity.html">
+  <link rel="canonical" href="https://blog.maoning.vip/archives/2020/">
 
 
 
@@ -139,7 +136,7 @@
   };
 </script>
 
-  <title>深入理解 Java 虚拟机（三）：内存分配与回收策略 | 猫宁i</title>
+  <title>归档 | 猫宁i</title>
   
 
 
@@ -187,7 +184,7 @@
     
   
 
-  <div class="container sidebar-position-left page-post-detail">
+  <div class="container sidebar-position-left page-archive">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -344,6 +341,31 @@
   
     
 
+    
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+    
+
+  
+
+
   
 
   
@@ -389,349 +411,77 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
-    
+  
+  
+  
+  <div class="post-block archive">
+    <div id="posts" class="posts-collapse">
+      <span class="archive-move-on"></span>
 
-  
+      
+      <span class="archive-page-counter">
+        
+        
+         
+        
+        还行! 目前共计 40 篇日志。 继续努力。
+      </span>
+      
 
-  
-  
-  
+      
 
-  
+        
+        
+        
+
+        
+          
+          <div class="collection-title">
+            <h1 class="archive-year" id="archive-year-2020">2020</h1>
+          </div>
+        
+        
+
+        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/Infinity.html">
+    <header class="post-header">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="猫宁i">
-      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
-      <meta itemprop="image" content="/images/avatar.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="猫宁i">
-    </span>
-
-    
-      <header class="post-header">
-
+      <h2 class="post-title">
         
+          <a class="post-title-link" href="/archives/3c79a541.html" itemprop="url">
+            
+              <span itemprop="name">深入理解 Java 虚拟机（四）：Jvm 性能监控与调优</span>
+            
+          </a>
         
-          <h1 class="post-title" itemprop="name headline">深入理解 Java 虚拟机（三）：内存分配与回收策略
+      </h2>
 
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-08-27 20:32:12" itemprop="dateCreated datePublished" datetime="2018-08-27T20:32:12+08:00">2018-08-27</time>
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Jvm/" itemprop="url" rel="index"><span itemprop="name">Jvm</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-            
-                <span class="post-meta-item-text">评论数：</span>
-                <a href="/archives/Infinity.html#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/archives/Infinity.html" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-            <span id="/archives/Infinity.html" class="leancloud_visitors" data-flag-title="深入理解 Java 虚拟机（三）：内存分配与回收策略">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-            <div class="post-symbolscount">
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">本文字数统计：</span>
-                
-                <span title="本文字数统计">3.5k</span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">3 分钟</span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
-          
-          
-            <div class="post-gallery-row">
-              <img src="/images/marcreation-JNDhWciiWLk-unsplash.jpg" itemprop="contentUrl">
-            
-          
-
-          
-          </div>
-        </div>
-      
-
-      
-        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Java 技术体系所提倡的自动内存管理最终可以归纳为自动化的解决两个问题：给对象分配内存以及回收分配给对象的内存。关于回收内存这一点，在本系列的第二章介绍了虚拟机中的垃圾收集器体系以及运作原理，本小节我们主要探讨一下对象内存分配那点事。</p>
-<p>对象的内存分配，往大的方向讲，就是在堆上分配（但也可能经过 JIT 编译后被拆散为标量类型并间接的在栈上分配），对象主要分配在新生代 Eden 区上，如果启动了本地线程分配缓冲，将按线程优先在 TLAB(本地线程分配缓冲)上分配。少数情况下，也可能直接分配在老年代中，分配的规则并不是百分之百固定的，其细节取决于当前使用的是哪一种垃圾收集器组合，还有虚拟机中与内存相关的参数的设置。</p>
-<p>本节下面的代码在测试时使用 Client 模式虚拟机运行，没有手工指定收集器组合，换句话说，验证的是在使用 Serial/SerialOld 收集器下（ParNew/SerialOld 收集器组合的规则也基本一致）的内存分配和回收策略。</p>
-<a id="more"></a>
-<h2 id="对象优先在-Eden-分配"><a href="#对象优先在-Eden-分配" class="headerlink" title="对象优先在 Eden 分配"></a>对象优先在 Eden 分配</h2><p>大多数情况下，对象在新生代 Eden 区中分配。当 Eden 区没有足够的空间进行分配时，虚拟机将发起一次 MonitorGC<sup>[1]</sup>。</p>
-<p><img src="/media/15470360086478/15505899876458.jpg" alt="-w512"></p>
-<p>代码清单 3-5 的 testAllocation()方法中，尝试分配 3 个 2MB 大小和 1 个 4MB 大小的对象，在运行时通过 - Xms20M、-Xmx20M、-Xmn10M 这 3 个参数限制了 Java 堆大小为 20MB，不可扩张，其中 10MB 分配给新生代，剩下的 10MB 分配给老年代。-XX:SurvivorRatio=8 决定了新生代中 Eden 区与一个 Survivor 区的空间比例是 8:1，从输出的结果也可以清楚地看到 “eden space 8192K、from space 1024K、to space 1024K” 的信息，新生代总可用空间为 9216K（Eden 区 + 1 个 Survivor 区的总容量）。</p>
-<p>执行 testAllocation()中分配 allocation4 对象的语句时会发生一次 Minor Gc，这次 GC 的结果是新生代 6651KB 变为 148KB，而总内存占用量几乎没有减少（因为 allocation1、allocation2、allocation3 三个对象都是存活的，虚拟机几乎没有找到可回收的对象）。这次 GC 发生的原因是给 allocation4 分配内存的时候，发现 Eden 已经被占用了 6MB，剩余空间已不足以分配 allocation4 所需的 4MB 内存，因此发生 Minor GC。GC 期间虚拟机又发现已有的 3 个 3MB 大小的对象全部无法进入 Survivor 空间（Survivor 空间只有 1MB 大小），所以只好通过分配担保机制提前转移到老年代去。</p>
-<p>这次 GC 结束后，4MB 的 allocation4 对象顺序分配在 Eden 中，因此程序执行完的结果是 Eden 占用 4MB（被 allocation4 占用），Survivor 空闲，老年代被占用 6MB（被 allocation1、allocation2、allocation3 占用）。</p>
-<h2 id="大对象直接进入老年代"><a href="#大对象直接进入老年代" class="headerlink" title="大对象直接进入老年代"></a>大对象直接进入老年代</h2><p>所谓的大对象是指，需要大量连续内存空间的 Java 对象，最典型的大对象就是那种很长的字符串以及数组（上例中的 byte[]数组就是典型的大对象）。大对象对虚拟机的内存分配来说就是一个坏消息（比遇到大对象更加块的消息就是遇到一群 “照生夕灭” 的“短命大对象”，写程序的时候应当避免），经常出现大对象容易导致内存还有不少空间时就提前触发垃圾收集以获取足够的连续空间来 “安置” 它们。</p>
-<p>虚拟机提供了一个—XX:PretenureSizeThreshold<sup>[2]</sup> 参数，令大于这个设置指的对象直接在老年代分配。这样做的目的是避免在 Eden 区及两个 Survivor 区之间发生大量的内存复制（新生代采用复制算法收集内存）。</p>
-<p>执行代码清单 testPretenureSizeThreshold()方法后，我们看到 Eden 空间几乎没有被使用，而老年代的 10MB 空间被使用了 40%，也就是 4MB 的 allocation 对象直接就分配在老年代中，这是因为 PretenureSizeTheashold 被设置为 3MB（就是 3145728，这个参数不能像—Xmx 之类的参数一样直接写 3MB），因此超过 3MB 的对象都会直接在老年代进行分配。</p>
-<p><img src="/media/15470360086478/15507367983778.jpg" alt="-w513"></p>
-<h2 id="长期存活的对象将进入老年代"><a href="#长期存活的对象将进入老年代" class="headerlink" title="长期存活的对象将进入老年代"></a>长期存活的对象将进入老年代</h2><p>既然虚拟机采用了分代收集的思想来管理内存，那么内存回收时就必须能识别哪些对象应放在新生代，哪些对象应放在老年代中。为了做到这点，虚拟机给每个对象定义了一个对象年龄 (Age) 计数器。如果对象在 Eden 出生并经过第一次 Minor GC 后仍然存过，并且能被 Survivor 区容纳的话，将被移动到 Survivor 空间中，并且对象年龄设为 1。对象在 Survivor 区中每 “熬过” 一次 Minor GC，年龄就增加 1 岁，当它的年龄增加到一定程度（默认为 15 岁），就将会被晋升到老年代中。对象晋升老年代的年龄阀值，可以通过参数—XX:MaxTenuringThreshold 设置。</p>
-<h2 id="动态对象年龄判定"><a href="#动态对象年龄判定" class="headerlink" title="动态对象年龄判定"></a>动态对象年龄判定</h2><p>为了能更好地适应不同程序的内存状况，虚拟机并不是永远地要求对象的年龄必须达到了 MaxTenuringThreshold 才能晋升老年代，如果 Survivor 空间中相同年龄所有对象大小的总和大于 Survivor 空间的一般，年龄大于或者等于该年龄的对象就可以直接进入老年代，无须等到 MaxTenuringThreshold 中要求的年龄。</p>
-<h2 id="空间分配担保"><a href="#空间分配担保" class="headerlink" title="空间分配担保"></a>空间分配担保</h2><p>在发生 Minor GC 之前，虚拟机会先检查老年代最大可用的连续空间是否大于新生代所有对象总空间，如果这个条件成立，那么 Minor GC 可以确保是安全的。如果不成立，则虚拟机会查看 HandlePromotionfailure 设置值是否允许担保失败。如果允许，那么会继续检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小，如果大于，将尝试着进行一次 Minor GC，尽管这次 Minor GC 是有风险的；如果小于，或者 HandlePromotionfailure 设置不允许冒险，那这时也要改为进行一次 Full GC。</p>
-<p>在 JDK 6 Update 24 之后，HandlePromotionfailure 参数不会再影响到虚拟机的空间分配担保策略，虽然源码中还定义了 HandlePromotionfailure 参数，但是在代码中已经不会再使用它。JDK 6 Update 24 之后的规则变为只要老年代的连续空间大于新生代对象总大小或者历次晋升的平均大小就会进行 Minor GC，否则将进行 Full GC。</p>
-<p><img src="/media/15470360086478/15507557585337.jpg" alt="-w519"></p>
-<hr>
-<h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1].《深入理解 Java 虚拟机：JVM 高级特效与最佳实现》，第 3 章</p>
-<hr>
-<h2 id="注脚"><a href="#注脚" class="headerlink" title="注脚"></a>注脚</h2><p><small>[1].MonitorGC 和 FullGC 有什么不一样？<br>新生代 GC（MonitorGC）：指发生在新生代的垃圾收集动作，因为 Java 对象大多都具备朝生夕灭的特征，所有 MonitorGC 非常频繁，一般回收速度也比较快。<br>老年代 GC（MajorGC/FullGC）：指发生在老年代的垃圾收集动作，出现了 MajorGC，经常会伴随至少一次的 MonitorGC（但非绝对的，在 ParallelScavenge 收集器的收集策略里就有直接进行 MajorGC 的策略选择过程）。MajorGC 的速度一般会比 MonitorGC 慢 10 倍以上。</small><br><small>[2].—XX:PretenureSizeThreshold：PretenureSizeThreshold 参数只对 Serial 和 ParNew 两款收集器有效，Parallel Scavenge 收集器不认识这个参数，Parallel Scavenge 一般不需要设置。如果遇到必须使用此参数的场合，可以考虑 ParNew 加 CMS 的收集器组合。</small></p>
-<hr>
-<h2 id="深入理解-Java-虚拟机系列"><a href="#深入理解-Java-虚拟机系列" class="headerlink" title="深入理解 Java 虚拟机系列"></a>深入理解 Java 虚拟机系列</h2><ul>
-<li><a href="6cd92fa9.html">深入理解 Java 虚拟机（一）：Java 内存区域与内存溢出异常</a></li>
-<li><a href="1a0b1a8e.html">深入理解 Java 虚拟机（二）：JVM 垃圾收集器</a></li>
-<li><a href="6e218856.html">深入理解 Java 虚拟机（三）：内存分配与回收策略</a></li>
-</ul>
-<hr>
-
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-      <div>
-        <div id="reward-container">
-  <div>谢谢你长得那么好看，还打赏我！😘</div>
-  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-
-    
-      
-      
-        
-      
-      <div style="display: inline-block">
-        <img src="/images/wechatpay.jpg" alt="猫宁i 微信支付">
-        <p>微信支付</p>
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated" datetime="2020-01-06T12:32:59+08:00" content="2020-01-06">
+          01-06
+        </time>
       </div>
-    
-      
-      
-        
-      
-      <div style="display: inline-block">
-        <img src="/images/alipay.jpg" alt="猫宁i 支付宝">
-        <p>支付宝</p>
-      </div>
-    
 
-  </div>
-</div>
-
-      </div>
-    
-
-    
-      <div>
-        
-
-
-
-
-  
-
-
-
-<ul class="post-copyright">
-  <li class="post-copyright-author">
-    <strong>本文作者： </strong>猫宁i</li>
-  <li class="post-copyright-link">
-    <strong>本文链接：</strong>
-    
-    <a href="https://blog.maoning.vip/archives/Infinity.html" title="深入理解 Java 虚拟机（三）：内存分配与回收策略">https://blog.maoning.vip/archives/Infinity.html</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
-</ul>
-
-      </div>
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/Jvm/" rel="tag"># Jvm</a>
-          
-            <a href="/tags/内存分配/" rel="tag"># 内存分配</a>
-          
-            <a href="/tags/回收策略/" rel="tag"># 回收策略</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/archives/7475b55d.html" rel="next" title="一网打尽 NoSQL：当下 NoSQL 类型、适用场景及使用公司">
-                <i class="fa fa-chevron-left"></i> 一网打尽 NoSQL：当下 NoSQL 类型、适用场景及使用公司
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/archives/275d83e6.html" rel="prev" title="Linux 工匠精神（二）：理解 Linux 的处理器负载均值">
-                Linux 工匠精神（二）：理解 Linux 的处理器负载均值 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
+    </header>
   </article>
 
 
+
+      
+
+    </div>
   </div>
+  
+  
+  
+
+  
+
 
 
           </div>
           
-
-  
-    <div class="comments" id="comments">
-    </div>
-
-  
-
-
 
         </div>
         
@@ -751,17 +501,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <div class="site-overview-wrap sidebar-panel">
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -778,7 +519,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-count">40</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1018,7 +759,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">87</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">89</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1083,23 +828,6 @@
       </div>
 
       
-      <!--noindex-->
-        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-            
-            
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对象优先在-Eden-分配"><span class="nav-number">2.</span> <span class="nav-text">对象优先在 Eden 分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#大对象直接进入老年代"><span class="nav-number">3.</span> <span class="nav-text">大对象直接进入老年代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#长期存活的对象将进入老年代"><span class="nav-number">4.</span> <span class="nav-text">长期存活的对象将进入老年代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态对象年龄判定"><span class="nav-number">5.</span> <span class="nav-text">动态对象年龄判定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#空间分配担保"><span class="nav-number">6.</span> <span class="nav-text">空间分配担保</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">7.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注脚"><span class="nav-number">8.</span> <span class="nav-text">注脚</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#深入理解-Java-虚拟机系列"><span class="nav-number">9.</span> <span class="nav-text">深入理解 Java 虚拟机系列</span></a></li></ol></div>
-            
-
-          </div>
-        </div>
-      <!--/noindex-->
-      
 
       
 
@@ -1114,7 +842,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
   <span class="with-love" id="animate">
     <i class="fa fa-paper-plane"></i>
   </span>
@@ -1128,7 +856,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">471k</span>
+    <span title="博客全站字数">495k</span>
   
 
   
@@ -1254,10 +982,6 @@
 
 
   
-  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
-<script src="/js/src/post-details.js?v=7.0.1"></script>
-
-
 
   
 
@@ -1305,8 +1029,6 @@
 
 
 
-
-  
 
 
   

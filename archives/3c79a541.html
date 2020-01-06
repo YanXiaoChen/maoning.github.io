@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: true,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言处理过线上问题的同学基本上都会遇到系统突然运行缓慢，CPU 100%，以及 Full GC 次数过多的问题。当然，这些问题的最终导致的直观现象就是系统运行缓慢，并且有大量的报警。给一个系统定位问题的时候，知识、经验是关键基础，数据是依据，工具是运用处理数据的手段。这里说的数据包括：运行日志、异常堆栈、GC 日志、线程快照（threaddump/javacore 文件）、堆转侟快照（heapdu">
+<meta name="keywords" content="Jvm,性能监控,线上问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解 Java 虚拟机（四）：Jvm 性能监控与调优">
+<meta property="og:url" content="https://blog.maoning.vip/archives/3c79a541.html">
+<meta property="og:site_name" content="猫宁i">
+<meta property="og:description" content="前言处理过线上问题的同学基本上都会遇到系统突然运行缓慢，CPU 100%，以及 Full GC 次数过多的问题。当然，这些问题的最终导致的直观现象就是系统运行缓慢，并且有大量的报警。给一个系统定位问题的时候，知识、经验是关键基础，数据是依据，工具是运用处理数据的手段。这里说的数据包括：运行日志、异常堆栈、GC 日志、线程快照（threaddump/javacore 文件）、堆转侟快照（heapdu">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://blog.maoning.vip/images/felix-bacher--jEEnRx38wo-unsplash.jpg">
+<meta property="og:updated_time" content="2020-01-06T06:08:30.443Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入理解 Java 虚拟机（四）：Jvm 性能监控与调优">
+<meta name="twitter:description" content="前言处理过线上问题的同学基本上都会遇到系统突然运行缓慢，CPU 100%，以及 Full GC 次数过多的问题。当然，这些问题的最终导致的直观现象就是系统运行缓慢，并且有大量的报警。给一个系统定位问题的时候，知识、经验是关键基础，数据是依据，工具是运用处理数据的手段。这里说的数据包括：运行日志、异常堆栈、GC 日志、线程快照（threaddump/javacore 文件）、堆转侟快照（heapdu">
+<meta name="twitter:image" content="https://blog.maoning.vip/images/felix-bacher--jEEnRx38wo-unsplash.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="猫宁i" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://blog.maoning.vip/archives/3c79a541.html">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>深入理解 Java 虚拟机（四）：Jvm 性能监控与调优 | 猫宁i</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">猫宁i</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">趁着年轻，好好生活，用心折腾。</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives menu-item-active">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/books/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>书单</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/3c79a541.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">深入理解 Java 虚拟机（四）：Jvm 性能监控与调优
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-01-06 12:32:59" itemprop="dateCreated datePublished" datetime="2020-01-06T12:32:59+08:00">2020-01-06</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Jvm/" itemprop="url" rel="index"><span itemprop="name">Jvm</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/archives/3c79a541.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/archives/3c79a541.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/archives/3c79a541.html" class="leancloud_visitors" data-flag-title="深入理解 Java 虚拟机（四）：Jvm 性能监控与调优">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">23k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">21 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/felix-bacher--jEEnRx38wo-unsplash.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>处理过线上问题的同学基本上都会遇到系统突然运行缓慢，CPU 100%，以及 Full GC 次数过多的问题。当然，这些问题的最终导致的直观现象就是系统运行缓慢，并且有大量的报警。给一个系统定位问题的时候，知识、经验是关键基础，数据是依据，工具是运用处理数据的手段。这里说的数据包括：运行日志、异常堆栈、GC 日志、线程快照（threaddump/javacore 文件）、堆转侟快照（heapdump/hprof 文件）等。经常使用适当的虚拟机监控和分析的工具可以加快我们分析数据、定位解决问题的速度。</p>
+<p>对于线上系统突然产生的运行缓慢问题，如果该问题导致线上系统不可用，那么首先需要做的就是，导出 jstack 和内存信息，然后重启系统，尽快保证系统的可用性。本文主要针对 JDK 的命令行工具，主要包括用于监视虚拟机和故障处理的工具。根据 JDK 的命令行工具提供解决问题的排查思路，从而定位出问题的代码点，进而提供解决该问题的思路。</p>
+<a id="more"></a>
+<h2 id="JDK-命令行工具"><a href="#JDK-命令行工具" class="headerlink" title="JDK 命令行工具"></a>JDK 命令行工具</h2><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>主要作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jps</td>
+<td>JVM Process Status Tool，显示指定系统内所有 HotSpot 虚拟机进程</td>
+</tr>
+<tr>
+<td>jstat</td>
+<td>JVM Statistics Monitoring Tool，用于收集 HotSpot 虚拟机各方面的运行数据</td>
+</tr>
+<tr>
+<td>jinfo</td>
+<td>Configuration Info For Java，显示虚拟机配置信息</td>
+</tr>
+<tr>
+<td>jmap</td>
+<td>Memory Map for Java，生成虚拟机的内存转储快照（heapdump 文件）</td>
+</tr>
+<tr>
+<td>jhat</td>
+<td>JVM Heap Dump Browser，用于分析 heapdump 文件，它会建立一个 HTTP/HTML 服务器，让用于可以在游览器上查看分析结果</td>
+</tr>
+<tr>
+<td>jstack</td>
+<td>Stack Trace for Java，显示虚拟机的线程快照</td>
+</tr>
+</tbody>
+</table>
+<p>这些命令行工具大多数是 jdk/lib/tools.jar 类库的一层薄包装而已，它们主要的功能代码是在 tools 类库中实现的。接来下介绍的 JDK 命令行工具大多都是基于 JDK 1.6，因此会存在个别参数在新版本 JDK 被淘汰的情况出现。所有的 JDK 工具都可以在 Oracle 官网的 <a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/index.html" target="_blank" rel="noopener">Java Tools Reference</a> 文档中找到使用说明，这是主要参考，包括命令格式、参数内容、输出信息等等。</p>
+<h3 id="jps：虚拟机进程状况工具"><a href="#jps：虚拟机进程状况工具" class="headerlink" title="jps：虚拟机进程状况工具"></a>jps：虚拟机进程状况工具</h3><p>jps 可以列出正在运行的虚拟机进程，并显示虚拟机执行主类（Main Class，main() 函数所在的类）名称以及这些进程的本地虚拟机唯一 ID（Local Virtual Machine Identifier，LVMID）。</p>
+<p>查看 jps 的帮助信息：</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_24_98_centos jvm]# jps -help</span><br><span class="line">usage: jps [-help]</span><br><span class="line">       jps [-q] [-mlvV] <span class="meta">[&lt;hostid&gt;]</span></span><br><span class="line"></span><br><span class="line">Definitions:</span><br><span class="line">    &lt;hostid&gt;:      &lt;hostname&gt;[:&lt;port&gt;]</span><br></pre></td></tr></table></figure>
+<p>jps 命令格式：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">λ  <span class="keyword">jps </span>-lv</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">选项</th>
+<th style="text-align:center">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">-q</td>
+<td style="text-align:center">只输出 LVMID，省略主类的名称</td>
+</tr>
+<tr>
+<td style="text-align:center">-m</td>
+<td style="text-align:center">输出虚拟机进程启动时传递给主类 main() 函数的参数</td>
+</tr>
+<tr>
+<td style="text-align:center">-l</td>
+<td style="text-align:center">输出主类的全名，如果进程执行的是 Jar 包，输出 Jar 路径</td>
+</tr>
+<tr>
+<td style="text-align:center">-v</td>
+<td style="text-align:center">输出虚拟机进程启动时 JVM 参数</td>
+</tr>
+</tbody>
+</table>
+<h3 id="jstat：虚拟机统计信息监视工具"><a href="#jstat：虚拟机统计信息监视工具" class="headerlink" title="jstat：虚拟机统计信息监视工具"></a>jstat：虚拟机统计信息监视工具</h3><p>jstat（JVM Statistics Monitoring Tool）是用于监视虚拟机各种运行状态信息的命令行工具，它可以显示本地或者远程虚拟机进程中的类装载、内存、垃圾收集、JIT 编译等运行数据。</p>
+<p>查看 jstat 的帮助信息：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_24_98_centos jvm]<span class="comment"># jstat -help</span></span><br><span class="line">Usage: jstat -help|-options</span><br><span class="line">       jstat -&lt;option&gt; [-t] [-h&lt;lines&gt;] &lt;vmid&gt; [&lt;interval&gt; [&lt;<span class="built_in">count</span>&gt;]]</span><br><span class="line"></span><br><span class="line">Definitions:</span><br><span class="line">  &lt;option&gt;      An option reported <span class="keyword">by</span> <span class="keyword">the</span> -options option</span><br><span class="line">  &lt;vmid&gt;        Virtual Machine Identifier. A vmid takes <span class="keyword">the</span> following form:</span><br><span class="line">                     &lt;lvmid&gt;[@&lt;hostname&gt;[:&lt;port&gt;]]</span><br><span class="line">                Where &lt;lvmid&gt; <span class="keyword">is</span> <span class="keyword">the</span> <span class="keyword">local</span> vm identifier <span class="keyword">for</span> <span class="keyword">the</span> target</span><br><span class="line">                Java virtual machine, typically a process <span class="built_in">id</span>; &lt;hostname&gt; <span class="keyword">is</span></span><br><span class="line">                <span class="keyword">the</span> <span class="built_in">name</span> <span class="keyword">of</span> <span class="keyword">the</span> host <span class="built_in">running</span> <span class="keyword">the</span> target Java virtual machine;</span><br><span class="line">                <span class="keyword">and</span> &lt;port&gt; <span class="keyword">is</span> <span class="keyword">the</span> port <span class="built_in">number</span> <span class="keyword">for</span> <span class="keyword">the</span> rmiregistry <span class="keyword">on</span> <span class="keyword">the</span></span><br><span class="line">                target host. See <span class="keyword">the</span> jvmstat documentation <span class="keyword">for</span> a more complete</span><br><span class="line">                description <span class="keyword">of</span> <span class="keyword">the</span> Virtual Machine Identifier.</span><br><span class="line">  &lt;lines&gt;       Number <span class="keyword">of</span> samples <span class="keyword">between</span> header lines.</span><br><span class="line">  &lt;interval&gt;    Sampling interval. The following forms are allowed:</span><br><span class="line">                    &lt;n&gt;[<span class="string">"ms"</span>|<span class="string">"s"</span>]</span><br><span class="line">                Where &lt;n&gt; <span class="keyword">is</span> an <span class="built_in">integer</span> <span class="keyword">and</span> <span class="keyword">the</span> suffix specifies <span class="keyword">the</span> units <span class="keyword">as</span></span><br><span class="line">                milliseconds(<span class="string">"ms"</span>) <span class="keyword">or</span> seconds(<span class="string">"s"</span>). The default units are <span class="string">"ms"</span>.</span><br><span class="line">  &lt;<span class="built_in">count</span>&gt;       Number <span class="keyword">of</span> samples <span class="keyword">to</span> take <span class="keyword">before</span> terminating.</span><br><span class="line">  -J&lt;flag&gt;      Pass &lt;flag&gt; directly <span class="keyword">to</span> <span class="keyword">the</span> runtime system.</span><br></pre></td></tr></table></figure>
+<p>jstat 命令格式：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 每 250 毫秒查询一次进程 2764 垃圾收集状态，一共查询 20 次</span></span><br><span class="line">λ  jstat -gc <span class="number">2764</span> <span class="number">250</span> <span class="number">20</span></span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-class</td>
+<td>监视类装载、卸载数量、总空间以及类装载所耗费的时间</td>
+</tr>
+<tr>
+<td>-gc</td>
+<td>监视 Java 堆状况，包括 Eden 区、两个 survivor 区、老年代、永久代等的容量、已用空间、GC 空间合计等信息</td>
+</tr>
+<tr>
+<td>-gccapacity</td>
+<td>监视内容与 -gc 基本相同，但输出主要关注 Java 堆各个区域使用到的最大、最小空间</td>
+</tr>
+<tr>
+<td>-gcutil</td>
+<td>监视内容与 -gc 基本相同，但输出主要关注已使用空间占总空间的百分比</td>
+</tr>
+<tr>
+<td>-gccause</td>
+<td>与 -gcutil 功能一样，但是会额外输出导致上一次 GC 产生的原因</td>
+</tr>
+<tr>
+<td>-gcnew</td>
+<td>监视新生代 GC 状况</td>
+</tr>
+<tr>
+<td>-gcnewcapacity</td>
+<td>监视内容与 -gcnew 基本相同，但输出主要关注使用到的最大、最小空间</td>
+</tr>
+<tr>
+<td>-gcold</td>
+<td>监视老年代 GC 状况</td>
+</tr>
+<tr>
+<td>-gcoldcapacity</td>
+<td>监视内容与 -gcold 基本相同，但输出主要关注使用到的最大、最小空间</td>
+</tr>
+<tr>
+<td>-gcpermcapacity</td>
+<td>输出永久代使用到的最大、最小空间（JDK1.8 已废弃）</td>
+</tr>
+<tr>
+<td>-gcmetacapacity</td>
+<td>输出元数据空间使用到的最大、最小空间（JDK1.8 已废弃）</td>
+</tr>
+<tr>
+<td>-compiler</td>
+<td>输出 JIT 编译器编译过的方法、耗时等信息</td>
+</tr>
+<tr>
+<td>-printcompilation</td>
+<td>输出已经被 JIT 编译的方法</td>
+</tr>
+</tbody>
+</table>
+<p>特别说明：jstat 监视选项众多，由于版本原因无法逐一演示，感兴趣的朋友可以参考博客 <a href="https://www.jianshu.com/p/213710fb9e40" target="_blank" rel="noopener">《jvm 性能调优工具之 jstat》</a></p>
+<h3 id="jinfo：Java-配置信息工具"><a href="#jinfo：Java-配置信息工具" class="headerlink" title="jinfo：Java 配置信息工具"></a>jinfo：Java 配置信息工具</h3><p>jinfo（Configuration Info for Java）的作用是实时地查看和调整虚拟机各项参数。使用 jps 命令的 -v 参数可以查看虚拟机启动时显示指定的参数列表，但如果想知道未被显示指定的参数的系统默认值，就只能使用 jinfo 的 -flag 选项进行查询了。</p>
+<p>查看 jinfo 的帮助信息：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_24_98_centos jvm]# jinfo -help</span><br><span class="line">Usage:</span><br><span class="line">    jinfo [option] &lt;pid&gt;</span><br><span class="line">        (<span class="keyword">to</span> connect <span class="keyword">to</span> running process)</span><br><span class="line">    jinfo [option] &lt;executable &lt;core&gt;</span><br><span class="line">        (<span class="keyword">to</span> connect <span class="keyword">to</span> a core file)</span><br><span class="line">    jinfo [option] [server_id@]&lt;remote<span class="built_in"> server IP </span><span class="keyword">or</span> hostname&gt;</span><br><span class="line">        (<span class="keyword">to</span> connect <span class="keyword">to</span> remote <span class="builtin-name">debug</span> server)</span><br><span class="line"></span><br><span class="line">where &lt;option&gt; is one of:</span><br><span class="line">    -flag &lt;name&gt;         <span class="keyword">to</span> <span class="builtin-name">print</span> the value of the named VM flag</span><br><span class="line">    -flag [+|-]&lt;name&gt;    <span class="keyword">to</span> <span class="builtin-name">enable</span> <span class="keyword">or</span> <span class="builtin-name">disable</span> the named VM flag</span><br><span class="line">    -flag &lt;name&gt;=&lt;value&gt; <span class="keyword">to</span> <span class="builtin-name">set</span> the named VM flag <span class="keyword">to</span> the given value</span><br><span class="line">    -flags               <span class="keyword">to</span> <span class="builtin-name">print</span> VM flags</span><br><span class="line">    -sysprops            <span class="keyword">to</span> <span class="builtin-name">print</span> Java<span class="built_in"> system </span>properties</span><br><span class="line">    &lt;<span class="literal">no</span> option&gt;          <span class="keyword">to</span> <span class="builtin-name">print</span> both of the above</span><br><span class="line">    -h | -help           <span class="keyword">to</span> <span class="builtin-name">print</span> this help message</span><br></pre></td></tr></table></figure>
+<p>jinfo 命令格式：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// jinfo 查询进程 2764 虚拟机各项参数</span></span><br><span class="line">λ  jinfo -flags <span class="number">2764</span></span><br></pre></td></tr></table></figure>
+<h3 id="jmap：Java-内存映像工具"><a href="#jmap：Java-内存映像工具" class="headerlink" title="jmap：Java 内存映像工具"></a>jmap：Java 内存映像工具</h3><p>jmap（Memory Map for Java）命令用于生成堆转储快照（一般称为 heapdump 或者 dump 文件）。如果不使用 jmap 命令，可以使用 -XX:+HeapDumpOnOutOfMemoryError 参数，让虚拟机在 OOM 异常出现之后自动生成 dump 文件。</p>
+<p>jmap 的作用并不仅仅是为了获取 dump 文件，它还可以查询 finalize 执行队列、Java 堆和永久代的详细信息，如空间使用率、当前用的是哪种收集器等。</p>
+<p>查看 jmap 的帮助信息：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_24_98_centos ~]# jmap -help</span><br><span class="line">Usage:</span><br><span class="line">    jmap [option] &lt;pid&gt;</span><br><span class="line">        (<span class="keyword">to</span> connect <span class="keyword">to</span> running process)</span><br><span class="line">    jmap [option] &lt;executable &lt;core&gt;</span><br><span class="line">        (<span class="keyword">to</span> connect <span class="keyword">to</span> a core file)</span><br><span class="line">    jmap [option] [server_id@]&lt;remote<span class="built_in"> server IP </span><span class="keyword">or</span> hostname&gt;</span><br><span class="line">        (<span class="keyword">to</span> connect <span class="keyword">to</span> remote <span class="builtin-name">debug</span> server)</span><br><span class="line"></span><br><span class="line">where &lt;option&gt; is one of:</span><br><span class="line">    &lt;none&gt;               <span class="keyword">to</span> <span class="builtin-name">print</span> same <span class="builtin-name">info</span> as Solaris pmap</span><br><span class="line">    -heap                <span class="keyword">to</span> <span class="builtin-name">print</span> java heap summary</span><br><span class="line">    -histo[:live]        <span class="keyword">to</span> <span class="builtin-name">print</span> histogram of java object heap; <span class="keyword">if</span> the <span class="string">"live"</span></span><br><span class="line">                         suboption is specified, only count live objects</span><br><span class="line">    -clstats             <span class="keyword">to</span> <span class="builtin-name">print</span> class loader statistics</span><br><span class="line">    -finalizerinfo       <span class="keyword">to</span> <span class="builtin-name">print</span> information on objects awaiting finalization</span><br><span class="line">    -dump:&lt;dump-options&gt; <span class="keyword">to</span> dump java heap <span class="keyword">in</span> hprof binary format</span><br><span class="line">                         dump-options:</span><br><span class="line">                           live         dump only live objects; <span class="keyword">if</span> <span class="keyword">not</span> specified,</span><br><span class="line">                                        all objects <span class="keyword">in</span> the heap are dumped.</span><br><span class="line">                           <span class="attribute">format</span>=b     binary format</span><br><span class="line">                           <span class="attribute">file</span>=&lt;file&gt;  dump heap <span class="keyword">to</span> &lt;file&gt;</span><br><span class="line">                         Example: jmap -dump:live,<span class="attribute">format</span>=b,file=heap.bin &lt;pid&gt;</span><br><span class="line">    -F                   force. Use with -dump:&lt;dump-options&gt; &lt;pid&gt; <span class="keyword">or</span> -histo</span><br><span class="line">                         <span class="keyword">to</span> force a heap dump <span class="keyword">or</span> histogram when &lt;pid&gt; does <span class="keyword">not</span></span><br><span class="line">                         respond. The <span class="string">"live"</span> suboption is <span class="keyword">not</span> supported</span><br><span class="line">                         <span class="keyword">in</span> this mode.</span><br><span class="line">    -h | -help           <span class="keyword">to</span> <span class="builtin-name">print</span> this help message</span><br><span class="line">    -J&lt;flag&gt;             <span class="keyword">to</span> pass &lt;flag&gt; directly <span class="keyword">to</span> the runtime system</span><br></pre></td></tr></table></figure>
+<p>jmap 命令格式：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// jinfo 查询进程 2764 Java 堆详细信息</span></span><br><span class="line">λ  jmap -heap <span class="number">2764</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// jinfo 生成进程 2764 Java 堆转储快照</span></span><br><span class="line">λ  jmap -<span class="keyword">dump</span>:live,format=b,<span class="keyword">file</span>=<span class="keyword">file</span>.<span class="keyword">dump</span> <span class="number">2764</span></span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-dump</td>
+<td>生成 Java 堆转储快照。格式为：-dump:[live,]format=b,file=&lt;filename>，其中 live 子参数说明是否只 dump 出存活的对象</td>
+</tr>
+<tr>
+<td>-finalizerinfo</td>
+<td>显示在 F-Queue 中等待 Finalizer 线程执行 finalize 方法的对象。只有在 Linux/Solaris 平台下有效</td>
+</tr>
+<tr>
+<td>-heap</td>
+<td>显示 Java 堆详细信息，如使用哪种回收器、参数配置、分代状况等。只有在 Linux/Solaris 平台下有效</td>
+</tr>
+<tr>
+<td>-histo</td>
+<td>显示堆中对象统计信息，包括类、实例数量、合计容量</td>
+</tr>
+<tr>
+<td>-histo:live</td>
+<td>与 -histo:live 功能一样，在统计之前 JVM 会先触发一次 FULL GC，线上慎用</td>
+</tr>
+<tr>
+<td>-permstat</td>
+<td>以 ClassLoader 为统计口径显示永久代内存状态。只有在 Linux/Solaris 平台下有效</td>
+</tr>
+<tr>
+<td>-F</td>
+<td>当虚拟机进程对 -dump 选项没有响应时，可使用这个选项强制生成 dump 快照。只有在 Linux/Solaris 平台下有效</td>
+</tr>
+</tbody>
+</table>
+<h3 id="jhat：虚拟机堆转储快照分析工具"><a href="#jhat：虚拟机堆转储快照分析工具" class="headerlink" title="jhat：虚拟机堆转储快照分析工具"></a>jhat：虚拟机堆转储快照分析工具</h3><p>Sun JDK 提供 jhat（JVM Heap Analysis Tool）命令与 jmap 搭配使用，来分析 jmap 生成的堆转快照。jhat 内置了一个微型的 HTTP/HTML 服务器，生成 dump 文件的分析结果后，可以在游览器中查看。</p>
+<p>jhat 的分析功能相对来说比较简陋，在现实工作中，我们一般会使用 VisualVM、Eclipse Memory Analyzer、IBM HeapAnalyzer 等专业用于分析 dump 文件的工具。</p>
+<p>查看 jhat 的帮助信息：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_24_98_centos ~]# jhat -help</span><br><span class="line">Usage:  jhat [-stack &lt;bool&gt;] [-refs &lt;bool&gt;] [-port &lt;port&gt;] [-baseline &lt;file&gt;] [-<span class="builtin-name">debug</span> &lt;int&gt;] [-version] [-h|-help] &lt;file&gt;</span><br><span class="line"></span><br><span class="line">        -J&lt;flag&gt;          Pass &lt;flag&gt; directly <span class="keyword">to</span> the runtime system. <span class="keyword">For</span></span><br><span class="line">                          example, -J-mx512m <span class="keyword">to</span> use a maximum heap size of 512MB</span><br><span class="line">        -stack <span class="literal">false</span>:     Turn off<span class="built_in"> tracking </span>object allocation call stack.</span><br><span class="line">        -refs <span class="literal">false</span>:      Turn off<span class="built_in"> tracking </span>of references <span class="keyword">to</span> objects</span><br><span class="line">        -port &lt;port&gt;:     <span class="builtin-name">Set</span> the<span class="built_in"> port </span><span class="keyword">for</span> the HTTP server.  Defaults <span class="keyword">to</span> 7000</span><br><span class="line">        -exclude &lt;file&gt;:  Specify a file that lists data members that should</span><br><span class="line">                          be excluded <span class="keyword">from</span> the reachableFrom query.</span><br><span class="line">        -baseline &lt;file&gt;: Specify a baseline object dump.  Objects <span class="keyword">in</span></span><br><span class="line">                          both heap dumps with the same ID <span class="keyword">and</span> same class will</span><br><span class="line">                          be marked as <span class="keyword">not</span> being <span class="string">"new"</span>.</span><br><span class="line">        -<span class="builtin-name">debug</span> &lt;int&gt;:     <span class="builtin-name">Set</span> <span class="builtin-name">debug</span> level.</span><br><span class="line">                            0:  <span class="literal">No</span> <span class="builtin-name">debug</span> output</span><br><span class="line">                            1:  <span class="builtin-name">Debug</span> hprof file parsing</span><br><span class="line">                            2:  <span class="builtin-name">Debug</span> hprof file parsing, <span class="literal">no</span> server</span><br><span class="line">        -version          Report version number</span><br><span class="line">        -h|-help          <span class="builtin-name">Print</span> this help <span class="keyword">and</span> exit</span><br><span class="line">        &lt;file&gt;            The file <span class="keyword">to</span> read</span><br><span class="line"></span><br><span class="line"><span class="keyword">For</span> a dump file that contains multiple heap dumps,</span><br><span class="line">you may specify which dump <span class="keyword">in</span> the file</span><br><span class="line">by appending <span class="string">"#&lt;number&gt;"</span> <span class="keyword">to</span> the file name, i.e. <span class="string">"foo.hprof#3"</span>.</span><br><span class="line"></span><br><span class="line">All boolean options<span class="built_in"> default </span><span class="keyword">to</span> <span class="string">"true"</span></span><br></pre></td></tr></table></figure>
+<p>jmap 命令格式：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// jhat 分析 <span class="keyword">file</span>.dump，屏幕显示“Server <span class="keyword">is</span> ready”的提示后，用户在游览器输入 http://localhos<span class="variable">t:7000</span>/ 就可以看到分析结果</span><br><span class="line">λ  jhat <span class="keyword">file</span>.dump</span><br></pre></td></tr></table></figure>
+<h3 id="jstack：Java-堆栈跟踪工具"><a href="#jstack：Java-堆栈跟踪工具" class="headerlink" title="jstack：Java 堆栈跟踪工具"></a>jstack：Java 堆栈跟踪工具</h3><p>jstack（Stack Trace for Java）命令用于生成虚拟机当前时刻的线程快照（一般称为 threaddump 或者 javacore 文件）。线程快照就是当前虚拟机内每一条线程正在执行的方法堆栈的集合，生成线程快照的主要目的是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待都是导致线程长时间停顿的常见原因。</p>
+<p>查看 jstack 的帮助信息：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_24_98_centos ~]# jstack -help</span><br><span class="line">Usage:</span><br><span class="line">    jstack [-l] &lt;pid&gt;</span><br><span class="line">        (<span class="keyword">to</span> connect <span class="keyword">to</span> running process)</span><br><span class="line">    jstack -F [-m] [-l] &lt;pid&gt;</span><br><span class="line">        (<span class="keyword">to</span> connect <span class="keyword">to</span> a hung process)</span><br><span class="line">    jstack [-m] [-l] &lt;executable&gt; &lt;core&gt;</span><br><span class="line">        (<span class="keyword">to</span> connect <span class="keyword">to</span> a core file)</span><br><span class="line">    jstack [-m] [-l] [server_id@]&lt;remote<span class="built_in"> server IP </span><span class="keyword">or</span> hostname&gt;</span><br><span class="line">        (<span class="keyword">to</span> connect <span class="keyword">to</span> a remote <span class="builtin-name">debug</span> server)</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line">    -F  <span class="keyword">to</span> force a thread dump. Use when jstack &lt;pid&gt; does <span class="keyword">not</span> respond (process is hung)</span><br><span class="line">    -m  <span class="keyword">to</span> <span class="builtin-name">print</span> both java <span class="keyword">and</span> native frames (mixed mode)</span><br><span class="line">    -l  long listing. Prints additional information about locks</span><br><span class="line">    -h <span class="keyword">or</span> -help <span class="keyword">to</span> <span class="builtin-name">print</span> this help message</span><br></pre></td></tr></table></figure>
+<p>jstack 命令格式：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// jstack 查看进程 2764 线程快照</span></span><br><span class="line">λ  jstack -l <span class="number">2764</span></span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-F</td>
+<td>当正常输出的请求不被响应时，强制输出线程堆栈</td>
+</tr>
+<tr>
+<td>-l</td>
+<td>除堆栈外，显示关于锁的附加信息</td>
+</tr>
+<tr>
+<td>-m</td>
+<td>如果调用本地方法的话，可以显示 C/C++ 的堆栈</td>
+</tr>
+</tbody>
+</table>
+<h2 id="JDK-可视化工具"><a href="#JDK-可视化工具" class="headerlink" title="JDK 可视化工具"></a>JDK 可视化工具</h2><p>JDK 中除了提供大量的命令行工具外，还有两个功能强大的可视化工具：JConsole 和 VisualVM。</p>
+<h3 id="JConsole：Java-监视与管理控制台"><a href="#JConsole：Java-监视与管理控制台" class="headerlink" title="JConsole：Java 监视与管理控制台"></a>JConsole：Java 监视与管理控制台</h3><p>JConsole（Java Monitoring and Management Console）是一种基于 JMX 的可视化监视、管理工具，它管理部分的功能是针对 JMX MBean 进行管理。</p>
+<p><img src="/media/15470360146770/20191210171528.png" alt="通过 jconsole 命令启动 JConsole"></p>
+<p><img src="/media/15470360146770/20191210155101.png" alt="JConsole Java 监视和管理控制台"></p>
+<p>特殊说明：要对 Java 进程进行远程监控，在启动它的时候需要启用 JMX，对于 Java 进程开启远程调试可以参考博客<a href="https://www.jianshu.com/p/923580d3a5a2" target="_blank" rel="noopener">《Java - jmx远程调优》</a></p>
+<h3 id="VisualVM：多合一故障处理工具"><a href="#VisualVM：多合一故障处理工具" class="headerlink" title="VisualVM：多合一故障处理工具"></a>VisualVM：多合一故障处理工具</h3><p>VisualVM（All-in-One Java Troubleshooting Tool）是到目前为止随 JDK 发布的功能最强大的运行监视和故障处理程序。VisualVM 除了运行监视、故障处理外，还提供了很多其他方面你的功能，如性能分析（Profiling）。VisualVM 的性能分析功能甚至比起 Jprofiler、YourKit 等专业且收费的 Profiling 工具都不会逊色多少，而且 VisualVM 不需要被监视的程序基于特殊 Agent 运行，因此它对对应用程序的实际性能的影响很小，使得它可以直接应用在生产环境中。</p>
+<p><img src="/media/15470360146770/20191210171124.png" alt="通过 jvisualvm 命令启动 VisualVM"></p>
+<p><img src="/media/15470360146770/20191210171205.png" alt="Java VisualVM 监视和管理控制台"></p>
+<h2 id="调优案例分析与实战"><a href="#调优案例分析与实战" class="headerlink" title="调优案例分析与实战"></a>调优案例分析与实战</h2><p>模拟环境：Centos7 1 核 2GB，Java 8</p>
+<h3 id="JVM-调优之-jstack-找出最耗-CPU-的线程并定位代码"><a href="#JVM-调优之-jstack-找出最耗-CPU-的线程并定位代码" class="headerlink" title="JVM 调优之 jstack 找出最耗 CPU 的线程并定位代码"></a>JVM 调优之 jstack 找出最耗 CPU 的线程并定位代码</h3><p>笔者之前在一家互联网公司从事爬虫业务，在解析 HTML 时，经常由于网站返回的 HTML 网页结构不完整而导致解析框架死循环，从而导致 CPU 飚高，系统运行缓慢。</p>
+<h4 id="场景模拟"><a href="#场景模拟" class="headerlink" title="场景模拟"></a>场景模拟</h4><p>场景模拟：在线上的环境中，一般 CPU 飙高极大的可能性是出现了死循环了。因此我们通过模拟死循环的方式模拟 CPU 飚高的情况，然后通过 jstack 找出最耗 CPU 的线程并定位代码。启动程序后，发现该程序 CPU 直线飙高，直接到达 100% 根本没有要下降的趋势，并且系统平均负载也直线飙高至 3.79，导致系统缓慢。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExceptionHandler</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> nThreads = <span class="number">3</span>;</span><br><span class="line">        Executor executor = Executors.newFixedThreadPool(nThreads);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nThreads; i++) &#123;</span><br><span class="line">            executor.execute(() -&gt; &#123;</span><br><span class="line">                <span class="keyword">long</span> temp = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">                    temp++;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="排查思路"><a href="#排查思路" class="headerlink" title="排查思路"></a>排查思路</h4><p>（1）  jstack 找出最耗 CPU 的线程并定位代码</p>
+<p>① 通过 top 命令找到占用 CPU 最高的 pid[进程 ID]，定位到 pid 是 12870</p>
+<p><img src="/media/15470360146770/20191211144353.png" alt="通过 top 命令找到占用 CPU 最高的 pid"></p>
+<p>② 通过 top -Hp pid 查看该进程中占用 CPU  过高的 tid[线程 id]，定位到 tid 分别为 12894、12895、12896</p>
+<p><img src="/media/15470360146770/20191211144748.png" alt="通过 top -Hp pid 查看该进程中占用 CPU  过高的 tid"></p>
+<p>③ 通过 printf “0x%x\n” tid 把线程 id 转化为十六进制，转换后的十六进制 tid 分别为 0x325e、0x325f、0x3260</p>
+<p>④ 通过 jstack pid |grep tid -A 30 定位线程堆栈信息，这里的 tid 指的是转换后的十六进制 tid，定位到导致 CPU 飚高的代码为 ExceptionHandler 类 27 行处，发现里面有一个死循环。</p>
+<p><img src="/media/15470360146770/20191211145743.png" alt="jstack pid |grep tid -A 30"></p>
+<p>（2） 通过在线可视化分析工具分析 threaddump </p>
+<p><a href="https://fastthread.io/" target="_blank" rel="noopener">fastthread.io</a> 是一个在线线程日志分析网站，科学上网打开速度会更快。定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待都是导致线程长时间停顿的常见原因。比较好的是它会提供一些优化的建议，可以作为参考，而且各个部分的分析也比较详细。</p>
+<p>① 通过 top 命令找到占用 CPU 最高的 pid[进程 ID]，定位到 pid 是 12870</p>
+<p>② 通过 jstack -l pid &gt; file-path 抓取 thread dump 文件，即 jstack -l 12870 &gt; threaddump-1576050339106.tdump</p>
+<p>③ 将 thread dump 文件上传至 fastthread 网站，查看分析结果</p>
+<p><img src="/media/15470360146770/20191211152249.png" alt="根据 fastthread 分析结果找出最耗 CPU 的线程并定位代码"></p>
+<h3 id="JVM-调优之-jstack-找出死锁线程并定位代码"><a href="#JVM-调优之-jstack-找出死锁线程并定位代码" class="headerlink" title="JVM 调优之 jstack 找出死锁线程并定位代码"></a>JVM 调优之 jstack 找出死锁线程并定位代码</h3><p>Deadlock：死锁线程，一般指多个线程调用间，进入相互资源占用，导致一直等待无法释放的情况。由于锁使用不当，导致多个线程进入死锁状态，从而导致系统整体比较缓慢。</p>
+<h4 id="场景模拟-1"><a href="#场景模拟-1" class="headerlink" title="场景模拟"></a>场景模拟</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExceptionHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String obj1 = <span class="string">"obj1"</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String obj2 = <span class="string">"obj2"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Thread a = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Lock1());</span><br><span class="line">        Thread b = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Lock2());</span><br><span class="line">        a.start();</span><br><span class="line">        b.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Lock1</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                System.out.println(<span class="string">"Lock1 running"</span>);</span><br><span class="line">                <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                    <span class="keyword">synchronized</span> (ExceptionHandler.obj1) &#123;</span><br><span class="line">                        System.out.println(<span class="string">"Lock1 lock obj1"</span>);</span><br><span class="line">                        <span class="comment">// 获取obj1后先等一会儿，让Lock2有足够的时间锁住obj2</span></span><br><span class="line">                        TimeUnit.SECONDS.sleep(<span class="number">3</span>);</span><br><span class="line">                        <span class="keyword">synchronized</span> (ExceptionHandler.obj2) &#123;</span><br><span class="line">                            System.out.println(<span class="string">"Lock1 lock obj2"</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Lock2</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                System.out.println(<span class="string">"Lock2 running"</span>);</span><br><span class="line">                <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                    <span class="keyword">synchronized</span> (ExceptionHandler.obj2) &#123;</span><br><span class="line">                        System.out.println(<span class="string">"Lock2 lock obj2"</span>);</span><br><span class="line">                        <span class="comment">// 获取obj2后先等一会儿，让Lock1有足够的时间锁住obj1</span></span><br><span class="line">                        TimeUnit.SECONDS.sleep(<span class="number">3</span>);</span><br><span class="line">                        <span class="keyword">synchronized</span> (ExceptionHandler.obj1) &#123;</span><br><span class="line">                            System.out.println(<span class="string">"Lock2 lock obj1"</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="排查思路-1"><a href="#排查思路-1" class="headerlink" title="排查思路"></a>排查思路</h4><p>（1）  jstack 分析线程运行状况，找出死锁线程并定位代码</p>
+<p>① 通过 top 命令找到占用 需要分析的 pid[进程 ID]，定位到 pid 是 7120</p>
+<p>② 通过 jstack pid 定位线程堆栈信息，通过分析线程快照，可以很轻松的发现死锁状况</p>
+<p><img src="/media/15470360146770/20200102191557.png" alt="jstack 分析线程死锁"></p>
+<p>（2） 通过在线可视化分析工具分析 threaddump </p>
+<p>① 通过 top 命令找到占用 CPU 最高的 pid[进程 ID]，定位到 pid 是 7120</p>
+<p>② 通过 jstack -l pid &gt; file-path 抓取 thread dump 文件，即 jstack -l 7120 &gt; threaddump-1576050339106.tdump</p>
+<p>③ 将 thread dump 文件上传至 fastthread 网站，查看分析结果</p>
+<p><img src="/media/15470360146770/20200102205305.png" alt="根据 fastthread 分析结果找出死锁线程并定位代码"></p>
+<h3 id="JVM-调优之-jstack-找出-Full-GC-次数过多并定位代码"><a href="#JVM-调优之-jstack-找出-Full-GC-次数过多并定位代码" class="headerlink" title="JVM 调优之 jstack 找出 Full GC 次数过多并定位代码"></a>JVM 调优之 jstack 找出 Full GC 次数过多并定位代码</h3><p>Full GC 次数过多，这种情况是最容易出现的，尤其是新功能上线时。对于 Full GC 较多的情况，其主要有如下两个特征：1、线上多个线程的 CPU 都超过了 100%，通过 jstack 命令可以看到这些线程主要是垃圾回收线程；2、通过 jstat 命令监控 GC 情况，可以看到 Full GC 次数非常多，并且次数在不断增加。</p>
+<h4 id="排查思路-2"><a href="#排查思路-2" class="headerlink" title="排查思路"></a>排查思路</h4><p>（1）  jstack 分析线程运行状况，找出 Full GC 次数过多原因并定位代码</p>
+<p>① 首先我们通过 top 命令查看当前 CPU 消耗过高的进程是哪个，从而得到进程 id；然后通过 top -Hp &lt;pid> 来查看该进程中有哪些线程 CPU 过高，一般超过 80% 就是比较高的，80% 左右是合理情况。这样我们就能得到 CPU 消耗比较高的线程 id。接着通过该线程 id 的十六进制表示在 jstack 日志中查看当前线程具体的堆栈信息</p>
+<p>② 通过 jstack pid |grep tid -A 30 定位线程堆栈信息，这里的 tid 指的是转换后的十六进制 tid，定位到导致 CPU 飚高的线程为 “VM Thread”，而 VM Thread 指的就是垃圾回收的线程。这里我们基本上可以确定，当前系统缓慢的原因主要是垃圾回收过于频繁，导致 GC 停顿时间较长</p>
+<p>③ 通过 jstat -gcutil pid 1000 10 查看 GC 的情况，可以看到，这里 FGC 指的是 Full GC 数量，若 FGC 过高，可能是由于内存溢出导致的系统缓慢，也可能是代码或者第三方依赖的包中有显示的 System.gc() 调用</p>
+<p>④ 通过分析 dump 文件，确定由于内存溢出导致 Full GC 次数过多还是由于代码或者第三方依赖的包中有显示的 System.gc() 调用导致 Full GC 次数过多</p>
+<p>（2） 通过在线可视化分析工具分析 gc.log </p>
+<p><a href="https://gceasy.io/" target="_blank" rel="noopener">gceasy.io</a> 是一个在线 GC 日志分析工具，科学上网打开速度会更快。gceasy 可帮助您可帮助您分析程序运行时 GC 情况，您可以根据分析结果及时优化程序。</p>
+<p>① 通过 -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:gc.log 命令获取 gc 日志</p>
+<p>② 将 gc.log 文件上传至 gceasy 网站，查看分析结果</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>对于 Full GC 次数过多，主要有以下两种原因：</p>
+<ul>
+<li>代码中一次获取了大量的对象，导致内存溢出，此时可以通过 eclipse 的 mat 工具查看内存中有哪些对象比较多。</li>
+<li>内存占用不高，但是 Full GC 次数还是比较多，此时可能是显示的 System.gc() 调用导致 GC 次数过多，这可以通过添加 - XX:+DisableExplicitGC 来禁用 JVM 对显示 GC 的响应。</li>
+</ul>
+<h3 id="JVM-调优之-jmap-找出内存泄漏并定位代码"><a href="#JVM-调优之-jmap-找出内存泄漏并定位代码" class="headerlink" title="JVM 调优之 jmap 找出内存泄漏并定位代码"></a>JVM 调优之 jmap 找出内存泄漏并定位代码</h3><p>同样是笔者之前所在的爬虫业务，有个网站改版后，登录时采用 RSA 加密方式，笔者根据网站的加密方式改版后项目重新上线后，发现项目内存使用率每天都会增加一点，对于一个长期稳定运行 Java 项目而言，出现这种情况一般都有可能是出现了内存泄露。</p>
+<h4 id="场景模拟-2"><a href="#场景模拟-2" class="headerlink" title="场景模拟"></a>场景模拟</h4><p>场景模拟：在线上的环境中，一个长期稳定运行的项目，内存使用率每天都增加，一般情况就是出现了内存泄露。而笔者所说的场景就是，网站采用 RSA 对网站的登录账号、密码进行加密，Java 默认的 RSA 实现是 “RSA/None/PKCS1Padding”（即 Cipher cipher = Cipher.getInstance(“RSA”);）；而该网站采用的 RSA 实现是 “RSA/None/NoPadding”（即 Cipher cipher = Cipher.getInstance(“RSA”, new org.bouncycastle.jce.provider.BouncyCastleProvider());）。项目长时间运行，就会出现 JceSecurity 占用的内存越来越多，而且不会释放。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExceptionHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String DEFAULT_PUBLIC_KEY = <span class="string">"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCO/qrEGrKGX06KP9Aks1BeP/2RTQkg/WXUQoCbtKQOqQQGY5N/ekCSW0Ow9ZAiEl3GMG/E7elNvEPV17bpRP3k+PFB0YxhgqOPLqxSN+57PUSUJU1rTkVY8mcu3eWrrGf2xpud1eXKEW3YeI95uCPyGPq4sO3NtHJY1xUTaFhG7QIDAQAB"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            System.out.println(encrypt(DEFAULT_PUBLIC_KEY, <span class="keyword">new</span> org.bouncycastle.jce.provider.BouncyCastleProvider(), <span class="string">"morning"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 使用publicKey来加密内容</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> publicKeyString 公钥key</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> provider        加密提供商</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> content         内容</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> byte[]</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">encrypt</span><span class="params">(String publicKeyString, Provider provider, String content)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Cipher cipher = Cipher.getInstance(<span class="string">"RSA"</span>, provider);</span><br><span class="line">        PublicKey publicKey = KeyFactory.getInstance(<span class="string">"RSA"</span>, provider).generatePublic(<span class="keyword">new</span> X509EncodedKeySpec(Base64.decodeBase64(publicKeyString)));</span><br><span class="line">        cipher.init(Cipher.ENCRYPT_MODE, publicKey);</span><br><span class="line">        <span class="keyword">return</span> Base64.encodeBase64String(cipher.doFinal(content.getBytes()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/media/15470360146770/20191211164804.png" alt="RSA 加密导致的内存泄漏"></p>
+<h4 id="排查思路-3"><a href="#排查思路-3" class="headerlink" title="排查思路"></a>排查思路</h4><p>（1）   MAT 找出内存泄漏并定位代码</p>
+<p>Eclipse Memory Analyzer Tool（MAT）是一个强大的基于 Eclipse 的内存分析工具，可以帮助我们找到内存泄露，减少内存消耗。MAT 是有两种安装方式的：一种安装方式是将 MAT 当做 eclipse 的插件进行安装：启动 Eclipse –&gt; Help –&gt; Eclipse Marketplace，然后搜索 Memory Analyzer，安装，重启 eclipse 即可；另外一种安装方式是将 MAT 作为一个独立的软件进行安装：去 <a href="https://www.eclipse.org/mat/downloads.php" target="_blank" rel="noopener">官网</a>，根据操作系统版本下载最新的 MAT。下载后解压就可以运行了。</p>
+<p>① 通过 top 命令找到占用内存使用率持续增加的 pid[进程 ID]，定位到 pid 是 12870</p>
+<p>② 通过 jmap -dump:[live,]format=b,file=&lt;filename> &lt;pid> 获取堆转储文件，即 jmap -dump:live,format=b,file=heapdump-1576054225319.hprof 12870</p>
+<p>③ 将 heap dump 文件导入 MAT，查看分析结果</p>
+<p>④ 加载后首页如下图，在首页上比较有用的是 Histogram 和 Leak Suspects。由下图看出这个类 javax.crypto.JceSecurity 占用 896.3 MB，表示这其中很多不能够被回对象的对象</p>
+<p><img src="/media/15470360146770/20191211183328.png" alt="MAT 首页图"></p>
+<p>⑤ 根据 Leak Suspects 快速查看泄露的可疑点，在 Leak Suspects 页面会给出可能的内存泄露，点击 Details 进入详情页面。在详情页面 Shortest Paths To the Accumulation Point 表示 GC root 到内存消耗聚集点的最短路径，如果某个内存消耗聚集点有路径到达 GC root，则该内存消耗聚集点不会被当做垃圾被回收。由下图可以看到大量的 BouncyCastleProvider 对象没有被垃圾回收器回收，占用了大量内存空间。</p>
+<p><img src="/media/15470360146770/20191211184331.png" alt="BouncyCastleProvider 对象占用大量内存空间从而导致内存泄漏"></p>
+<p>（3） 通过在线可视化分析工具分析 heaphero </p>
+<p><a href="https://heaphero.io/" target="_blank" rel="noopener">heaphero.io</a> 是一个在线内存分析工具，科学上网打开速度会更快。heaphero 可帮助您查找内存泄漏并减少内存消耗，运行报告以自动提取泄漏嫌疑者，主要展示项有：堆统计，大对象，字符串重复，低效率对象，线程数，及优化建议等。</p>
+<p>① 通过 top 命令找到占用内存使用率持续增加的 pid[进程 ID]，定位到 pid 是 12870</p>
+<p>② 通过 jmap -dump:[live,]format=b,file=&lt;filename> &lt;pid> 获取堆转储文件，即 jmap -dump:live,format=b,file=heapdump-1576054225319.hprof 12870</p>
+<p>③ 将 heap dump 文件上传至 heaphero 网站，查看分析结果</p>
+<p><img src="/media/15470360146770/20191211190821.png" alt="根据 heaphero 分析结果找出大对象"></p>
+<p><img src="/media/15470360146770/20191211190958.png" alt="查看 JceSecurity 包含哪些对象"></p>
+<h4 id="解决方式"><a href="#解决方式" class="headerlink" title="解决方式"></a>解决方式</h4><p>（1）修改 provider 指定方式：Security.addProvider(new BouncyCastleProvider())</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExceptionHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String DEFAULT_PUBLIC_KEY = <span class="string">"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCO/qrEGrKGX06KP9Aks1BeP/2RTQkg/WXUQoCbtKQOqQQGY5N/ekCSW0Ow9ZAiEl3GMG/E7elNvEPV17bpRP3k+PFB0YxhgqOPLqxSN+57PUSUJU1rTkVY8mcu3eWrrGf2xpud1eXKEW3YeI95uCPyGPq4sO3NtHJY1xUTaFhG7QIDAQAB"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            System.out.println(encrypt(DEFAULT_PUBLIC_KEY, BouncyCastleProvider.PROVIDER_NAME, <span class="string">"morning"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == <span class="keyword">null</span>) &#123;</span><br><span class="line">            Security.addProvider(<span class="keyword">new</span> BouncyCastleProvider());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 使用publicKey来加密内容</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> publicKeyString 公钥key</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> provider        加密提供商</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> content         内容</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> byte[]</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">encrypt</span><span class="params">(String publicKeyString, String provider, String content)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Cipher cipher = Cipher.getInstance(<span class="string">"RSA"</span>, provider);</span><br><span class="line">        PublicKey publicKey = KeyFactory.getInstance(<span class="string">"RSA"</span>, provider).generatePublic(<span class="keyword">new</span> X509EncodedKeySpec(Base64.decodeBase64(publicKeyString)));</span><br><span class="line">        cipher.init(Cipher.ENCRYPT_MODE, publicKey);</span><br><span class="line">        <span class="keyword">return</span> Base64.encodeBase64String(cipher.doFinal(content.getBytes()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>（2）把 BouncyCastleProvider 改成单例模式</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExceptionHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> final <span class="keyword">String</span> DEFAULT_PUBLIC_KEY = <span class="string">"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCO/qrEGrKGX06KP9Aks1BeP/2RTQkg/WXUQoCbtKQOqQQGY5N/ekCSW0Ow9ZAiEl3GMG/E7elNvEPV17bpRP3k+PFB0YxhgqOPLqxSN+57PUSUJU1rTkVY8mcu3eWrrGf2xpud1eXKEW3YeI95uCPyGPq4sO3NtHJY1xUTaFhG7QIDAQAB"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) throws Exception &#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">            System.out.println(encrypt(DEFAULT_PUBLIC_KEY, BouncyCastleProviderEnum.INSTANCE.getBouncyCastleProvider(), <span class="string">"morning"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == <span class="literal">null</span>) &#123;</span><br><span class="line">            Security.addProvider(<span class="keyword">new</span> <span class="type">BouncyCastleProvider</span>());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 使用publicKey来加密内容</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @param publicKeyString 公钥key</span></span><br><span class="line"><span class="comment">     * @param provider        加密提供商</span></span><br><span class="line"><span class="comment">     * @param content         内容</span></span><br><span class="line"><span class="comment">     * @return byte[]</span></span><br><span class="line"><span class="comment">     * @throws Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">String</span> encrypt(<span class="keyword">String</span> publicKeyString, Provider provider, <span class="keyword">String</span> content) throws Exception &#123;</span><br><span class="line">        Cipher cipher = Cipher.getInstance(<span class="string">"RSA"</span>, provider);</span><br><span class="line">        PublicKey publicKey = KeyFactory.getInstance(<span class="string">"RSA"</span>, provider).generatePublic(<span class="keyword">new</span> <span class="type">X509EncodedKeySpec</span>(Base64.decodeBase64(publicKeyString)));</span><br><span class="line">        cipher.init(Cipher.ENCRYPT_MODE, publicKey);</span><br><span class="line">        <span class="keyword">return</span> Base64.encodeBase64String(cipher.doFinal(content.getBytes()));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 枚举实现单例模式.</span></span><br><span class="line"><span class="comment">     * 避免项目中出现反复 new BouncyCastleProvider() 导致内存泄漏.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">enum</span> <span class="title">BouncyCastleProviderEnum</span> &#123;</span></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 枚举类实例</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        INSTANCE;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 枚举类实例变量</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">private</span> BouncyCastleProvider bouncyCastleProvider;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 枚举类构造方法，默认为private</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        BouncyCastleProviderEnum() &#123;</span><br><span class="line">            bouncyCastleProvider = <span class="keyword">new</span> <span class="type">BouncyCastleProvider</span>();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 枚举类成员方法.</span></span><br><span class="line"><span class="comment">         * 获取产生的bouncyCastleProvider变量.</span></span><br><span class="line"><span class="comment">         *</span></span><br><span class="line"><span class="comment">         * @return BouncyCastleProvider</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">public</span> BouncyCastleProvider getBouncyCastleProvider() &#123;</span><br><span class="line">            <span class="keyword">return</span> bouncyCastleProvider;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="https://www.jianshu.com/p/213710fb9e40" target="_blank" rel="noopener">jvm 性能调优工具之 jstat</a><br>[2]. <a href="https://www.cnblogs.com/qingshanli/p/9333487.html" target="_blank" rel="noopener">JDK的可视化工具系列 (四) JConsole、VisualVM</a><br>[3]. <a href="https://www.cnblogs.com/trust-freedom/p/6744948.html" target="_blank" rel="noopener">使用Eclipse Memory Analyzer Tool（MAT）分析线上故障(一) - 视图&amp;功能篇</a><br>[4]. <a href="http://cmsblogs.com/?p=5155" target="_blank" rel="noopener">一道必备面试题：系统CPU飙高和GC频繁，如何排查？</a></p>
+<hr>
+<h2 id="深入理解-Java-虚拟机系列"><a href="#深入理解-Java-虚拟机系列" class="headerlink" title="深入理解 Java 虚拟机系列"></a>深入理解 Java 虚拟机系列</h2><ul>
+<li><a href="6cd92fa9.html">深入理解 Java 虚拟机（一）：Java 内存区域与内存溢出异常</a></li>
+<li><a href="1a0b1a8e.html">深入理解 Java 虚拟机（二）：JVM 垃圾收集器</a></li>
+<li><a href="2dc6708f.html">深入理解 Java 虚拟机（三）：内存分配与回收策略</a></li>
+<li><a href="3c79a541.html">深入理解 Java 虚拟机（四）：Jvm 性能监控与调优</a></li>
+</ul>
+<hr>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>谢谢你长得那么好看，还打赏我！😘</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.jpg" alt="猫宁i 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.jpg" alt="猫宁i 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>猫宁i</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://blog.maoning.vip/archives/3c79a541.html" title="深入理解 Java 虚拟机（四）：Jvm 性能监控与调优">https://blog.maoning.vip/archives/3c79a541.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Jvm/" rel="tag"># Jvm</a>
+          
+            <a href="/tags/性能监控/" rel="tag"># 性能监控</a>
+          
+            <a href="/tags/线上问题/" rel="tag"># 线上问题</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/97ab96a0.html" rel="next" title="Git 在团队中的最佳实践（三）：如何优雅的使用 Git？">
+                <i class="fa fa-chevron-left"></i> Git 在团队中的最佳实践（三）：如何优雅的使用 Git？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="猫宁i">
+            
+              <p class="site-author-name" itemprop="name">猫宁i</p>
+              <div class="site-description motion-element" itemprop="description">趁着年轻，好好生活，用心折腾。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">40</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">89</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://morning-pro.github.io/" title="https://morning-pro.github.io/" rel="noopener" target="_blank">我的镜像站</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://crossoverjie.top/" title="https://crossoverjie.top/" rel="noopener" target="_blank">crossoverJie's Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://fangjian0423.github.io/" title="http://fangjian0423.github.io/" rel="noopener" target="_blank">Format's Notes</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.fangjunhao.com/" title="https://www.fangjunhao.com/" rel="noopener" target="_blank">渣博客</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://bestzuo.cn" title="https://bestzuo.cn" rel="noopener" target="_blank">Sanarous</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK-命令行工具"><span class="nav-number">2.</span> <span class="nav-text">JDK 命令行工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#jps：虚拟机进程状况工具"><span class="nav-number">2.1.</span> <span class="nav-text">jps：虚拟机进程状况工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jstat：虚拟机统计信息监视工具"><span class="nav-number">2.2.</span> <span class="nav-text">jstat：虚拟机统计信息监视工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jinfo：Java-配置信息工具"><span class="nav-number">2.3.</span> <span class="nav-text">jinfo：Java 配置信息工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jmap：Java-内存映像工具"><span class="nav-number">2.4.</span> <span class="nav-text">jmap：Java 内存映像工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jhat：虚拟机堆转储快照分析工具"><span class="nav-number">2.5.</span> <span class="nav-text">jhat：虚拟机堆转储快照分析工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jstack：Java-堆栈跟踪工具"><span class="nav-number">2.6.</span> <span class="nav-text">jstack：Java 堆栈跟踪工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK-可视化工具"><span class="nav-number">3.</span> <span class="nav-text">JDK 可视化工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JConsole：Java-监视与管理控制台"><span class="nav-number">3.1.</span> <span class="nav-text">JConsole：Java 监视与管理控制台</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VisualVM：多合一故障处理工具"><span class="nav-number">3.2.</span> <span class="nav-text">VisualVM：多合一故障处理工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调优案例分析与实战"><span class="nav-number">4.</span> <span class="nav-text">调优案例分析与实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JVM-调优之-jstack-找出最耗-CPU-的线程并定位代码"><span class="nav-number">4.1.</span> <span class="nav-text">JVM 调优之 jstack 找出最耗 CPU 的线程并定位代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#场景模拟"><span class="nav-number">4.1.1.</span> <span class="nav-text">场景模拟</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#排查思路"><span class="nav-number">4.1.2.</span> <span class="nav-text">排查思路</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JVM-调优之-jstack-找出死锁线程并定位代码"><span class="nav-number">4.2.</span> <span class="nav-text">JVM 调优之 jstack 找出死锁线程并定位代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#场景模拟-1"><span class="nav-number">4.2.1.</span> <span class="nav-text">场景模拟</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#排查思路-1"><span class="nav-number">4.2.2.</span> <span class="nav-text">排查思路</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JVM-调优之-jstack-找出-Full-GC-次数过多并定位代码"><span class="nav-number">4.3.</span> <span class="nav-text">JVM 调优之 jstack 找出 Full GC 次数过多并定位代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#排查思路-2"><span class="nav-number">4.3.1.</span> <span class="nav-text">排查思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">4.3.2.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JVM-调优之-jmap-找出内存泄漏并定位代码"><span class="nav-number">4.4.</span> <span class="nav-text">JVM 调优之 jmap 找出内存泄漏并定位代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#场景模拟-2"><span class="nav-number">4.4.1.</span> <span class="nav-text">场景模拟</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#排查思路-3"><span class="nav-number">4.4.2.</span> <span class="nav-text">排查思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方式"><span class="nav-number">4.4.3.</span> <span class="nav-text">解决方式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">5.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#深入理解-Java-虚拟机系列"><span class="nav-number">6.</span> <span class="nav-text">深入理解 Java 虚拟机系列</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-paper-plane"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">猫宁i</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">博客全站字数：</span>
+    
+    <span title="博客全站字数">495k</span>
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.0.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+  
+  <script color="0,0,0" opacity="0.3" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+  
+
+<script src="//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: '2saqKR15nDJaNg0KgkpiEIIB-gzGzoHsz',
+    appKey: 'NBf24H2IPzFCX7DjwNXFpDbH',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/haruto.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"react":{"opacity":0.7},"log":false,"tagMode":false});</script></body>
+</html>
