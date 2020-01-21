@@ -116,7 +116,7 @@
 <meta property="og:description" content="前言在工作中常常会接触到 Nginx，而本人却对它一知半解，便想在空余时间详细的了解一下 Nginx。本篇是我学习 Nginx 系列的开篇，主要内容讲述 Nginx 的基本概念，然后介绍一下 Nginx 的主要功能，最后探讨一下 Nginx 的模块化的组织架构，以及各个模块的分类、工作方式、职责和提供的相关指令。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://blog.maoning.vip/images/64568561_p0.jpg">
-<meta property="og:updated_time" content="2019-12-03T08:35:05.648Z">
+<meta property="og:updated_time" content="2020-01-20T03:22:58.285Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初识 Nginx（一）：理解原理和功能">
 <meta name="twitter:description" content="前言在工作中常常会接触到 Nginx，而本人却对它一知半解，便想在空余时间详细的了解一下 Nginx。本篇是我学习 Nginx 系列的开篇，主要内容讲述 Nginx 的基本概念，然后介绍一下 Nginx 的主要功能，最后探讨一下 Nginx 的模块化的组织架构，以及各个模块的分类、工作方式、职责和提供的相关指令。">
@@ -614,7 +614,7 @@
 <hr>
 <h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="http://www.cnblogs.com/strick/p/9336948.html" target="_blank" rel="noopener">认识 Nginx，理解原理和功能</a><br>[2]. <a href="https://www.cnblogs.com/gmlblog/p/5415527.html" target="_blank" rel="noopener">nginx 的五种负载算法模式</a><br>[3]. <a href="https://www.jianshu.com/p/8bf73d1a758c" target="_blank" rel="noopener">全面了解 Nginx 到底能做什么</a><br>[4]. <a href="https://www.cnblogs.com/jiekzou/p/4486447.html" target="_blank" rel="noopener">Nginx 详解 - 服务器集群</a></p>
 <hr>
-<h2 id="注脚"><a href="#注脚" class="headerlink" title="注脚"></a>注脚</h2><p><small>[1]. C10K：随着互联网的普及，应用的用户群体几何倍增长，此时服务器性能问题就出现。最初的服务器是基于进程 / 线程模型。假如有 C10K（即单机 1 万个并发连接），就需要创建 1W 个进程，可想而知单机是无法承受的。那么如何突破单机性能是高性能网络编程必须要面对的问题，进而这些局限和问题就统称为 C10K 问题。</small><br><small>[2]. 惊群问题：惊群问题是由于系统中有多个进程在等待同一个资源，当资源可用的时候，系统会唤醒所有或部分处于休眠状态的进程去争抢资源，但是最终只会有一个进程能够成功的响应请求并获得资源，但在这个过程中由于系统要对全部的进程唤醒，导致了需要对这些进程进行不必要的切换，从而会产生系统资源的浪费。</small></p>
+<h2 id="注脚"><a href="#注脚" class="headerlink" title="注脚"></a>注脚</h2><p><small>[1]. C10K：随着互联网的普及，应用的用户群体几何倍增长，此时服务器性能问题就出现。最初的服务器是基于进程 / 线程模型。假如有 C10K（即单机 1 万个并发连接），就需要创建 1W 个进程，可想而知单机是无法承受的。那么如何突破单机性能是高性能网络编程必须要面对的问题，进而这些局限和问题就统称为 C10K 问题。</small><br><small>[2]. 惊群问题： 惊群问题是由于系统中有多个进程在等待同一个资源，当资源可用的时候，系统会唤醒所有或部分处于休眠状态的进程去争抢资源，但是最终只会有一个进程能够成功的响应请求并获得资源，但在这个过程中由于系统要对全部的进程唤醒，导致了需要对这些进程进行不必要的切换，从而会产生系统资源的浪费。</small></p>
 <hr>
 <h2 id="初识-Nginx-系列"><a href="#初识-Nginx-系列" class="headerlink" title="初识 Nginx 系列"></a>初识 Nginx 系列</h2><ul>
 <li><a href="b9ada66e.html">初识 Nginx（一）：理解原理和功能</a></li>
@@ -807,7 +807,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">40</span>
+                    <span class="site-state-item-count">42</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -854,9 +854,7 @@
                     
                       
                     
-                      
-                    
-                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-count">15</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -1051,7 +1049,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">89</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">92</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1161,7 +1165,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">495k</span>
+    <span title="博客全站字数">558k</span>
   
 
   

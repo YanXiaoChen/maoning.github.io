@@ -116,7 +116,7 @@
 <meta property="og:description" content="背景分布式消息队列中间件是是大型分布式系统不可缺少的中间件，通过消息队列，应用程序可以在不知道彼此位置的情况下独立处理消息，或者在处理消息前不需要等待接收此消息。所以消息队列主要解决应用耦合、异步消息、流量削锋等问题，实现高性能、高可用、可伸缩和最终一致性架构。消息队列已经逐渐成为企业应用系统内部通信的核心手段，当前使用较多的消息队列有 RabbitMQ、RocketMQ、ActiveMQ、Kaf">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://blog.maoning.vip/images/20190701134838.jpg">
-<meta property="og:updated_time" content="2019-08-30T06:49:41.061Z">
+<meta property="og:updated_time" content="2020-01-20T03:19:44.874Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="了不起的消息队列（一）：浅谈消息队列及常见的分布式消息队列中间件">
 <meta name="twitter:description" content="背景分布式消息队列中间件是是大型分布式系统不可缺少的中间件，通过消息队列，应用程序可以在不知道彼此位置的情况下独立处理消息，或者在处理消息前不需要等待接收此消息。所以消息队列主要解决应用耦合、异步消息、流量削锋等问题，实现高性能、高可用、可伸缩和最终一致性架构。消息队列已经逐渐成为企业应用系统内部通信的核心手段，当前使用较多的消息队列有 RabbitMQ、RocketMQ、ActiveMQ、Kaf">
@@ -519,7 +519,7 @@
                 
                   <span class="post-meta-item-text">本文字数统计：</span>
                 
-                <span title="本文字数统计">9.1k</span>
+                <span title="本文字数统计">9.2k</span>
               
 
               
@@ -685,6 +685,12 @@
 <p><img src="/media/15662836853167/20190826102530.png" alt="20190826102530"></p>
 <hr>
 <h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="https://juejin.im/post/5b41fe36e51d45191252e79e#heading-21" target="_blank" rel="noopener">浅谈消息队列及常见的消息中间件</a><br>[2]. <a href="https://mp.weixin.qq.com/s/ad7jibTb5nTzh3nDQYKFeg" target="_blank" rel="noopener">消息中间件选型分析</a><br>[3]. <a href="https://www.jianshu.com/p/36a7775b04ec" target="_blank" rel="noopener">新手也能看懂，消息队列其实很简单</a><br>[4]. <a href="https://mp.weixin.qq.com/s/MbM3xc5egIEaklRKfr7nzg" target="_blank" rel="noopener">10 分钟搞懂：95% 的程序员都拎不清的分布式消息队列中间件</a></p>
+<hr>
+<h2 id="了不起的消息队列系列"><a href="#了不起的消息队列系列" class="headerlink" title="了不起的消息队列系列"></a>了不起的消息队列系列</h2><ul>
+<li><a href="1c55560e.html">了不起的消息队列（一）：浅谈消息队列及常见的分布式消息队列中间件</a></li>
+<li><a href="f99da47b.html">了不起的消息队列（二）：啊哈！RabbitMQ</a></li>
+</ul>
+<hr>
 
       
     </div>
@@ -871,7 +877,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">40</span>
+                    <span class="site-state-item-count">42</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -918,9 +924,7 @@
                     
                       
                     
-                      
-                    
-                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-count">15</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -1115,7 +1119,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">89</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">92</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1190,7 +1200,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列概述"><span class="nav-number">2.</span> <span class="nav-text">消息队列概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列特点"><span class="nav-number">3.</span> <span class="nav-text">消息队列特点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要用消息队列？"><span class="nav-number">3.1.</span> <span class="nav-text">为什么要用消息队列？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#通过异步处理提高系统性能"><span class="nav-number">3.1.1.</span> <span class="nav-text">通过异步处理提高系统性能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#降低系统耦合性"><span class="nav-number">3.1.2.</span> <span class="nav-text">降低系统耦合性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用消息队列带来的一些问题？"><span class="nav-number">3.2.</span> <span class="nav-text">使用消息队列带来的一些问题？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JMS-VS-AMQP"><span class="nav-number">4.</span> <span class="nav-text">JMS VS AMQP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS"><span class="nav-number">4.1.</span> <span class="nav-text">JMS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#点对点（P2P）模型"><span class="nav-number">4.1.1.</span> <span class="nav-text">点对点（P2P）模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发布-订阅（Pub-Sub）模型"><span class="nav-number">4.1.2.</span> <span class="nav-text">发布 / 订阅（Pub/Sub）模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#点对点（P2P）模型与发布-订阅（Pub-Sub）模型应用"><span class="nav-number">4.1.3.</span> <span class="nav-text">点对点（P2P）模型与发布 / 订阅（Pub/Sub）模型应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AMQP"><span class="nav-number">4.2.</span> <span class="nav-text">AMQP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS-与-AMQP-对比"><span class="nav-number">4.3.</span> <span class="nav-text">JMS 与 AMQP 对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列推拉模型"><span class="nav-number">5.</span> <span class="nav-text">消息队列推拉模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RabbitMQ"><span class="nav-number">5.1.</span> <span class="nav-text">RabbitMQ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka"><span class="nav-number">5.2.</span> <span class="nav-text">Kafka</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列使用场景"><span class="nav-number">6.</span> <span class="nav-text">消息队列使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#异步处理：实现异步处理，提升处理性能"><span class="nav-number">6.1.</span> <span class="nav-text">异步处理：实现异步处理，提升处理性能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解耦：可以使生产者和消费者的代码实现解耦合"><span class="nav-number">6.2.</span> <span class="nav-text">解耦：可以使生产者和消费者的代码实现解耦合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流量削峰和流控：可以平衡流量峰值，削峰填谷"><span class="nav-number">6.3.</span> <span class="nav-text">流量削峰和流控：可以平衡流量峰值，削峰填谷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#易伸缩：可以让系统获得更好的伸缩性"><span class="nav-number">6.4.</span> <span class="nav-text">易伸缩：可以让系统获得更好的伸缩性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隔离失效机器以及自我修复：失败隔离和自我修复"><span class="nav-number">6.5.</span> <span class="nav-text">隔离失效机器以及自我修复：失败隔离和自我修复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#日志处理"><span class="nav-number">6.6.</span> <span class="nav-text">日志处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列技术对比"><span class="nav-number">7.</span> <span class="nav-text">消息队列技术对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">8.</span> <span class="nav-text">参考博文</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列概述"><span class="nav-number">2.</span> <span class="nav-text">消息队列概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列特点"><span class="nav-number">3.</span> <span class="nav-text">消息队列特点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要用消息队列？"><span class="nav-number">3.1.</span> <span class="nav-text">为什么要用消息队列？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#通过异步处理提高系统性能"><span class="nav-number">3.1.1.</span> <span class="nav-text">通过异步处理提高系统性能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#降低系统耦合性"><span class="nav-number">3.1.2.</span> <span class="nav-text">降低系统耦合性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用消息队列带来的一些问题？"><span class="nav-number">3.2.</span> <span class="nav-text">使用消息队列带来的一些问题？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JMS-VS-AMQP"><span class="nav-number">4.</span> <span class="nav-text">JMS VS AMQP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS"><span class="nav-number">4.1.</span> <span class="nav-text">JMS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#点对点（P2P）模型"><span class="nav-number">4.1.1.</span> <span class="nav-text">点对点（P2P）模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发布-订阅（Pub-Sub）模型"><span class="nav-number">4.1.2.</span> <span class="nav-text">发布 / 订阅（Pub/Sub）模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#点对点（P2P）模型与发布-订阅（Pub-Sub）模型应用"><span class="nav-number">4.1.3.</span> <span class="nav-text">点对点（P2P）模型与发布 / 订阅（Pub/Sub）模型应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AMQP"><span class="nav-number">4.2.</span> <span class="nav-text">AMQP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JMS-与-AMQP-对比"><span class="nav-number">4.3.</span> <span class="nav-text">JMS 与 AMQP 对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列推拉模型"><span class="nav-number">5.</span> <span class="nav-text">消息队列推拉模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RabbitMQ"><span class="nav-number">5.1.</span> <span class="nav-text">RabbitMQ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka"><span class="nav-number">5.2.</span> <span class="nav-text">Kafka</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列使用场景"><span class="nav-number">6.</span> <span class="nav-text">消息队列使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#异步处理：实现异步处理，提升处理性能"><span class="nav-number">6.1.</span> <span class="nav-text">异步处理：实现异步处理，提升处理性能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解耦：可以使生产者和消费者的代码实现解耦合"><span class="nav-number">6.2.</span> <span class="nav-text">解耦：可以使生产者和消费者的代码实现解耦合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流量削峰和流控：可以平衡流量峰值，削峰填谷"><span class="nav-number">6.3.</span> <span class="nav-text">流量削峰和流控：可以平衡流量峰值，削峰填谷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#易伸缩：可以让系统获得更好的伸缩性"><span class="nav-number">6.4.</span> <span class="nav-text">易伸缩：可以让系统获得更好的伸缩性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隔离失效机器以及自我修复：失败隔离和自我修复"><span class="nav-number">6.5.</span> <span class="nav-text">隔离失效机器以及自我修复：失败隔离和自我修复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#日志处理"><span class="nav-number">6.6.</span> <span class="nav-text">日志处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列技术对比"><span class="nav-number">7.</span> <span class="nav-text">消息队列技术对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">8.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#了不起的消息队列系列"><span class="nav-number">9.</span> <span class="nav-text">了不起的消息队列系列</span></a></li></ol></div>
             
 
           </div>
@@ -1225,7 +1235,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">495k</span>
+    <span title="博客全站字数">558k</span>
   
 
   
