@@ -108,7 +108,7 @@
 
 
   <meta name="description" content="前言在开始本章的讲解之前，我们首先从宏观角度回顾一下 Redis 实现高可用相关的技术。它们包括：持久化、复制、哨兵和集群，在本系列的前篇文章介绍了持久化以及复制的原理以及实现。本文将对剩下的两种高可用技术哨兵、集群进行讲解，讲一讲它们是如何进一步提高系统的高可用性？ Redis 的主从复制模式下，一旦主节点由于故障不能提供服务，需要手动将从节点晋升为主节点，同时还要通知客户端更新主节点地址，这种">
-<meta name="keywords" content="高可用,Redis,集群,哨兵">
+<meta name="keywords" content="Redis,高可用,集群,哨兵">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis 深度探险（四）：Redis 高可用性解决方案之哨兵与集群">
 <meta property="og:url" content="https://blog.maoning.vip/archives/d63e1e23.html">
@@ -885,9 +885,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/高可用/" rel="tag"># 高可用</a>
-          
             <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+            <a href="/tags/高可用/" rel="tag"># 高可用</a>
           
             <a href="/tags/集群/" rel="tag"># 集群</a>
           
