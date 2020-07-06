@@ -403,6 +403,220 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/8fb486e9.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/archives/8fb486e9.html" class="post-title-link" itemprop="url">Redis 深度探险（一）：那些绕不过去的 Redis 知识点</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-03 11:45:18" itemprop="dateCreated datePublished" datetime="2018-06-03T11:45:18+08:00">2018-06-03</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/archives/8fb486e9.html" class="leancloud_visitors" data-flag-title="Redis 深度探险（一）：那些绕不过去的 Redis 知识点">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">13k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">12 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/jj-ying-IqeMiAlx7-o-unsplash.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Redis 是我们工作中接触最多的非关系型数据库，我所在的公司也是 Redis 的深度用户，我们线上的大部分的业务都使用到了 Redis。与传统数据库不同的是 Redis 的数据是存在内存中的，所以存写速度非常快，因此 Redis 被广泛应用于缓存方向。值得注意的是，Redis 也经常用来做分布式锁。Redis 提供了多种数据类型来支持不同的业务场景。除此之外，Redis 支持事务 、持久化、LUA 脚本、LRU 驱动事件、多种集群方案。以前在使用 Redis 的时候，只是简单地使用它提供的基本数据类型和接口，并没有深入研究它底层的数据结构。最近打算重新学习梳理一下 Redis 方面的知识。本篇是我学习 Redis 系列的开篇，主要内容讲述 Redis 概述及其相关内容，然后介绍一下 Redis  数据结构，最后介绍一下 Redis  对象以及应用场景。</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/archives/8fb486e9.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/e230219b.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2317,223 +2531,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/f22a09ab.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="猫宁i">
-      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
-      <meta itemprop="image" content="/images/avatar.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="猫宁i">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/archives/f22a09ab.html" class="post-title-link" itemprop="url">Linux 工匠精神（一）：Systemd 命令完全指南</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-09-19 20:24:12" itemprop="dateCreated datePublished" datetime="2017-09-19T20:24:12+08:00">2017-09-19</time>
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/archives/f22a09ab.html" class="leancloud_visitors" data-flag-title="Linux 工匠精神（一）：Systemd 命令完全指南">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-            <div class="post-symbolscount">
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">本文字数统计：</span>
-                
-                <span title="本文字数统计">8.5k</span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">8 分钟</span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
-          
-          
-            <div class="post-gallery-row">
-              <img src="/images/57608263_p8.jpg" itemprop="contentUrl">
-            
-          
-
-          
-          </div>
-        </div>
-      
-
-      
-        
-          <h2 id="理解-Linux-启动过程"><a href="#理解-Linux-启动过程" class="headerlink" title="理解 Linux 启动过程"></a>理解 Linux 启动过程</h2><p>在我们打开 Linux 电脑的电源后第一个启动的进程就是 init。分配给 init 进程的 PID 是 1。它是系统其他所有进程的父进程。当一台 Linux 电脑启动后，处理器会先在系统存储中查找 BIOS，之后 BIOS 会检测系统资源然后找到第一个引导设备，通常为硬盘，然后会查找硬盘的主引导记录（MBR），然后加载到内存中并把控制权交给它，以后的启动过程就由 MBR 控制。</p>
-<p>主引导记录会初始化引导程序（Linux 上有两个著名的引导程序，GRUB 和 LILO，80% 的 Linux 系统在用 GRUB 引导程序），这个时候 GRUB 或 LILO 会加载内核模块。内核会马上查找 / sbin 下的 “init” 程序并执行它。从这里开始 init 成为了 Linux 系统的父进程。init 读取的第一个文件是 / etc/inittab，通过它 init 会确定我们 Linux 操作系统的运行级别。它会从文件 / etc/fstab 里查找分区表信息然后做相应的挂载。然后 init 会启动 / etc/init.d 里指定的默认启动级别的所有服务 / 脚本。所有服务在这里通过 init 一个一个被初始化。在这个过程里，init 每次只启动一个服务，所有服务 / 守护进程都在后台执行并由 init 来管理。</p>
-<p>关机过程差不多是相反的过程，首先 init 停止所有服务，最后阶段会卸载文件系统。</p>
-<p>以上提到的启动过程有一些不足的地方：一是启动时间长。init 进程是串行启动，只有前一个进程启动完，才会启动下一个进程；二是启动脚本复杂。init 进程只是执行启动脚本，不管其他事情。脚本需要自己处理各种情况，这往往使得脚本变得很长。而用一种更好的方式来替代传统 init 的需求已经存在很长时间了。也产生了许多替代方案。其中比较著名的有 Upstart，Epoch，Muda 和 Systemd。而 Systemd 获得最多关注并被认为是目前最佳的方案。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/archives/f22a09ab.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2582,7 +2579,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">43</span>
+                    <span class="site-state-item-count">44</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2929,7 +2926,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">563k</span>
+    <span title="博客全站字数">596k</span>
   
 
   
