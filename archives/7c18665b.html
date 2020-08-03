@@ -116,7 +116,7 @@
 <meta property="og:description" content="背景Java 11 已于 2018 年 9 月 25 日正式发布，Java 开发团队为了加快的版本迭代、跟进社区反馈，Java 的版本发布周期调整为每六个月一次——即每半年发布一个大版本，每个季度发布一个中间特性版本，并且做出不会跳票的承诺。通过这样的方式，Java 开发团队能够将一些重要特性尽早的合并到 Java Release 版本中，以便快速得到开发者的反馈，避免出现类似 Java 9 发布">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://blog.maoning.vip/images/red-morley-hewitt-c5xKMRTMvAo-unsplash.jpg">
-<meta property="og:updated_time" content="2020-07-06T13:28:39.158Z">
+<meta property="og:updated_time" content="2020-08-03T09:30:16.301Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="以匠人之心，Java 11 正式发布">
 <meta name="twitter:description" content="背景Java 11 已于 2018 年 9 月 25 日正式发布，Java 开发团队为了加快的版本迭代、跟进社区反馈，Java 的版本发布周期调整为每六个月一次——即每半年发布一个大版本，每个季度发布一个中间特性版本，并且做出不会跳票的承诺。通过这样的方式，Java 开发团队能够将一些重要特性尽早的合并到 Java Release 版本中，以便快速得到开发者的反馈，避免出现类似 Java 9 发布">
@@ -448,7 +448,7 @@
                 
               
 
-              <time title="创建时间：2020-02-24 16:18:44" itemprop="dateCreated datePublished" datetime="2020-02-24T16:18:44+08:00">2020-02-24</time>
+              <time title="创建时间：2020-08-03 23:22:06" itemprop="dateCreated datePublished" datetime="2020-08-03T23:22:06+08:00">2020-08-03</time>
             
 
             
@@ -519,7 +519,7 @@
                 
                   <span class="post-meta-item-text">本文字数统计：</span>
                 
-                <span title="本文字数统计">13k</span>
+                <span title="本文字数统计">14k</span>
               
 
               
@@ -533,7 +533,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">12 分钟</span>
+                <span title="阅读时长">13 分钟</span>
               
             </div>
           
@@ -597,8 +597,8 @@
 <p>（2）缺点：掩盖类型</p>
 <figure class="highlight pony"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> token = <span class="function"><span class="keyword">new</span> <span class="title">JsonParserDelegate</span>(parser).<span class="title">currentToken</span>();</span></span><br></pre></td></tr></table></figure>
 <p>看以上代码，不进去看返回结果类型，谁知道返回的类型是什么？所以这种情况最好别使用 var，而使用具体的抽象类、接口或者实例类型。</p>
-<h3 id="私有接口方法-since-9"><a href="#私有接口方法-since-9" class="headerlink" title="私有接口方法 @since 9"></a>私有接口方法 @since 9</h3><p>在 Java 8之前，接口可以有常量变量和抽象方法。我们不能在接口中提供方法实现。如果我们要提供抽象方法和非抽象方法（方法与实现）的组合，那么我们就得使用抽象类。</p>
-<p>在 Java 8 接口引入了一些新功能——默认方法和静态方法。我们可以在 Java SE 8 的接口中编写方法实现，仅仅需要使用 default 关键字来定义它们。</p>
+<h3 id="私有接口方法-since-9"><a href="#私有接口方法-since-9" class="headerlink" title="私有接口方法 @since 9"></a>私有接口方法 @since 9</h3><p>在 Java 8 之前，接口可以有常量变量和抽象方法。我们不能在接口中提供方法实现。如果我们要提供抽象方法和非抽象方法（方法与实现）的组合，那么我们就得使用抽象类。</p>
+<p>在 Java 8 接口引入了一些新功能——默认方法和静态方法。我们可以在Java SE 8的接口中编写方法实现，仅仅需要使用 default 关键字来定义它们。</p>
 <p>Java 9 不仅像 Java 8 一样支持接口默认方法，同时还支持私有方法。在 Java 9 中，一个接口中能定义如下几种变量/方法：</p>
 <ul>
 <li>常量</li>
@@ -614,6 +614,14 @@
 <h3 id="集合工厂方法-since-9"><a href="#集合工厂方法-since-9" class="headerlink" title="集合工厂方法  @since 9"></a>集合工厂方法  @since 9</h3><p>自 Java 9 开始，Jdk 里面为集合（List/ Set/ Map）都添加了 of 和 copyOf 方法，它们两个都用来创建不可变的集合，来看下它们的使用和区别。</p>
 <figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不可变集合 List</span></span><br><span class="line"><span class="built_in">var</span> <span class="built_in">list</span> = <span class="built_in">List</span>.of(<span class="string">"Java"</span>, <span class="string">"Python"</span>, <span class="string">"C"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 不可变集合 Set</span></span><br><span class="line"><span class="built_in">var</span> <span class="built_in">set</span> = <span class="built_in">Set</span>.of(<span class="string">"Java"</span>, <span class="string">"Python"</span>, <span class="string">"C"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 不可变集合 Map</span></span><br><span class="line"><span class="built_in">var</span> <span class="built_in">map</span> = <span class="built_in">Map</span>.of(<span class="string">"Java"</span>, <span class="number">1</span>, <span class="string">"Python"</span>, <span class="number">2</span>, <span class="string">"C"</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
 <p>注意：使用 of 创建的集合为不可变集合，不能进行添加、删除、替换、排序等操作，不然会报 java.lang.UnsupportedOperationException 异常，使用 Set.of() 不能出现重复元素、Map.of() 不能出现重复 key，否则回报 java.lang.IllegalArgumentException。</p>
+<h4 id="List-of-和-Arrays-asList-区别-since-9"><a href="#List-of-和-Arrays-asList-区别-since-9" class="headerlink" title="List.of 和 Arrays.asList 区别 @since 9"></a>List.of 和 Arrays.asList 区别 @since 9</h4><p>1、Arrays.asList 返回可变的 list，而 List.of 返回的是不可变的 list</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; <span class="type">list</span> = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, null);</span><br><span class="line"><span class="type">list</span>.set(<span class="number">1</span>, <span class="number">10</span>); <span class="comment">// OK</span></span><br><span class="line">List&lt;Integer&gt; <span class="type">list</span> = List.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line"><span class="type">list</span>.set(<span class="number">1</span>, <span class="number">10</span>); <span class="comment">// Fails</span></span><br></pre></td></tr></table></figure>
+<p>2、Arrays.asList 支持 null，而 List.of 不行</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">List</span>&lt;<span class="built_in">Integer</span>&gt; <span class="built_in">list</span> = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="built_in">null</span>); <span class="comment">// OK</span></span><br><span class="line"><span class="built_in">List</span>&lt;<span class="built_in">Integer</span>&gt; <span class="built_in">list</span> = <span class="built_in">List</span>.of(<span class="number">1</span>, <span class="number">2</span>, <span class="built_in">null</span>); <span class="comment">// 异常：NullPointerException</span></span><br></pre></td></tr></table></figure>
+<p>3、List.of 和 Arrays.asList 的 contains 方法对 null 处理不一样</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">List</span>&lt;<span class="built_in">Integer</span>&gt; <span class="built_in">list</span> = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line"><span class="built_in">list</span>.contains(<span class="built_in">null</span>); <span class="comment">// Return false</span></span><br><span class="line"><span class="built_in">List</span>&lt;<span class="built_in">Integer</span>&gt; <span class="built_in">list</span> = <span class="built_in">List</span>.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line"><span class="built_in">list</span>.contains(<span class="built_in">null</span>); <span class="comment">// 抛出NullPointerException异常</span></span><br></pre></td></tr></table></figure>
+<p>4、Arrays.asList 的数组的修改会影响原数组</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Integer[]<span class="built_in"> array </span>= &#123;1, 2, 3&#125;;</span><br><span class="line">List&lt;Integer&gt; list = Arrays.asList(array);</span><br><span class="line">array[1] = 10;</span><br><span class="line">System.out.println(list); // 输出 [1, 10, 3]</span><br><span class="line">Integer[]<span class="built_in"> array </span>= &#123;1, 2, 3&#125;;</span><br><span class="line">List&lt;Integer&gt; list = List.of(array);</span><br><span class="line">array[1] = 10;</span><br><span class="line">System.out.println(list); // 输出 [1, 2, 3]</span><br></pre></td></tr></table></figure>
 <h4 id="使用-copyOf-方法创建不可变集合-since-10"><a href="#使用-copyOf-方法创建不可变集合-since-10" class="headerlink" title="使用 copyOf 方法创建不可变集合 @since 10"></a>使用 copyOf 方法创建不可变集合 @since 10</h4><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不可变集合 List</span></span><br><span class="line"><span class="keyword">var</span> immutableList = <span class="keyword">List</span>.of(<span class="string">"Java"</span>, <span class="string">"Python"</span>, <span class="string">"C"</span>);</span><br><span class="line"><span class="keyword">var</span> copyImmutableList = <span class="keyword">List</span>.copyOf(immutableList);</span><br><span class="line">System.<span class="keyword">out</span>.println(immutableList == copyImmutableList);  <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 正常集合 List：用的 new 创建的集合，不属于不可变 AbstractImmutableList 类的子类，所以 copyOf 方法又创建了一个新的实例，所以为false</span></span><br><span class="line"><span class="keyword">var</span> <span class="keyword">list</span> = new ArrayList&lt;String&gt;();</span><br><span class="line"><span class="keyword">var</span> <span class="keyword">copy</span> = <span class="keyword">List</span>.copyOf(<span class="keyword">list</span>);</span><br><span class="line">System.<span class="keyword">out</span>.println(<span class="keyword">list</span> == <span class="keyword">copy</span>);  <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
 <p>来看下它们的源码：</p>
 <figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &lt;E&gt; <span class="built_in">List</span>&lt;E&gt; of(E... elements) &#123;</span><br><span class="line">    <span class="keyword">switch</span> (elements.length) &#123; <span class="comment">// implicit null check of elements</span></span><br><span class="line">        <span class="keyword">case</span> <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> ImmutableCollections.emptyList();</span><br><span class="line">        <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ImmutableCollections.List12&lt;&gt;(elements[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ImmutableCollections.List12&lt;&gt;(elements[<span class="number">0</span>], elements[<span class="number">1</span>]);</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ImmutableCollections.ListN&lt;&gt;(elements);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> &lt;E&gt; <span class="built_in">List</span>&lt;E&gt; copyOf(Collection&lt;? <span class="keyword">extends</span> E&gt; coll) &#123;</span><br><span class="line">    <span class="keyword">return</span> ImmutableCollections.listCopy(coll);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> &lt;E&gt; <span class="built_in">List</span>&lt;E&gt; listCopy(Collection&lt;? <span class="keyword">extends</span> E&gt; coll) &#123;</span><br><span class="line">    <span class="keyword">if</span> (coll instanceof AbstractImmutableList &amp;&amp; coll.getClass() != SubList.<span class="keyword">class</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> (<span class="built_in">List</span>&lt;E&gt;)coll;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> (<span class="built_in">List</span>&lt;E&gt;)<span class="built_in">List</span>.of(coll.toArray());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -761,8 +769,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/archives/f88003a.html" rel="next" title="2019 年度总结">
-                <i class="fa fa-chevron-left"></i> 2019 年度总结
+              <a href="/archives/a3263046.html" rel="next" title="Java8 那些事儿（六）：从 CompletableFuture 到异步编程">
+                <i class="fa fa-chevron-left"></i> Java8 那些事儿（六）：从 CompletableFuture 到异步编程
               </a>
             
           </div>
@@ -770,10 +778,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/archives/5d3d79c7.html" rel="prev" title="了不起的消息队列（三）：致敬匠心，Kafka">
-                了不起的消息队列（三）：致敬匠心，Kafka <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -848,7 +852,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">44</span>
+                    <span class="site-state-item-count">45</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1102,7 +1106,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">94</span>
+                      
+                    
+                    <span class="site-state-item-count">95</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1177,7 +1183,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特性介绍"><span class="nav-number">2.</span> <span class="nav-text">特性介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#REPL（JShell）-since-9"><span class="nav-number">2.1.</span> <span class="nav-text">REPL（JShell）@since 9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#局部变量类型推断-since-10"><span class="nav-number">2.2.</span> <span class="nav-text">局部变量类型推断 @since 10</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#用于-Lambda-参数的局部变量语法-since-11"><span class="nav-number">2.2.1.</span> <span class="nav-text">用于 Lambda 参数的局部变量语法 @since 11</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#私有接口方法-since-9"><span class="nav-number">2.3.</span> <span class="nav-text">私有接口方法 @since 9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串增强-since-11"><span class="nav-number">2.4.</span> <span class="nav-text">字符串增强 @since 11</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集合工厂方法-since-9"><span class="nav-number">2.5.</span> <span class="nav-text">集合工厂方法  @since 9</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用-copyOf-方法创建不可变集合-since-10"><span class="nav-number">2.5.1.</span> <span class="nav-text">使用 copyOf 方法创建不可变集合 @since 10</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Stream-增强-since-9"><span class="nav-number">2.6.</span> <span class="nav-text">Stream 增强 @since 9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Optional-增强-since-9"><span class="nav-number">2.7.</span> <span class="nav-text">Optional 增强 @since 9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标准-HTTP-Client-升级-since-11"><span class="nav-number">2.8.</span> <span class="nav-text">标准 HTTP Client 升级 @since 11</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简化启动单个源代码文件的方法-since-11"><span class="nav-number">2.9.</span> <span class="nav-text">简化启动单个源代码文件的方法 @since 11</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更多新特性"><span class="nav-number">3.</span> <span class="nav-text">更多新特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">4.</span> <span class="nav-text">参考博文</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特性介绍"><span class="nav-number">2.</span> <span class="nav-text">特性介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#REPL（JShell）-since-9"><span class="nav-number">2.1.</span> <span class="nav-text">REPL（JShell）@since 9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#局部变量类型推断-since-10"><span class="nav-number">2.2.</span> <span class="nav-text">局部变量类型推断 @since 10</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#用于-Lambda-参数的局部变量语法-since-11"><span class="nav-number">2.2.1.</span> <span class="nav-text">用于 Lambda 参数的局部变量语法 @since 11</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#私有接口方法-since-9"><span class="nav-number">2.3.</span> <span class="nav-text">私有接口方法 @since 9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串增强-since-11"><span class="nav-number">2.4.</span> <span class="nav-text">字符串增强 @since 11</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集合工厂方法-since-9"><span class="nav-number">2.5.</span> <span class="nav-text">集合工厂方法  @since 9</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#List-of-和-Arrays-asList-区别-since-9"><span class="nav-number">2.5.1.</span> <span class="nav-text">List.of 和 Arrays.asList 区别 @since 9</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用-copyOf-方法创建不可变集合-since-10"><span class="nav-number">2.5.2.</span> <span class="nav-text">使用 copyOf 方法创建不可变集合 @since 10</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Stream-增强-since-9"><span class="nav-number">2.6.</span> <span class="nav-text">Stream 增强 @since 9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Optional-增强-since-9"><span class="nav-number">2.7.</span> <span class="nav-text">Optional 增强 @since 9</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标准-HTTP-Client-升级-since-11"><span class="nav-number">2.8.</span> <span class="nav-text">标准 HTTP Client 升级 @since 11</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简化启动单个源代码文件的方法-since-11"><span class="nav-number">2.9.</span> <span class="nav-text">简化启动单个源代码文件的方法 @since 11</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更多新特性"><span class="nav-number">3.</span> <span class="nav-text">更多新特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">4.</span> <span class="nav-text">参考博文</span></a></li></ol></div>
             
 
           </div>
@@ -1212,7 +1218,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">596k</span>
+    <span title="博客全站字数">626k</span>
   
 
   

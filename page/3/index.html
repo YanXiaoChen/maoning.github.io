@@ -403,6 +403,221 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/1cad84b0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/archives/1cad84b0.html" class="post-title-link" itemprop="url">Git 在团队中的最佳实践（一）：Git 备忘清单</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-22 14:36:22" itemprop="dateCreated datePublished" datetime="2019-03-22T14:36:22+08:00">2019-03-22</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/archives/1cad84b0.html" class="leancloud_visitors" data-flag-title="Git 在团队中的最佳实践（一）：Git 备忘清单">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">11k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">10 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/55133220_p0_meitu_1.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Git 是一个免费并且开源的分布式版本控制系统，旨在快速高效地处理从小到大所有项目的版本管理。Git 是目前最流行的版本管理工具，目前绝大部分公司都是使用 Git 作为项目的版本管理工具。目前最火的开源社区 Github，就是基于 Git 版本控制系统，所以掌握 Git 技能很重要。由于 Git 开发效率高、团队协作方便，现在很多 IDE 都集成了 Git，并且提供一些相关的图形化操作。也有很多很优秀，专门用来简化 Git 操作的 Git GUI 工具，例如 Sourcetree，Tortoise 等。我刚接触 Git 的时候，就是从 GUI 入手的，使用 Sourcetree 可视化版本控制工具进行操作。Sourcetree 底层也是对常用的 Git 命令进行封装实现的，傻瓜式操作，使用非常方便，但是我用完什么都不懂，Git 的内部原理也不易理解，决定在回头仔细学习一下 Git 命令行。学习完 Git 命令行后发现，命令行很好学，非常灵活，而且使用起来非常帅气。因此，直接 Git 命令，才是最灵活的操作。</p>
+<p>本篇是我学习 Git 系列的开篇，主要讲述 Git 的基本概念和工作原理，然后介绍一下 Git 安装以及环境配置，最后探讨一下 Git 常用命令以及使用场景。</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/archives/1cad84b0.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/e993c76c.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1363,7 +1578,7 @@
                 
                   <span class="post-meta-item-text">本文字数统计：</span>
                 
-                <span title="本文字数统计">7.7k</span>
+                <span title="本文字数统计">7.8k</span>
               
 
               
@@ -2318,231 +2533,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/d66032e3.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="猫宁i">
-      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
-      <meta itemprop="image" content="/images/avatar.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="猫宁i">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/archives/d66032e3.html" class="post-title-link" itemprop="url">Java8 那些事儿（三）：Date/Time API(JSR 310)</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-06-29 17:45:12" itemprop="dateCreated datePublished" datetime="2018-06-29T17:45:12+08:00">2018-06-29</time>
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/archives/d66032e3.html" class="leancloud_visitors" data-flag-title="Java8 那些事儿（三）：Date/Time API(JSR 310)">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-            <div class="post-symbolscount">
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">本文字数统计：</span>
-                
-                <span title="本文字数统计">14k</span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">13 分钟</span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
-          
-          
-            <div class="post-gallery-row">
-              <img src="/images/57608263_p5.jpg" itemprop="contentUrl">
-            
-          
-
-          
-          </div>
-        </div>
-      
-
-      
-        
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Java8 引入了新的 Date-Time API(JSR 310)来改进时间、日期的处理。时间和日期的管理一直是最令 Java 开发者痛苦的问题。java.util.Date 和后来的 java.util.Calendar 一直没有解决这个问题（甚至令开发者更加迷茫）。</p>
-<p>因为上面这些原因，诞生了第三方库 Joda-Time，可以替代 Java 的时间管理 API。Java8 中新的时间和日期管理 API 深受 Joda-Time 影响，并吸收了很多 Joda-Time 的精华。新的 java.time 包包含了所有关于瞬时时间（Instant），持续时间（Duration），日期（Date），时间（Time），时区（Time-Zone）以及时间段（Period）操作的类。新设计的 API 认真考虑了这些类的不变性（从 java.util.Calendar 吸取的教训），如果某个实例需要修改，则返回一个新的对象。</p>
-<ul>
-<li>ZoneId: 时区 ID，用来确定 Instant 和 LocalDateTime 互相转换的规则</li>
-<li>Instant: 用来表示时间线上的一个点</li>
-<li>LocalDate: 表示没有时区的日期，LocalDate 是不可变并且线程安全的</li>
-<li>LocalTime: 表示没有时区的时间，LocalTime 是不可变并且线程安全的</li>
-<li>LocalDateTime: 表示没有时区的日期时间，LocalDateTime 是不可变并且线程安全的</li>
-<li>Clock: 用于访问当前时刻、日期、时间，用到时区</li>
-<li>Duration: 用秒和纳秒表示时间的数量</li>
-</ul>
-<p>最常用的就是 LocalDate、LocalTime、LocalDateTime 了，从它们的名字就可以看出是操作日期和时间的。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/archives/d66032e3.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2591,7 +2581,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">44</span>
+                    <span class="site-state-item-count">45</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2845,7 +2835,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">94</span>
+                      
+                    
+                    <span class="site-state-item-count">95</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -2938,7 +2930,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">596k</span>
+    <span title="博客全站字数">626k</span>
   
 
   

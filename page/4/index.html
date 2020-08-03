@@ -403,6 +403,231 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/d66032e3.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="猫宁i">
+      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="猫宁i">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/archives/d66032e3.html" class="post-title-link" itemprop="url">Java8 那些事儿（三）：Date/Time API(JSR 310)</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-29 17:45:12" itemprop="dateCreated datePublished" datetime="2018-06-29T17:45:12+08:00">2018-06-29</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/archives/d66032e3.html" class="leancloud_visitors" data-flag-title="Java8 那些事儿（三）：Date/Time API(JSR 310)">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数统计：</span>
+                
+                <span title="本文字数统计">14k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">13 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+          
+          
+            <div class="post-gallery-row">
+              <img src="/images/57608263_p5.jpg" itemprop="contentUrl">
+            
+          
+
+          
+          </div>
+        </div>
+      
+
+      
+        
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Java8 引入了新的 Date-Time API(JSR 310)来改进时间、日期的处理。时间和日期的管理一直是最令 Java 开发者痛苦的问题。java.util.Date 和后来的 java.util.Calendar 一直没有解决这个问题（甚至令开发者更加迷茫）。</p>
+<p>因为上面这些原因，诞生了第三方库 Joda-Time，可以替代 Java 的时间管理 API。Java8 中新的时间和日期管理 API 深受 Joda-Time 影响，并吸收了很多 Joda-Time 的精华。新的 java.time 包包含了所有关于瞬时时间（Instant），持续时间（Duration），日期（Date），时间（Time），时区（Time-Zone）以及时间段（Period）操作的类。新设计的 API 认真考虑了这些类的不变性（从 java.util.Calendar 吸取的教训），如果某个实例需要修改，则返回一个新的对象。</p>
+<ul>
+<li>ZoneId: 时区 ID，用来确定 Instant 和 LocalDateTime 互相转换的规则</li>
+<li>Instant: 用来表示时间线上的一个点</li>
+<li>LocalDate: 表示没有时区的日期，LocalDate 是不可变并且线程安全的</li>
+<li>LocalTime: 表示没有时区的时间，LocalTime 是不可变并且线程安全的</li>
+<li>LocalDateTime: 表示没有时区的日期时间，LocalDateTime 是不可变并且线程安全的</li>
+<li>Clock: 用于访问当前时刻、日期、时间，用到时区</li>
+<li>Duration: 用秒和纳秒表示时间的数量</li>
+</ul>
+<p>最常用的就是 LocalDate、LocalTime、LocalDateTime 了，从它们的名字就可以看出是操作日期和时间的。</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/archives/d66032e3.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/8fb486e9.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2006,7 +2231,7 @@
                 
                   <span class="post-meta-item-text">本文字数统计：</span>
                 
-                <span title="本文字数统计">15k</span>
+                <span title="本文字数统计">16k</span>
               
 
               
@@ -2020,7 +2245,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">13 分钟</span>
+                <span title="阅读时长">14 分钟</span>
               
             </div>
           
@@ -2053,7 +2278,7 @@
 
       
         
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Java8(又称为 Jdk1.8)是 Java 语言开发的一个主要版本。Oracle 公司于 2014 年 3 月 18 日发布 Java8，它支持函数式编程，新的 JavaScript 引擎，新的日期 API，新的 Stream API 等。Java8 API 添加了一个新的抽象称为流 Stream，可以让你以一种声明的方式处理数据。Stream API 可以极大提高 Java 程序员的生产力，让程序员写出高效率、干净、简洁的代码。</p>
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Java8（又称为 Jdk1.8）是 Java 语言开发的一个主要版本。Oracle 公司于 2014 年 3 月 18 日发布 Java8，它支持函数式编程，新的 JavaScript 引擎，新的日期 API，新的 Stream API 等。Java8 API 添加了一个新的抽象称为流 Stream，可以让你以一种声明的方式处理数据。Stream API 可以极大提高 Java 程序员的生产力，让程序员写出高效率、干净、简洁的代码。</p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -2317,220 +2542,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.maoning.vip/archives/b9ada66e.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="猫宁i">
-      <meta itemprop="description" content="趁着年轻，好好生活，用心折腾。">
-      <meta itemprop="image" content="/images/avatar.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="猫宁i">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/archives/b9ada66e.html" class="post-title-link" itemprop="url">初识 Nginx（一）：理解原理和功能</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-10-03 12:03:12" itemprop="dateCreated datePublished" datetime="2017-10-03T12:03:12+08:00">2017-10-03</time>
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/archives/b9ada66e.html" class="leancloud_visitors" data-flag-title="初识 Nginx（一）：理解原理和功能">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-            <div class="post-symbolscount">
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">本文字数统计：</span>
-                
-                <span title="本文字数统计">7.2k</span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">7 分钟</span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-        <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
-          
-          
-            <div class="post-gallery-row">
-              <img src="/images/64568561_p0.jpg" itemprop="contentUrl">
-            
-          
-
-          
-          </div>
-        </div>
-      
-
-      
-        
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在工作中常常会接触到 Nginx，而本人却对它一知半解，便想在空余时间详细的了解一下 Nginx。本篇是我学习 Nginx 系列的开篇，主要内容讲述 Nginx 的基本概念，然后介绍一下 Nginx 的主要功能，最后探讨一下 Nginx 的模块化的组织架构，以及各个模块的分类、工作方式、职责和提供的相关指令。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/archives/b9ada66e.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2579,7 +2590,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">44</span>
+                    <span class="site-state-item-count">45</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2833,7 +2844,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">94</span>
+                      
+                    
+                    <span class="site-state-item-count">95</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -2926,7 +2939,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">596k</span>
+    <span title="博客全站字数">626k</span>
   
 
   
