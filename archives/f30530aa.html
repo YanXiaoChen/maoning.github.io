@@ -108,7 +108,7 @@
 
 
   <meta name="description" content="前言博客《Java 并发编程之美（四）：深入剖析 ThreadLocal》提到 ThreadLocal 变量的基本使用方式，ThreadLocal 是一个本地线程副本变量工具类，主要用于将私有线程和该线程存放的副本对象做一个映射，各个线程之间的变量互不干扰，在高并发场景下，可以实现无状态的调用，特别适用于各个线程依赖不同的变量值完成操作的场景。但是在实际的开发中，有这样的一种需求：父线程生成的变量">
-<meta name="keywords" content="ThreadLocal,InheritableThreadLocal">
+<meta name="keywords" content="InheritableThreadLocal,ThreadLocal">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱">
 <meta property="og:url" content="https://blog.maoning.vip/archives/f30530aa.html">
@@ -116,7 +116,7 @@
 <meta property="og:description" content="前言博客《Java 并发编程之美（四）：深入剖析 ThreadLocal》提到 ThreadLocal 变量的基本使用方式，ThreadLocal 是一个本地线程副本变量工具类，主要用于将私有线程和该线程存放的副本对象做一个映射，各个线程之间的变量互不干扰，在高并发场景下，可以实现无状态的调用，特别适用于各个线程依赖不同的变量值完成操作的场景。但是在实际的开发中，有这样的一种需求：父线程生成的变量">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://blog.maoning.vip/images/65966314_p2.jpg">
-<meta property="og:updated_time" content="2019-08-13T11:34:52.291Z">
+<meta property="og:updated_time" content="2020-10-12T07:44:27.191Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱">
 <meta name="twitter:description" content="前言博客《Java 并发编程之美（四）：深入剖析 ThreadLocal》提到 ThreadLocal 变量的基本使用方式，ThreadLocal 是一个本地线程副本变量工具类，主要用于将私有线程和该线程存放的副本对象做一个映射，各个线程之间的变量互不干扰，在高并发场景下，可以实现无状态的调用，特别适用于各个线程依赖不同的变量值完成操作的场景。但是在实际的开发中，有这样的一种需求：父线程生成的变量">
@@ -607,6 +607,8 @@
 <li><a href="b9c60c0e.html">Java 并发编程之美（四）：深入剖析 ThreadLocal</a></li>
 <li><a href="f30530aa.html">Java 并发编程之美（五）：揭开 InheritableThreadLocal 的面纱</a></li>
 <li><a href="f4f43ede.html">Java 并发编程之美（六）：J.U.C 之线程同步辅助工具类</a></li>
+<li><a href="bdbfedfb.html">Java 并发编程之美（七）：透彻理解 Java 并发编程</a></li>
+<li><a href="c0108a7c.html">Java 并发编程之美（八）：循序渐进学习 Java 锁机制</a></li>
 </ul>
 <hr>
 
@@ -689,9 +691,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/ThreadLocal/" rel="tag"># ThreadLocal</a>
-          
             <a href="/tags/InheritableThreadLocal/" rel="tag"># InheritableThreadLocal</a>
+          
+            <a href="/tags/ThreadLocal/" rel="tag"># ThreadLocal</a>
           
         </div>
       
@@ -791,7 +793,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">45</span>
+                    <span class="site-state-item-count">47</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1047,7 +1049,29 @@
                     
                       
                     
-                    <span class="site-state-item-count">95</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">106</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1157,7 +1181,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">626k</span>
+    <span title="博客全站字数">655k</span>
   
 
   

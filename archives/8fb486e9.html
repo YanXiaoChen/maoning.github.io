@@ -116,7 +116,7 @@
 <meta property="og:description" content="前言Redis 是我们工作中接触最多的非关系型数据库，我所在的公司也是 Redis 的深度用户，我们线上的大部分的业务都使用到了 Redis。与传统数据库不同的是 Redis 的数据是存在内存中的，所以存写速度非常快，因此 Redis 被广泛应用于缓存方向。值得注意的是，Redis 也经常用来做分布式锁。Redis 提供了多种数据类型来支持不同的业务场景。除此之外，Redis 支持事务 、持久化、">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://blog.maoning.vip/images/jj-ying-IqeMiAlx7-o-unsplash.jpg">
-<meta property="og:updated_time" content="2019-11-20T10:52:34.564Z">
+<meta property="og:updated_time" content="2020-10-12T07:48:17.556Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis 深度探险（一）：那些绕不过去的 Redis 知识点">
 <meta name="twitter:description" content="前言Redis 是我们工作中接触最多的非关系型数据库，我所在的公司也是 Redis 的深度用户，我们线上的大部分的业务都使用到了 Redis。与传统数据库不同的是 Redis 的数据是存在内存中的，所以存写速度非常快，因此 Redis 被广泛应用于缓存方向。值得注意的是，Redis 也经常用来做分布式锁。Redis 提供了多种数据类型来支持不同的业务场景。除此之外，Redis 支持事务 、持久化、">
@@ -565,9 +565,10 @@
       
 
       
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Redis 是我们工作中接触最多的非关系型数据库，我所在的公司也是 Redis 的深度用户，我们线上的大部分的业务都使用到了 Redis。与传统数据库不同的是 Redis 的数据是存在内存中的，所以存写速度非常快，因此 Redis 被广泛应用于缓存方向。值得注意的是，Redis 也经常用来做分布式锁。Redis 提供了多种数据类型来支持不同的业务场景。除此之外，Redis 支持事务 、持久化、LUA 脚本、LRU 驱动事件、多种集群方案。以前在使用 Redis 的时候，只是简单地使用它提供的基本数据类型和接口，并没有深入研究它底层的数据结构。最近打算重新学习梳理一下 Redis 方面的知识。本篇是我学习 Redis 系列的开篇，主要内容讲述 Redis 概述及其相关内容，然后介绍一下 Redis  数据结构，最后介绍一下 Redis  对象以及应用场景。</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Redis 是我们工作中接触最多的非关系型数据库，我所在的公司也是 Redis 的深度用户，我们线上的大部分的业务都使用到了 Redis。与传统数据库不同的是 Redis 的数据是存在内存中的，所以存写速度非常快，因此 Redis 被广泛应用于缓存方向。值得注意的是，Redis 也经常用来做分布式锁。Redis 提供了多种数据类型来支持不同的业务场景。除此之外，Redis 支持事务 、持久化、LUA 脚本、LRU 驱动事件、多种集群方案。以前在使用 Redis 的时候，只是简单地使用它提供的基本数据类型和接口，并没有深入研究它底层的数据结构。最近打算重新学习梳理一下 Redis 方面的知识。</p>
+<p>本篇是我学习 Redis 系列的开篇，主要内容讲述 Redis 概述及其相关内容，然后介绍一下 Redis  数据结构，最后介绍一下 Redis  对象以及应用场景。</p>
 <a id="more"></a>
-<h2 id="Redis-概述"><a href="#Redis-概述" class="headerlink" title="Redis 概述"></a>Redis 概述</h2><p>Redis 是一个开源的使用ANSI C语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。</p>
+<h2 id="Redis-概述"><a href="#Redis-概述" class="headerlink" title="Redis 概述"></a>Redis 概述</h2><p>Redis 是一个开源的使用 ANSI C 语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value 数据库，并提供多种语言的 API。</p>
 <p>Redis 是互联网技术领域使用最为广泛的存储中间件，它是「Remote Dictionary Service」的首字母缩写，也就是「远程字典服务」。Redis 以其超高的性能、完美的文档、简洁易懂的源码和丰富的客户端库支持在开源中间件领域广受好评。</p>
 <p>Redis 是一个开源（BSD 许可），内存存储的数据结构服务器，可用作数据库，高速缓存和消息队列代理。它支持字符串、哈希表、列表、集合、有序集合、位图、hyperloglogs 等数据类型。内置复制、LUA 脚本、LRU 收回、事务以及不同级别磁盘持久化功能，同时通过 Redis Sentinel 提供高可用，通过 Redis Cluster 提供自动分区。</p>
 <h3 id="Redis-为什么这么快"><a href="#Redis-为什么这么快" class="headerlink" title="Redis 为什么这么快"></a>Redis 为什么这么快</h3><p>1、完全基于内存，绝大部分请求是纯粹的内存操作，非常快速。数据存在内存中，类似于 HashMap，HashMap 的优势就是查找和操作的时间复杂度都是 O(1)；</p>
@@ -576,7 +577,10 @@
 <p>4、使用多路 I/O 复用模型<sup>[1]</sup>，非阻塞 IO；</p>
 <p>5、使用底层模型不同，它们之间底层实现方式以及与客户端之间通信的应用协议不一样，Redis 直接自己构建了 VM 机制 ，因为一般的系统调用系统函数的话，会浪费一定的时间去移动和请求；</p>
 <p>主要由以上几点造就了 Redis 具有很高的吞吐量。</p>
-<h3 id="Redis-为什么是单线程的？"><a href="#Redis-为什么是单线程的？" class="headerlink" title="Redis 为什么是单线程的？"></a>Redis 为什么是单线程的？</h3><p>因为 CPU 不是 Redis 的瓶颈。Redis 的瓶颈最有可能是机器内存或者网络带宽。既然单线程容易实现，而且 CPU 不会成为瓶颈，那就顺理成章地采用单线程的方案了。</p>
+<h3 id="Redis-为什么是单线程的？"><a href="#Redis-为什么是单线程的？" class="headerlink" title="Redis 为什么是单线程的？"></a>Redis 为什么是单线程的？</h3><p>Redis 基于 Reactor 模式开发了网络事件处理器，这个处理器被称为文件事件处理器。它的组成结构为 4 部分：多个套接字、IO 多路复用程序、文件事件分派器、事件处理器。因为文件事件分派器队列的消费是单线程的，所以 Redis 才叫单线程模型。那么，Redis 为什么是单线程的？因为 CPU 不是 Redis 的瓶颈。Redis 的瓶颈最有可能是机器内存或者网络带宽。既然单线程容易实现，而且 CPU 不会成为瓶颈，那就顺理成章地采用单线程的方案了。</p>
+<p><img src="/media/15681845196086/885859-20191025163819424-934628585.png" alt="Redis 文件事件处理器过程 "></p>
+<p>Redis 4.0 开始就有多线程的概念了，比如 Redis 通过多线程方式在后台删除对象（在旧版中删除包含体积较大的键，可能造成服务器阻塞）、以及通过 Redis 模块实现的阻塞命令等。目前对于单线程 Redis 来说，性能瓶颈主要在于网络的 IO 消耗，因此 Redis 6.0 的多线程则增加了对 IO 读写的并发能力，用于更好的提升 Redis 的性能。</p>
+<p>Redis 6.0 默认是否关闭多线程，那么开启多线程后，是否会存在线程并发安全问题？不会，Redis 的多线程部分只是用来处理网络数据的读写和协议解析，执行命令仍然是单线程顺序执行。</p>
 <h2 id="Redis-数据结构与对象"><a href="#Redis-数据结构与对象" class="headerlink" title="Redis  数据结构与对象"></a>Redis  数据结构与对象</h2><p>Redis 作为目前最流行的 Key-Value 类型的内存数据库，对于数据库的操作都在内存中进行，并可定期的将数据异步的持久化到磁盘之上。由于是纯内存的操作，因此它的性能比普通的关系型数据库高出很多，同时由于是单线程串行的执行指令，因此也避免了加锁和释放锁的开销。相比于 Memcache，Redis 的每个 value 值最大可存储 1GB，而 Memcache 只有 10MB，同时 Redis 在速度上也快于 Memcache，还可以持久化。Redis 最大的特点则是，它可以支持五种基本数据类型，分别是string（字符串），list（列表），hash（字典），set（集合）以及 zet（有序集合），下面具体介绍下它们的特点以及内部实现。</p>
 <h3 id="Redis-数据结构"><a href="#Redis-数据结构" class="headerlink" title="Redis  数据结构"></a>Redis  数据结构</h3><h4 id="简单动态字符串"><a href="#简单动态字符串" class="headerlink" title="简单动态字符串"></a>简单动态字符串</h4><p>Redis 没有直接使用 C 语言传统的字符串表示（以空字符结尾的字符数组，以下简称 C 字符串）， 而是自己构建了一种名为简单动态字符串（simple dynamic string，SDS）的抽象类型， 并将 SDS 用作 Redis 的默认字符串表示。</p>
 <p>在 Redis 里面， C 字符串只会作为字符串字面量（string literal）， 用在一些无须对字符串值进行修改的地方， 比如打印日志；当 Redis 需要的不仅仅是一个字符串字面量， 而是一个可以被修改的字符串值时， Redis 就会使用 SDS 来表示字符串值： 比如在 Redis 的数据库里面， 包含字符串值的键值对在底层都是由 SDS 实现的。</p>
@@ -586,7 +590,7 @@
 <p>buf 的扩容过程如下：</p>
 <ul>
 <li>如果修改后 len 长度将小于 1M， 这时分配给 free 的大小和 len 一样， 例如修改过后为 10 字节， 那么给 free 也是 10 字节，buf 实际长度变成了 10byte + 10byte + 1byte<sup>[2]</sup></li>
-<li>如果修改后 len 长度将大于等于 1M， 这时分配给 free 的长度为 1M， 例如修改过后为 30M， 那么给 free 是 1M.buf 实际长度变成了 30M + 1M + 1byte</li>
+<li>如果修改后 len 长度将大于等于 1M， 这时分配给 free 的长度为 1M， 例如修改过后为 30M， 那么给 free 是 1M，buf 实际长度变成了 30M + 1M + 1byte</li>
 </ul>
 <p><img src="/media/15681845196086/16ceceddee2a2f20.jpg" alt="16ceceddee2a2f20"></p>
 <p><strong>重点回顾：</strong></p>
@@ -668,56 +672,46 @@
 <li>压缩列表可以包含多个节点，每个节点可以保存一个字节数组或者整数值。</li>
 <li>添加新节点到压缩列表， 或者从压缩列表中删除节点， 可能会引发连锁更新操作， 但这种操作出现的几率并不高。</li>
 </ul>
-<h4 id="压缩列表-1"><a href="#压缩列表-1" class="headerlink" title="压缩列表"></a>压缩列表</h4><p>压缩列表（ziplist）是列表键和哈希键的底层实现之一。当一个列表键只包含少量列表项， 并且每个列表项要么就是小整数值， 要么就是长度比较短的字符串， 那么 Redis 就会使用压缩列表来做列表键的底层实现。另外， 当一个哈希键只包含少量键值对， 并且每个键值对的键和值要么就是小整数值， 要么就是长度比较短的字符串， 那么 Redis 就会使用压缩列表来做哈希键的底层实现。</p>
-<p>压缩列表是 Redis 为了节约内存而开发的， 由一系列特殊编码的连续内存块组成的顺序型（sequential）数据结构。一个压缩列表可以包含任意多个节点（entry）， 每个节点可以保存一个字节数组或者一个整数值。</p>
-<p><img src="/media/15681845196086/Redis压缩列表结构.png" alt="Redis压缩列表结构"></p>
-<p><strong>重点回顾：</strong></p>
-<ul>
-<li>压缩列表是一种为节约内存而开发的顺序型数据结构。</li>
-<li>压缩列表被用作列表键和哈希键的底层实现之一。</li>
-<li>压缩列表可以包含多个节点，每个节点可以保存一个字节数组或者整数值。</li>
-<li>添加新节点到压缩列表， 或者从压缩列表中删除节点， 可能会引发连锁更新操作， 但这种操作出现的几率并不高。</li>
-</ul>
-<h2 id="Redis-对象"><a href="#Redis-对象" class="headerlink" title="Redis  对象"></a>Redis  对象</h2><h3 id="redisObject"><a href="#redisObject" class="headerlink" title="redisObject"></a>redisObject</h3><p>Redis 并没有直接使用这些数据结构来实现键值对数据库， 而是基于这些数据结构创建了一个对象系统， 这个系统包含字符串对象、列表对象、哈希对象、集合对象和有序集合对象这五种类型的对象， 每种对象都用到了至少一种我们前面所介绍的数据结构。通过这五种不同类型的对象， Redis 可以在执行命令之前， 根据对象的类型来判断一个对象是否可以执行给定的命令。 使用对象的另一个好处是， 我们可以针对不同的使用场景， 为对象设置多种不同的数据结构实现， 从而优化对象在不同场景下的使用效率。</p>
+<h3 id="Redis-对象"><a href="#Redis-对象" class="headerlink" title="Redis  对象"></a>Redis  对象</h3><h4 id="redisObject"><a href="#redisObject" class="headerlink" title="redisObject"></a>redisObject</h4><p>Redis 并没有直接使用这些数据结构来实现键值对数据库， 而是基于这些数据结构创建了一个对象系统， 这个系统包含字符串对象、列表对象、哈希对象、集合对象和有序集合对象这五种类型的对象， 每种对象都用到了至少一种我们前面所介绍的数据结构。通过这五种不同类型的对象， Redis 可以在执行命令之前， 根据对象的类型来判断一个对象是否可以执行给定的命令。 使用对象的另一个好处是， 我们可以针对不同的使用场景， 为对象设置多种不同的数据结构实现， 从而优化对象在不同场景下的使用效率。</p>
 <p>Redis 使用对象来表示数据库中的键和值，每次当我们在 Redis 的数据库中新创建一个键值对时，我们至少会创建两个对象，一个对象用作键值对的键（键对象），另一个对象用作键值对的值（值对象）。</p>
 <p>举个例子，以 “ SET msg “hello world” ” 命令在数据库中创建了一个新的键值对，其中键值对的键是一个包含了字符串值 “msg” 的对象，而键值对的值则是一个包含了字符串值 “hello world” 对象。</p>
 <p>Redis 中每个对象都由一个 redisObject 结构表示，该结构中和保存数据有关的三个属性分别是 type 属性、 encoding 属性和 ptr 属性：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">redisObject</span> &#123;</span></span><br><span class="line">	<span class="comment">// 数据类型：就是我们熟悉的 string、hash、list 等五种数据类型</span></span><br><span class="line">    <span class="keyword">unsigned</span> type:<span class="number">4</span>;</span><br><span class="line">    <span class="comment">// 内部编码：其实就是数据结构</span></span><br><span class="line">    <span class="keyword">unsigned</span> encoding:<span class="number">4</span>;</span><br><span class="line">    <span class="comment">// 指向底层实现数据结构的指针：指向以 encoding 的方式实现这个对象的实际地址</span></span><br><span class="line">    <span class="keyword">void</span> *ptr;</span><br><span class="line">    <span class="comment">// 当前对象可以保留的时长</span></span><br><span class="line">    <span class="keyword">unsigned</span> lru:REDIS_LRU_BITS; <span class="comment">/* lru time (relative to server.lruclock) */</span></span><br><span class="line">    <span class="comment">// 对象引用计数：用于 GC</span></span><br><span class="line">    <span class="keyword">int</span> refcount;</span><br><span class="line">&#125; robj;</span><br></pre></td></tr></table></figure>
 <p><img src="/media/15681845196086/16ceceddf287d51c.jpg" alt="16ceceddf287d51c"></p>
-<h4 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h4><p>对象的 type 属性记录了对象的类型。对于 Redis 数据库保存的键值对来说，键总是一个字符串对象，而值则可以是字符串对象、列表对象、哈希对象、集合对象或者有序集合对象其中一种。</p>
+<h5 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h5><p>对象的 type 属性记录了对象的类型。对于 Redis 数据库保存的键值对来说，键总是一个字符串对象，而值则可以是字符串对象、列表对象、哈希对象、集合对象或者有序集合对象其中一种。</p>
 <p><img src="/media/15681845196086/20190924150404.png" alt="20190924150404"></p>
 <p>TYPE 命令返回的结果为数据库键对应的值对象的类型。</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 键为字符串对象，值为字符串对象</span></span><br><span class="line">redis&gt; <span class="builtin-name">SET</span> msg <span class="string">"hello world"</span></span><br><span class="line"><span class="string">"OK"</span></span><br><span class="line"></span><br><span class="line">redis&gt;<span class="built_in"> TYPE </span>msg</span><br><span class="line"><span class="string">"string"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 键为字符串对象，值为列表对象</span></span><br><span class="line">redis&gt; RPUSH numbers 1 3 5</span><br><span class="line"><span class="string">"3"</span></span><br><span class="line"></span><br><span class="line">redis&gt;<span class="built_in"> TYPE </span>numbers</span><br><span class="line"><span class="string">"list"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 键为字符串对象，值为哈希对象</span></span><br><span class="line">redis&gt; HMSET<span class="built_in"> profile </span>name Tom age 25 career Programmer</span><br><span class="line"><span class="string">"OK"</span></span><br><span class="line"></span><br><span class="line">redis&gt;<span class="built_in"> TYPE </span>profile</span><br><span class="line"><span class="string">"hash"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 键为字符串对象，值为集合对象</span></span><br><span class="line">redis&gt; SADD fruits apple banana cherry</span><br><span class="line"><span class="string">"3"</span></span><br><span class="line"></span><br><span class="line">redis&gt;<span class="built_in"> TYPE </span>fruits</span><br><span class="line"><span class="string">"set"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 键为字符串对象，值为有序集合对象</span></span><br><span class="line">redis&gt; ZADD price 8.5 apple 5.0 banana 6.0 cherry</span><br><span class="line"><span class="string">"3"</span></span><br><span class="line"></span><br><span class="line">redis&gt;<span class="built_in"> TYPE </span>price</span><br><span class="line"><span class="string">"zset"</span></span><br></pre></td></tr></table></figure>
 <p><img src="/media/15681845196086/20190924152407.png" alt="20190924152407"></p>
-<h4 id="编码和底层实现"><a href="#编码和底层实现" class="headerlink" title="编码和底层实现"></a>编码和底层实现</h4><p>对象的 ptr 指针指向对象的底层实现数据结构， 而这些数据结构由对象的 encoding 属性决定。</p>
+<h5 id="编码和底层实现"><a href="#编码和底层实现" class="headerlink" title="编码和底层实现"></a>编码和底层实现</h5><p>对象的 ptr 指针指向对象的底层实现数据结构， 而这些数据结构由对象的 encoding 属性决定。</p>
 <p><img src="/media/15681845196086/20190927161532.png" alt="20190927161532"></p>
 <p>每种类型的对象都至少使用了两种不同的编码。</p>
 <p><img src="/media/15681845196086/20190927161718.png" alt="20190927161718"></p>
 <p>通过 encoding 属性来设定对象所使用的编码， 而不是为特定类型的对象关联一种固定的编码， 极大地提升了 Redis 的灵活性和效率， 因为 Redis 可以根据不同的使用场景来为一个对象设置不同的编码， 从而优化对象在某一场景下的效率。</p>
 <p>举个例子， 在列表对象包含的元素比较少时， Redis 使用压缩列表作为列表对象的底层实现：因为压缩列表比双端链表更节约内存， 并且在元素数量较少时， 在内存中以连续块方式保存的压缩列表比起双端链表可以更快被载入到缓存中；随着列表对象包含的元素越来越多， 使用压缩列表来保存元素的优势逐渐消失时， 对象就会将底层实现从压缩列表转向功能更强、也更适合保存大量元素的双端链表上面；</p>
-<h3 id="string（字符串对象）"><a href="#string（字符串对象）" class="headerlink" title="string（字符串对象）"></a>string（字符串对象）</h3><p>字符串对象的编码可以是 int 、 raw 或者 embstr 。</p>
+<h4 id="string（字符串对象）"><a href="#string（字符串对象）" class="headerlink" title="string（字符串对象）"></a>string（字符串对象）</h4><p>字符串对象的编码可以是 int 、 raw 或者 embstr 。</p>
 <p>如果一个字符串对象保存的是整数值， 并且这个整数值可以用 long 类型来表示， 那么字符串对象会将整数值保存在字符串对象结构的 ptr属性里面（将 void 转换成 long ）， 并将字符串对象的编码设置为 int 。</p>
 <p>如果字符串对象保存的是一个字符串值， 并且这个字符串值的长度大于 39 字节（<strong>在 Redis 3.2 版本之后，变成了 44 字节为分界</strong>）， 那么字符串对象将使用一个简单动态字符串（SDS）来保存这个字符串值， 并将对象的编码设置为 raw 。</p>
 <p>如果字符串对象保存的是一个字符串值， 并且这个字符串值的长度小于等于 39 字节， 那么字符串对象将使用 embstr 编码的方式来保存这个字符串值。</p>
 <p><strong>常用命令：</strong>set、get、decr、incr、mget 等。</p>
 <p><strong>常见应用：</strong>缓存、限流、计数器、分布式锁、分布式 Session 等。</p>
-<h3 id="list（列表对象）"><a href="#list（列表对象）" class="headerlink" title="list（列表对象）"></a>list（列表对象）</h3><p>列表对象的编码可以是 ziplist 或者 linkedlist 。</p>
+<h4 id="list（列表对象）"><a href="#list（列表对象）" class="headerlink" title="list（列表对象）"></a>list（列表对象）</h4><p>列表对象的编码可以是 ziplist 或者 linkedlist 。</p>
 <p>ziplist 编码的列表对象使用压缩列表作为底层实现， 每个压缩列表节点（entry）保存了一个列表元素。当一个列表键只包含少量列表项， 并且每个列表项要么就是小整数值， 要么就是长度比较短的字符串， 那么 Redis 就会使用压缩列表来做列表键的底层实现。</p>
 <p>linkedlist 编码的列表对象使用双端链表作为底层实现， 每个双端链表节点（node）都保存了一个字符串对象， 而每个字符串对象都保存了一个列表元素。 当一个列表键包含了数量比较多的元素， 又或者列表中包含的元素都是比较长的字符串时， Redis 就会使用链表作为列表键的底层实现。</p>
 <p><strong>常用命令：</strong>lpush、rpush、lpop、rpop、lrange 等。</p>
 <p><strong>常见应用：</strong>微博关注人时间轴列表、简单队列、文章列表。</p>
 <p><img src="/media/15681845196086/20190927152522.png" alt="20190927152522"></p>
-<h3 id="hash（哈希对象）"><a href="#hash（哈希对象）" class="headerlink" title="hash（哈希对象）"></a>hash（哈希对象）</h3><p>哈希对象的编码可以是 ziplist 或者 hashtable 。</p>
+<h4 id="hash（哈希对象）"><a href="#hash（哈希对象）" class="headerlink" title="hash（哈希对象）"></a>hash（哈希对象）</h4><p>哈希对象的编码可以是 ziplist 或者 hashtable 。</p>
 <p>ziplist 编码的哈希对象使用压缩列表作为底层实现， 每当有新的键值对要加入到哈希对象时， 程序会先将保存了键的压缩列表节点推入到压缩列表表尾， 然后再将保存了值的压缩列表节点推入到压缩列表表尾。当一个哈希键只包含少量键值对， 并且每个键值对的键和值要么就是小整数值， 要么就是长度比较短的字符串， 那么 Redis 就会使用压缩列表来做哈希键的底层实现。</p>
 <p>hashtable 编码的哈希对象使用字典作为底层实现， 哈希对象中的每个键值对都使用一个字典键值对来保存。 当一个哈希键包含的键值对比较多， 又或者键值对中的元素都是比较长的字符串时， Redis 就会使用字典作为哈希键的底层实现。</p>
 <p><strong>常用命令：</strong>hget、hset、hgetall 等。</p>
 <p><strong>常见应用：</strong>存储用户信息、用户主页访问量、组合查询。</p>
-<h3 id="set（集合对象）"><a href="#set（集合对象）" class="headerlink" title="set（集合对象）"></a>set（集合对象）</h3><p>集合对象的编码可以是 intset 或者 hashtable 。</p>
+<h4 id="set（集合对象）"><a href="#set（集合对象）" class="headerlink" title="set（集合对象）"></a>set（集合对象）</h4><p>集合对象的编码可以是 intset 或者 hashtable 。</p>
 <p>intset 编码的集合对象使用整数集合作为底层实现， 集合对象包含的所有元素都被保存在整数集合里面。当一个集合只包含整数值元素， 并且这个集合的元素数量不多时， Redis 就会使用整数集合作为集合键的底层实现。</p>
 <p>hashtable 编码的集合对象使用字典作为底层实现， 字典的每个键都是一个字符串对象， 每个字符串对象包含了一个集合元素， 而字典的值则全部被设置为 NULL 。</p>
 <p><strong>常用命令：</strong> sadd、spop、smembers、sunion 等。</p>
 <p><strong>常见应用：</strong>赞、踩、标签、好友关系。</p>
-<h3 id="zset（有序集合对象）"><a href="#zset（有序集合对象）" class="headerlink" title="zset（有序集合对象）"></a>zset（有序集合对象）</h3><p>有序集合的编码可以是 ziplist 或者 skiplist 。</p>
+<h4 id="zset（有序集合对象）"><a href="#zset（有序集合对象）" class="headerlink" title="zset（有序集合对象）"></a>zset（有序集合对象）</h4><p>有序集合的编码可以是 ziplist 或者 skiplist 。</p>
 <p>ziplist 编码的有序集合对象使用压缩列表作为底层实现， 每个集合元素使用两个紧挨在一起的压缩列表节点来保存， 第一个节点保存元素的成员（member）， 而第二个元素则保存元素的分值（score）。压缩列表内的集合元素按分值从小到大进行排序， 分值较小的元素被放置在靠近表头的方向， 而分值较大的元素则被放置在靠近表尾的方向。</p>
 <p>skiplist 编码的有序集合对象使用 zset 结构作为底层实现， 一个 zset 结构同时包含一个字典和一个跳跃表。zset 结构中的 zsl 跳跃表按分值从小到大保存了所有集合元素， 每个跳跃表节点都保存了一个集合元素： 跳跃表节点的 object 属性保存了元素的成员， 而跳跃表节点的 score 属性则保存了元素的分值。 通过这个跳跃表， 程序可以对有序集合进行范围型操作， 比如 ZRANK 、ZRANGE 等命令就是基于跳跃表 API 来实现的。 如果一个有序集合包含的元素数量比较多， 又或者有序集合中元素的成员（member）是比较长的字符串时， Redis 就会使用跳跃表来作为有序集合键的底层实现。</p>
 <p><strong>常用命令：</strong>zadd、zrange、zrem、zcard 等。</p>
@@ -918,7 +912,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">45</span>
+                    <span class="site-state-item-count">47</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1174,7 +1168,29 @@
                     
                       
                     
-                    <span class="site-state-item-count">95</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">106</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1249,7 +1265,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-概述"><span class="nav-number">2.</span> <span class="nav-text">Redis 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-为什么这么快"><span class="nav-number">2.1.</span> <span class="nav-text">Redis 为什么这么快</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-为什么是单线程的？"><span class="nav-number">2.2.</span> <span class="nav-text">Redis 为什么是单线程的？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-数据结构与对象"><span class="nav-number">3.</span> <span class="nav-text">Redis  数据结构与对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-数据结构"><span class="nav-number">3.1.</span> <span class="nav-text">Redis  数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#简单动态字符串"><span class="nav-number">3.1.1.</span> <span class="nav-text">简单动态字符串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#链表"><span class="nav-number">3.1.2.</span> <span class="nav-text">链表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字典"><span class="nav-number">3.1.3.</span> <span class="nav-text">字典</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#跳跃表"><span class="nav-number">3.1.4.</span> <span class="nav-text">跳跃表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#整数集合"><span class="nav-number">3.1.5.</span> <span class="nav-text">整数集合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#压缩列表"><span class="nav-number">3.1.6.</span> <span class="nav-text">压缩列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#压缩列表-1"><span class="nav-number">3.1.7.</span> <span class="nav-text">压缩列表</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-对象"><span class="nav-number">4.</span> <span class="nav-text">Redis  对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#redisObject"><span class="nav-number">4.1.</span> <span class="nav-text">redisObject</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#类型"><span class="nav-number">4.1.1.</span> <span class="nav-text">类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编码和底层实现"><span class="nav-number">4.1.2.</span> <span class="nav-text">编码和底层实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#string（字符串对象）"><span class="nav-number">4.2.</span> <span class="nav-text">string（字符串对象）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#list（列表对象）"><span class="nav-number">4.3.</span> <span class="nav-text">list（列表对象）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hash（哈希对象）"><span class="nav-number">4.4.</span> <span class="nav-text">hash（哈希对象）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#set（集合对象）"><span class="nav-number">4.5.</span> <span class="nav-text">set（集合对象）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zset（有序集合对象）"><span class="nav-number">4.6.</span> <span class="nav-text">zset（有序集合对象）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">5.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注脚"><span class="nav-number">6.</span> <span class="nav-text">注脚</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-深度探险系列"><span class="nav-number">7.</span> <span class="nav-text">Redis 深度探险系列</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-概述"><span class="nav-number">2.</span> <span class="nav-text">Redis 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-为什么这么快"><span class="nav-number">2.1.</span> <span class="nav-text">Redis 为什么这么快</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-为什么是单线程的？"><span class="nav-number">2.2.</span> <span class="nav-text">Redis 为什么是单线程的？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-数据结构与对象"><span class="nav-number">3.</span> <span class="nav-text">Redis  数据结构与对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-数据结构"><span class="nav-number">3.1.</span> <span class="nav-text">Redis  数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#简单动态字符串"><span class="nav-number">3.1.1.</span> <span class="nav-text">简单动态字符串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#链表"><span class="nav-number">3.1.2.</span> <span class="nav-text">链表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字典"><span class="nav-number">3.1.3.</span> <span class="nav-text">字典</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#跳跃表"><span class="nav-number">3.1.4.</span> <span class="nav-text">跳跃表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#整数集合"><span class="nav-number">3.1.5.</span> <span class="nav-text">整数集合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#压缩列表"><span class="nav-number">3.1.6.</span> <span class="nav-text">压缩列表</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-对象"><span class="nav-number">3.2.</span> <span class="nav-text">Redis  对象</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#redisObject"><span class="nav-number">3.2.1.</span> <span class="nav-text">redisObject</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#类型"><span class="nav-number">3.2.1.1.</span> <span class="nav-text">类型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#编码和底层实现"><span class="nav-number">3.2.1.2.</span> <span class="nav-text">编码和底层实现</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#string（字符串对象）"><span class="nav-number">3.2.2.</span> <span class="nav-text">string（字符串对象）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#list（列表对象）"><span class="nav-number">3.2.3.</span> <span class="nav-text">list（列表对象）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hash（哈希对象）"><span class="nav-number">3.2.4.</span> <span class="nav-text">hash（哈希对象）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#set（集合对象）"><span class="nav-number">3.2.5.</span> <span class="nav-text">set（集合对象）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#zset（有序集合对象）"><span class="nav-number">3.2.6.</span> <span class="nav-text">zset（有序集合对象）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考博文"><span class="nav-number">4.</span> <span class="nav-text">参考博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注脚"><span class="nav-number">5.</span> <span class="nav-text">注脚</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-深度探险系列"><span class="nav-number">6.</span> <span class="nav-text">Redis 深度探险系列</span></a></li></ol></div>
             
 
           </div>
@@ -1284,7 +1300,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">626k</span>
+    <span title="博客全站字数">655k</span>
   
 
   

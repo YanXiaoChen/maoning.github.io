@@ -116,7 +116,7 @@
 <meta property="og:description" content="前言在本系列的前两篇博文中，笔者对 Git 以及 Git flow 进行了大致的介绍，相信各位读者已经对 Git 有了大致的了解。但是，在我们的日常工作中使用 Git 时常会遇到的各种突发状况，那么我们应该怎么合理的应对这些状况呢？俗话说，无规矩不成方圆，在团队协作中，如何规范 Git Commit 呢？本文将针对以上问题展开讨论，探讨一下在日常工作中，我们应该如何优雅的使用 Git？">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://blog.maoning.vip/images/2f9da4b7-649a-4042-bcc0-2640587a6393.jpg">
-<meta property="og:updated_time" content="2020-01-06T05:57:33.679Z">
+<meta property="og:updated_time" content="2020-10-12T07:51:11.550Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Git 在团队中的最佳实践（三）：如何优雅的使用 Git？">
 <meta name="twitter:description" content="前言在本系列的前两篇博文中，笔者对 Git 以及 Git flow 进行了大致的介绍，相信各位读者已经对 Git 有了大致的了解。但是，在我们的日常工作中使用 Git 时常会遇到的各种突发状况，那么我们应该怎么合理的应对这些状况呢？俗话说，无规矩不成方圆，在团队协作中，如何规范 Git Commit 呢？本文将针对以上问题展开讨论，探讨一下在日常工作中，我们应该如何优雅的使用 Git？">
@@ -519,7 +519,7 @@
                 
                   <span class="post-meta-item-text">本文字数统计：</span>
                 
-                <span title="本文字数统计">7k</span>
+                <span title="本文字数统计">7.1k</span>
               
 
               
@@ -692,11 +692,10 @@
 <p><img src="/media/15755331093489/20191209101712.png" alt="git reset 流程图"></p>
 <h3 id="git-revert"><a href="#git-revert" class="headerlink" title="git revert"></a>git revert</h3><p>git revert 撤销一个提交的同时会创建一个新的提交。这是一个安全的方法，因为它不会重写提交历史。</p>
 <p>【1】场景重现 one：改完代码匆忙提交，上线发现有问题，怎么办？赶紧回滚。改完代码测试也没有问题，但是上线发现你的修改影响了之前运行正常的代码报错，必须回滚。</p>
-<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 撤销指定 commit 到当前 HEAD 之间所有的变化</span></span><br><span class="line"><span class="variable">$ </span>git revert [commit]..HEAD</span><br></pre></td></tr></table></figure>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 撤销指定 commit 到当前 HEAD 之间所有的变化</span></span><br><span class="line"><span class="variable">$ </span>git revert [commit]..HEAD</span><br><span class="line"></span><br><span class="line"><span class="comment"># 撤销指定 commit 到当前 HEAD 之间所有的变化 [不自动生成多个新的 commit，而是用一个 commit 完成]</span></span><br><span class="line"><span class="variable">$ </span>git revert -n [commit]..HEAD</span><br></pre></td></tr></table></figure>
 <p>git revert 用于反转提交，用一个新提交来撤销某次提交，执行 git revert 命令时要求工作树必须是干净的。git revert 之后你再 git push 既可以把线上的代码更新。git revert 是放弃指定提交的修改，但是会生成一次新的提交，需要填写提交注释，以前的历史记录都在。</p>
 <p><img src="/media/15755331093489/20191206113641.png" alt="git revert 流程图"></p>
 <h2 id="强烈推荐"><a href="#强烈推荐" class="headerlink" title="强烈推荐"></a>强烈推荐</h2><p>如果你不能很好的应用 Git，那么这里为你提供一个非常棒的 Git 在线练习工具 <a href="https://learngitbranching.js.org/" target="_blank" rel="noopener">Learn Git Branching</a>。</p>
-<hr>
 <h2 id="参考博文"><a href="#参考博文" class="headerlink" title="参考博文"></a>参考博文</h2><p>[1]. <a href="https://ohshitgit.com" target="_blank" rel="noopener">Oh Shit, Git!?!</a></p>
 <hr>
 <h2 id="Git-在团队中的最佳实践系列"><a href="#Git-在团队中的最佳实践系列" class="headerlink" title="Git 在团队中的最佳实践系列"></a>Git 在团队中的最佳实践系列</h2><ul>
@@ -889,7 +888,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">45</span>
+                    <span class="site-state-item-count">47</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1145,7 +1144,29 @@
                     
                       
                     
-                    <span class="site-state-item-count">95</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">106</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1255,7 +1276,7 @@
     
       <span class="post-meta-item-text">博客全站字数：</span>
     
-    <span title="博客全站字数">626k</span>
+    <span title="博客全站字数">655k</span>
   
 
   
