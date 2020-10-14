@@ -168,9 +168,9 @@
       </categories>
       <tags>
         <tag>Java8</tag>
-        <tag>ConcurrentHashMap</tag>
         <tag>集合</tag>
         <tag>Java7</tag>
+        <tag>ConcurrentHashMap</tag>
       </tags>
   </entry>
   <entry>
@@ -223,8 +223,8 @@
         <category>MySQL</category>
       </categories>
       <tags>
-        <tag>索引</tag>
         <tag>EXPLAIN</tag>
+        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
@@ -337,9 +337,9 @@
       </categories>
       <tags>
         <tag>Java8</tag>
+        <tag>HashMap</tag>
         <tag>集合</tag>
         <tag>Java7</tag>
-        <tag>HashMap</tag>
       </tags>
   </entry>
   <entry>
@@ -350,8 +350,8 @@
         <category>MySQL</category>
       </categories>
       <tags>
-        <tag>MySQL</tag>
         <tag>索引</tag>
+        <tag>MySQL</tag>
         <tag>Btree</tag>
         <tag>Hash</tag>
       </tags>
@@ -580,8 +580,8 @@
         <category>编码</category>
       </categories>
       <tags>
-        <tag>编码</tag>
         <tag>字符编码</tag>
+        <tag>编码</tag>
       </tags>
   </entry>
   <entry>
