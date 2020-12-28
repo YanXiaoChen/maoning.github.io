@@ -108,7 +108,7 @@
 
 
   <meta name="description" content="背景分布式消息队列中间件是是大型分布式系统不可缺少的中间件，通过消息队列，应用程序可以在不知道彼此位置的情况下独立处理消息，或者在处理消息前不需要等待接收此消息。所以消息队列主要解决应用耦合、异步消息、流量削锋等问题，实现高性能、高可用、可伸缩和最终一致性架构。消息队列已经逐渐成为企业应用系统内部通信的核心手段，当前使用较多的消息队列有 RabbitMQ、RocketMQ、ActiveMQ、Kaf">
-<meta name="keywords" content="RabbitMQ,Kafka,JMS,AMQP">
+<meta name="keywords" content="Kafka,RabbitMQ,AMQP,JMS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="了不起的消息队列（一）：浅谈消息队列及常见的分布式消息队列中间件">
 <meta property="og:url" content="https://blog.maoning.vip/archives/1c55560e.html">
@@ -116,7 +116,7 @@
 <meta property="og:description" content="背景分布式消息队列中间件是是大型分布式系统不可缺少的中间件，通过消息队列，应用程序可以在不知道彼此位置的情况下独立处理消息，或者在处理消息前不需要等待接收此消息。所以消息队列主要解决应用耦合、异步消息、流量削锋等问题，实现高性能、高可用、可伸缩和最终一致性架构。消息队列已经逐渐成为企业应用系统内部通信的核心手段，当前使用较多的消息队列有 RabbitMQ、RocketMQ、ActiveMQ、Kaf">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://blog.maoning.vip/images/20190701134838.jpg">
-<meta property="og:updated_time" content="2020-07-03T08:56:51.959Z">
+<meta property="og:updated_time" content="2020-11-26T07:52:23.760Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="了不起的消息队列（一）：浅谈消息队列及常见的分布式消息队列中间件">
 <meta name="twitter:description" content="背景分布式消息队列中间件是是大型分布式系统不可缺少的中间件，通过消息队列，应用程序可以在不知道彼此位置的情况下独立处理消息，或者在处理消息前不需要等待接收此消息。所以消息队列主要解决应用耦合、异步消息、流量削锋等问题，实现高性能、高可用、可伸缩和最终一致性架构。消息队列已经逐渐成为企业应用系统内部通信的核心手段，当前使用较多的消息队列有 RabbitMQ、RocketMQ、ActiveMQ、Kaf">
@@ -617,7 +617,7 @@
 <ol>
 <li>发布者和订阅者有时间依赖：接受者和发布者只有建立订阅关系才能收到消息；</li>
 <li>持久订阅：订阅关系建立后，消息就不会消失，不管订阅者是否都在线；</li>
-<li>非持久订阅：订阅者为了接受消息，必须一直在线。 当只有一个订阅者时约等于点对点模。</li>
+<li>非持久订阅：订阅者为了接受消息，必须一直在线。 当只有一个订阅者时约等于点对点模型。</li>
 </ol>
 </blockquote>
 <h4 id="点对点（P2P）模型与发布-订阅（Pub-Sub）模型应用"><a href="#点对点（P2P）模型与发布-订阅（Pub-Sub）模型应用" class="headerlink" title="点对点（P2P）模型与发布 / 订阅（Pub/Sub）模型应用"></a>点对点（P2P）模型与发布 / 订阅（Pub/Sub）模型应用</h4><ul>
@@ -772,13 +772,13 @@
       
         <div class="post-tags">
           
-            <a href="/tags/RabbitMQ/" rel="tag"># RabbitMQ</a>
-          
             <a href="/tags/Kafka/" rel="tag"># Kafka</a>
           
-            <a href="/tags/JMS/" rel="tag"># JMS</a>
+            <a href="/tags/RabbitMQ/" rel="tag"># RabbitMQ</a>
           
             <a href="/tags/AMQP/" rel="tag"># AMQP</a>
+          
+            <a href="/tags/JMS/" rel="tag"># JMS</a>
           
         </div>
       
